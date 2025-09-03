@@ -1,0 +1,55 @@
+{
+  "name": "smarty-address",
+  "version": "1.0.1",
+  "description": "Quick and easy Smarty address autocomplete and validation.",
+  "keywords": [
+    "smarty",
+    "smartystreets",
+    "address",
+    "validation",
+    "verification",
+    "verify",
+    "validate",
+    "street-address",
+    "geocoding",
+    "addresses",
+    "zipcode",
+    "autocomplete",
+    "autosuggest",
+    "suggestions",
+    "international",
+    "http"
+  ],
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "unpkg": "dist/smarty-address.iife.js",
+  "jsdelivr": "dist/smarty-address.iife.js",
+  "browser": "dist/smarty-address.iife.js",
+  "author": "Smarty Integrations Team <support@smarty.com> (https://www.smarty.com)",
+  "license": "Apache-2.0",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "npm run build:esm && npm run build:cdn",
+    "build:esm": "tsc && cp -r assets dist/",
+    "build:cdn": "vite build",
+    "test": "jest"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    }
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
+    "prettier": "^3.6.2",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.2.2",
+    "vite": "^7.2.7"
+  }
+}

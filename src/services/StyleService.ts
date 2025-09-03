@@ -1,0 +1,134 @@
+import { BaseService } from "./BaseService";
+import { CSS_CLASSES, CSS_PREFIXES } from "../constants/cssClasses";
+
+export interface StylesObject {
+	[selector: string]: {
+		[cssVar: string]: string;
+	};
+}
+
+export class StyleService extends BaseService {
+	private static readonly LIGHT_MODE_BREAKPOINT = 50;
+	private static readonly LIGHTNESS_OFFSET = 10;
+	private static readonly ACCENT_BLUE = "#0066ff";
+	private static readonly ACCENT_LIGHT_BLUE = "#6699ff";
+	private static readonly BLUE_LOGO_LIGHTNESS_BREAKPOINT = 75;
+
+	static convertStylesObjectToCssBlock(stylesObject: StylesObject): string {
+		const selectorsBlock = Object.entries(stylesObject).map(([selector, selectorStyles]) => {
+			const stylesBlock = Object.entries(selectorStyles)
+				.map(([key, value]) => `${key}: ${value};`)
+				.join("\n\t");
+
+			return `\n${selector} {\n\t${stylesBlock}\n}`;
+		});
+
+		return selectorsBlock.join("");
+	}
+
+	formatStyleBlock(selector: string, styles: Record<string, string>): string {
+		const stylesString = Object.entries(styles)
+			.map(([property, value]) => `${property}: ${value};`)
+			.join("\n");
+		return `${selector} {\n${stylesString}\n}`;
+	}
+
+	getInstanceClassName(instanceId: number): string {
+		return `${CSS_PREFIXES.instance}${instanceId}`;
+	}
+
+	getNearestStyledElement(element: HTMLElement, colorProperty: string): HTMLElement {
+		const colorValue = this.getService("domService").getElementStyles(element, colorProperty);
+		const { alpha } = this.getService("colorService").getRgbaFromCssColor(colorValue);
+
+		return alpha < 0.1 && element.parentElement
+			? this.getNearestStyledElement(element.parentElement, colorProperty)
+			: element;
+	}
+
+	updateDynamicStyles(
+		stylesElement: HTMLStyleElement,
+		searchInputElement: HTMLInputElement,
+		instanceId: number,
+	): void {
+		const positionStyles = this.calculatePositionStyles(searchInputElement);
+		const colorStyles = this.calculateColorStyles(searchInputElement);
+		const instanceClass = this.getInstanceClassName(instanceId);
+
+		const colorsStyleBlock = this.formatStyleBlock(
+			`.${CSS_CLASSES.colorDynamic}.${instanceClass}`,
+			colorStyles,
+		);
+		const positionStyleBlock = this.formatStyleBlock(
+			`.${CSS_CLASSES.positionDynamic}.${instanceClass}`,
+			positionStyles,
+		);
+
+		stylesElement.innerHTML = `${colorsStyleBlock} ${positionStyleBlock}`;
+	}
+
+	private calculatePositionStyles(element: HTMLElement): Record<string, string> {
+		const { left, bottom, width } = element.getBoundingClientRect();
+		return {
+			"--smartyAddress__dropdownPositionTop": `${bottom + window.scrollY}px`,
+			"--smartyAddress__dropdownPositionLeft": `${left + window.scrollX}px`,
+			"--smartyAddress__dropdownWidth": `${width}px`,
+		};
+	}
+
+	private calculateColorStyles(element: HTMLElement): Record<string, string> {
+		const domService = this.getService("domService");
+		const colorService = this.getService("colorService");
+		const backgroundColorElement = this.getNearestStyledElement(element, "backgroundColor");
+		const colorElement = this.getNearestStyledElement(element, "color");
+
+		const inputBackgroundColor = domService.getElementStyles(
+			backgroundColorElement,
+			"backgroundColor",
+		);
+		const inputTextColor = domService.getElementStyles(colorElement, "color");
+
+		const { hue, saturation, lightness } =
+			colorService.getHslFromColorString(inputBackgroundColor);
+		const derivedColors = this.deriveSurfaceColors(hue, saturation, lightness);
+
+		return {
+			"--smartyAddress__textBasePrimaryColor": inputTextColor,
+			"--smartyAddress__surfaceBasePrimaryColor": inputBackgroundColor,
+			"--smartyAddress__surfaceBaseSecondaryColor": derivedColors.secondary,
+			"--smartyAddress__surfaceBaseTertiaryColor": derivedColors.tertiary,
+			"--smartyAddress__surfaceInverseExtremeColor": derivedColors.hoverMix,
+			"--smartyAddress__surfaceBasePrimaryInverseColor": inputTextColor,
+			"--smartyAddress__textAccentColor": derivedColors.accent,
+			"--smartyAddress__logoDarkDisplay": derivedColors.shouldUseBlueLogo ? "block" : "none",
+			"--smartyAddress__logoLightDisplay": derivedColors.shouldUseBlueLogo ? "none" : "block",
+			"--smartyAddress__largeShadow1": "0 12px 24px 0 rgba(4, 34, 75, 0.10)",
+			"--smartyAddress__largeShadow2": "0 20px 40px 0 rgba(21, 27, 35, 0.06)",
+		};
+	}
+
+	private deriveSurfaceColors(
+		hue: number,
+		saturation: number,
+		lightness: number,
+	): {
+		secondary: string;
+		tertiary: string;
+		hoverMix: string;
+		accent: string;
+		shouldUseBlueLogo: boolean;
+	} {
+		const isLightMode = lightness > StyleService.LIGHT_MODE_BREAKPOINT;
+		const lightnessOffset = isLightMode
+			? -StyleService.LIGHTNESS_OFFSET
+			: StyleService.LIGHTNESS_OFFSET;
+
+		return {
+			secondary: `hsl(${hue} ${saturation}% ${lightness + lightnessOffset}%)`,
+			tertiary: `hsl(${hue} ${saturation}% ${lightness + lightnessOffset * 2}%)`,
+			hoverMix: isLightMode ? "#000" : "#fff",
+			accent: isLightMode ? StyleService.ACCENT_BLUE : StyleService.ACCENT_LIGHT_BLUE,
+			shouldUseBlueLogo: lightness > StyleService.BLUE_LOGO_LIGHTNESS_BREAKPOINT,
+		};
+	}
+}

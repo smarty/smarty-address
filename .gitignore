@@ -1,0 +1,17 @@
+.idea/
+.claude/
+node_modules/
+dist/
+.playwright-mcp/
+*.tsbuildinfo
+.npm
+.eslintcache
+.stylelintcache
+
+# Output of 'npm pack'
+*.tgz
+
+# dotenv environment variable files
+.env
+.env.*
+!.env.example

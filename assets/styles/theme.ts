@@ -1,0 +1,132 @@
+export const themeStyles = {
+	".smartyAddress__autocompleteSuggestionsWrapperElement": {
+		top: "var(--smartyAddress__dropdownPositionTop)",
+		left: "var(--smartyAddress__dropdownPositionLeft)",
+		position: "var(--smartyAddress__wrapperPosition)",
+		"z-index": "var(--smartyAddress__dropdownZIndex)",
+		"font-weight": "var(--smartyAddress__dropdownFontWeight)",
+	},
+
+	".smartyAddress__hidden": {
+		display: "var(--smartyAddress__hiddenDisplay)",
+	},
+
+	".smartyAddress__srOnly": {
+		position: "absolute",
+		width: "1px",
+		height: "1px",
+		padding: "0",
+		margin: "-1px",
+		overflow: "hidden",
+		clip: "rect(0, 0, 0, 0)",
+		"white-space": "nowrap",
+		border: "0",
+	},
+
+	".smartyAddress__dropdownElement": {
+		position: "var(--smartyAddress__dropdownPosition)",
+		"box-sizing": "var(--smartyAddress__dropdownBoxSizing)",
+		width: "var(--smartyAddress__dropdownWidth)",
+		"box-shadow": "var(--smartyAddress__largeShadow1), var(--smartyAddress__largeShadow2)",
+		color: "var(--smartyAddress__textBasePrimaryColor)",
+		"background-color": "var(--smartyAddress__surfaceBasePrimaryColor)",
+		// TODO: This border color is too much contrast for light mode, and too little contrast for dark mode
+		border: "1px solid var(--smartyAddress__surfaceBaseSecondaryColor)",
+		"border-top": "none",
+	},
+
+	".smartyAddress__autocompleteSuggestionsElement": {
+		margin: "var(--smartyAddress__spacingNone)",
+		padding: "var(--smartyAddress__spacingNone)",
+		"overflow-y": "var(--smartyAddress__dropdownOverflowY)",
+		"max-height": "var(--smartyAddress__heightLarge1)",
+		"scrollbar-color":
+			"var(--smartyAddress__surfaceBaseTertiaryColor) var(--smartyAddress__surfaceBasePrimaryColor)",
+		"scrollbar-width": "var(--smartyAddress__scrollbarWidth)",
+	},
+
+	".smartyAddress__autocompleteSuggestion": {
+		cursor: "var(--smartyAddress__cursorStyle)",
+		padding: "var(--smartyAddress__spacingMedium3)",
+		color: "var(--smartyAddress__textBasePrimaryColor)",
+		"background-color": "var(--smartyAddress__surfaceBasePrimaryColor)",
+	},
+
+	".smartyAddress__secondaryAutocompleteSuggestion": {
+		cursor: "var(--smartyAddress__cursorStyle)",
+		padding: "var(--smartyAddress__spacingMedium3)",
+		"padding-left": "var(--smartyAddress__spacingLarge3)",
+		color: "var(--smartyAddress__textBasePrimaryColor)",
+		"background-color": "var(--smartyAddress__surfaceBasePrimaryColor)",
+	},
+
+	".smartyAddress__showAllSecondaries": {
+		cursor: "var(--smartyAddress__cursorStyle)",
+		padding: "var(--smartyAddress__spacingMedium3)",
+		"padding-left": "var(--smartyAddress__spacingLarge3)",
+		color: "var(--smartyAddress__textAccentColor)",
+		"background-color": "var(--smartyAddress__surfaceBasePrimaryColor)",
+	},
+
+	".smartyAddress__entriesChevron": {
+		height: "var(--smartyAddress__chevronHeight)",
+		transform: "var(--smartyAddress__chevronRotation)",
+		transition: "var(--smartyAddress__chevronTransition)",
+	},
+
+	".smartyAddress__entriesChevronUp": {
+		transform: "var(--smartyAddress__chevronRotationExpanded)",
+	},
+
+	".smartyAddress__addressWrapper": {
+		display: "var(--smartyAddress__suggestionDisplay)",
+		"justify-content": "var(--smartyAddress__suggestionJustifyContent)",
+	},
+
+	".smartyAddress__autocompleteSuggestion:hover, .smartyAddress__autocompleteSuggestion[aria-selected='true'], .smartyAddress__secondaryAutocompleteSuggestion:hover, .smartyAddress__secondaryAutocompleteSuggestion[aria-selected='true'], .smartyAddress__showAllSecondaries:hover, .smartyAddress__showAllSecondaries[aria-selected='true']":
+		{
+			"background-color": "var(--smartyAddress__surfaceBaseSecondaryColor)",
+		},
+
+	".smartyAddress__autocompleteAddress": {
+		"white-space": "var(--smartyAddress__suggestionWhitespace)",
+		"text-overflow": "var(--smartyAddress__suggestionOverflow)",
+		"overflow-x": "var(--smartyAddress__suggestionOverflowX)",
+	},
+
+	".smartyAddress__matchedText": {
+		color: "var(--smartyAddress__textBaseSecondaryColor)",
+	},
+
+	".smartyAddress__autocompleteSuggestionEntries": {
+		display: "var(--smartyAddress__entriesDisplay)",
+		"align-items": "var(--smartyAddress__entriesAlignItems)",
+		gap: "var(--smartyAddress__entriesGap)",
+		color: "var(--smartyAddress__textAccentColor)",
+		"white-space": "var(--smartyAddress__suggestionWhitespace)",
+	},
+
+	".smartyAddress__poweredBy": {
+		color: "var(--smartyAddress__textBaseSecondaryColor)",
+		margin: "var(--smartyAddress__spacingNone)",
+		padding: "var(--smartyAddress__spacingMedium3)",
+		display: "var(--smartyAddress__poweredByDisplay)",
+		"align-items": "var(--smartyAddress__poweredByAlignItems)",
+		"justify-content": "var(--smartyAddress__poweredByJustifyContent)",
+		"font-size": "var(--smartyAddress__fontSizeSmall1)",
+		gap: "var(--smartyAddress__spacingSmall3)",
+		"text-transform": "var(--smartyAddress__poweredByTextTransform)",
+	},
+
+	".smartyAddress__smartyLogoDark, .smartyAddress__smartyLogoLight": {
+		height: "var(--smartyAddress__poweredByLogoHeight)",
+	},
+
+	".smartyAddress__smartyLogoDark": {
+		display: "var(--smartyAddress__logoDarkDisplay)",
+	},
+
+	".smartyAddress__smartyLogoLight": {
+		display: "var(--smartyAddress__logoLightDisplay)",
+	},
+};
