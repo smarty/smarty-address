@@ -56,8 +56,57 @@ export class UiService {
 
 		this.eventDispatcher.dispatch("UiService.configuredDomElements");
 	}
+
+	openDropdown() {
+
+	}
+
+	updateDropdown() {
+
+	}
+
+	highlightAddress() {
+
+	}
+
+	closeDropdown() {
+
+	}
+
+	expandDropdown() {
+
+	}
+
+	populateForm() {
+
+	}
+
+	displayError() {
+
+	}
+
+	displaySuccess() {
+
+	}
+
+	updateTheme() {
+
+	}
+
 	handleSearchInputOnChange(event:Event) {
 		this.eventDispatcher.dispatch("UiServices.requestedNewAddressSuggestions", {searchString: event.target?.value});
+	}
+
+	handleHighlightedAddressOnChange(event) {
+
+	}
+
+	handleAddressOnSelect(event) {
+
+	}
+
+	handleDropdownOnBlur(event) {
+
 	}
 
 	createDropdownWrapperElement = (searchInputElement:HTMLInputElement) => {
