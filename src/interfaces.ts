@@ -22,3 +22,9 @@ export interface AddressSuggestion {
 	metadata?: Record<string, any>;
 }
 
+export interface StateObject {
+	[index: string]: any;
+}
+
+export interface EventHandler {(event:CustomEvent, state?:StateObject, setState?:{(name:string, newState:unknown):void}):void}
+
