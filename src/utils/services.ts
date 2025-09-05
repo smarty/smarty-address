@@ -1,8 +1,12 @@
-import {EventHandler, EventHandlersObject, AbstractStateObject} from "../interfaces.ts";
+import {EventHandler, EventHandlersObject, AbstractStateObject, Service} from "../interfaces.ts";
 import {EventDispatcher} from "./EventDispatcher.ts";
 
-export const defineService = (defaultMethods:EventHandlersObject = {}, initialState:AbstractStateObject, init:(state:AbstractStateObject, methods:{}) =>void) => {
-	return (eventDispatcher: EventDispatcher, overrideMethods = {}) => {
+export const defineService = (
+	defaultEventHandlers:EventHandlersObject = {},
+	initialState:AbstractStateObject,
+	init:(state:AbstractStateObject, eventHandlers:{}) => void
+):Service => {
+	return (eventDispatcher: EventDispatcher, overrideEventHandlers = {}) => {
 		const eventHandlerWrapper = (eventHandler: EventHandler) => {
 			return (event: CustomEvent) => {
 				eventHandler(event, state, setState);
@@ -17,8 +21,8 @@ export const defineService = (defaultMethods:EventHandlersObject = {}, initialSt
 		}
 
 		const mergedMethods:EventHandlersObject = {
-			...defaultMethods,
-			...overrideMethods,
+			...defaultEventHandlers,
+			...overrideEventHandlers,
 		};
 
 		const wrappedEventHandlers = Object.fromEntries(Object.entries(mergedMethods).map(([key, eventHandler]:[string, EventHandler]) => {

@@ -24,6 +24,10 @@ export interface AddressSuggestion {
 	metadata?: Record<string, any>;
 }
 
+export interface Service {
+	(eventDispatcher:EventDispatcher, overrideEventHandlers:EventHandlersObject): void
+}
+
 export interface AbstractStateObject {
 	[index: string]: any;
 }

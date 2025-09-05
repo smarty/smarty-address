@@ -1,12 +1,12 @@
 import {SmartyAddressConfig} from "./interfaces.ts";
 import {UiService} from "./services/UiService.ts";
-import {ApiServices} from "./ApiServices.ts";
+import {ApiService} from "./services/ApiService.ts";
 import {EventDispatcher} from "./utils/EventDispatcher.ts";
 
 export class SmartyAddress {
 	static defaultServices: {} = {
 		UiService,
-		ApiServices,
+		ApiService,
 	};
 
 	private eventDispatcher:EventDispatcher | undefined;
@@ -27,7 +27,8 @@ export class SmartyAddress {
 			this.services[name] = service;
 		});
 		Object.entries(this.services).forEach(([, service]) => {
-			new service(this.eventDispatcher);
+			const overrides = {};
+			service(this.eventDispatcher, overrides);
 		});
 	}
 }
