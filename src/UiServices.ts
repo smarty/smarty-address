@@ -1,39 +1,31 @@
 import {EventDispatcher} from "./utils/EventDispatcher.ts";
 import {EventHandler, StateObject} from "./interfaces.ts";
 
-export const UiService = (eventDispatcher: EventDispatcher, overrideMethods = {}) => {
-	const eventHandlerWrapper = (eventHandler: EventHandler) => {
-		return (event: CustomEvent) => {
-			eventHandler(event, state, setState);
+export const defineService = (defaultMethods = {}, initialState:StateObject, init:(state:StateObject, methods:{}) =>void) => {
+	return (eventDispatcher: EventDispatcher, overrideMethods = {}) => {
+		const eventHandlerWrapper = (eventHandler: EventHandler) => {
+			return (event: CustomEvent) => {
+				eventHandler(event, state, setState);
+			};
 		};
-	};
 
-	const defaultMethods = {
-		configureDomElements,
-		updateAutocompleteResults,
-	};
-	const state: StateObject = {
-		eventDispatcher,
-		eventHandlerWrapper,
-		searchInputElement: null,
-		streetLineInputElement: null,
-		secondaryInputElement: null,
-		cityInputElement: null,
-		stateInputElement: null,
-		zipcodeInputElement: null,
-	};
+		const state = {eventDispatcher, eventHandlerWrapper, ...initialState};
 
-	const setState = (name: string, newState: unknown) => {
-		state[name] = newState;
-	}
+		const setState = (name: string, newState: unknown) => {
+			state[name] = newState;
+		}
 
-	const mergedMethods = {
-		...defaultMethods,
-		...overrideMethods,
+		const mergedMethods = {
+			...defaultMethods,
+			...overrideMethods,
+		};
+
+		const wrappedEventHandlers = Object.fromEntries(Object.entries(mergedMethods).map(([key, eventHandler]) => {
+			return [key, eventHandlerWrapper(eventHandler)];
+		}));
+
+		init(state, wrappedEventHandlers);
 	};
-
-	state.eventDispatcher.addEventListener("SmartyAddress.receivedSmartyAddressConfig", eventHandlerWrapper(mergedMethods.configureDomElements));
-	state.eventDispatcher.addEventListener("ApiServices.receivedAddressSuggestions", eventHandlerWrapper(mergedMethods.updateAutocompleteResults));
 };
 
 const configureDomElements: EventHandler = (event, state, setState) => {
@@ -93,6 +85,21 @@ const updateAutocompleteResults:EventHandler = (event, state, setState) => {
 	});
 	state.dropdownWrapperElement.innerHTML = formattedSuggestions.join("");
 };
+
+export const UiService = defineService({
+	configureDomElements,
+	updateAutocompleteResults,
+}, {
+	searchInputElement: null,
+	streetLineInputElement: null,
+	secondaryInputElement: null,
+	cityInputElement: null,
+	stateInputElement: null,
+	zipcodeInputElement: null,
+}, (state, eventHandlers) => {
+	state.eventDispatcher.addEventListener("SmartyAddress.receivedSmartyAddressConfig", eventHandlers.configureDomElements);
+	state.eventDispatcher.addEventListener("ApiServices.receivedAddressSuggestions", eventHandlers.updateAutocompleteResults);
+});
 
 
 const openDropdown = () => {
