@@ -2,6 +2,7 @@ import {SmartyAddressConfig} from "./interfaces.ts";
 import {UiService} from "./services/UiService.ts";
 import {ApiService} from "./services/ApiService.ts";
 import {EventDispatcher} from "./utils/EventDispatcher.ts";
+import {defineService} from "./utils/services.ts";
 
 export class SmartyAddress {
 	static defaultServices: {} = {
@@ -24,6 +25,7 @@ export class SmartyAddress {
 
 	setupServices = (services = {}) => {
 		Object.entries(services)?.forEach(([name, service]) => {
+			defineService(this.eventDispatcher, service.initialState, service.init);
 			this.services[name] = service;
 		});
 		Object.entries(this.services).forEach(([, service]) => {
