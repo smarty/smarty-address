@@ -1,7 +1,12 @@
-import {EventHandler} from "./interfaces.ts";
-import {defineService} from "./utils/services.ts";
+import {EventHandler, UiStateObject} from "../interfaces.ts";
 
-const configureDomElements: EventHandler = (event, state, setState) => {
+const findDomElement = (selector: string | undefined) => {
+	const element: HTMLElement | null = selector ? document.querySelector(selector) : null;
+
+	return element;
+};
+
+export const configureDomElements: EventHandler = (event, state:UiStateObject, setState) => {
 	const {
 		searchInputSelector,
 		streetLineSelector,
@@ -30,7 +35,14 @@ const configureDomElements: EventHandler = (event, state, setState) => {
 	state.eventDispatcher.dispatch("UiService.configuredDomElements");
 }
 
-const handleSearchInputOnChange: EventHandler = (event, state) => {
+export const updateAutocompleteResults:EventHandler = (event, state:UiStateObject, setState) => {
+	const formattedSuggestions = event.detail.suggestions.map(({street_line, secondary, city, state, zipcode}) => {
+		return `<li>${street_line}, ${city}, ${state} ${zipcode}</li>`;
+	});
+	state.dropdownWrapperElement.innerHTML = formattedSuggestions.join("");
+};
+
+const handleSearchInputOnChange: EventHandler = (event, state:UiStateObject) => {
 	state.eventDispatcher.dispatch("UiServices.requestedNewAddressSuggestions", {searchString: event.target?.value});
 };
 
@@ -52,29 +64,6 @@ const createDropDownElement = () => {
 	return dropdownElement;
 };
 
-const updateAutocompleteResults:EventHandler = (event, state, setState) => {
-	const formattedSuggestions = event.detail.suggestions.map(({street_line, secondary, city, state, zipcode}) => {
-		return `<li>${street_line}, ${city}, ${state} ${zipcode}</li>`;
-	});
-	state.dropdownWrapperElement.innerHTML = formattedSuggestions.join("");
-};
-
-export const UiService = defineService({
-	configureDomElements,
-	updateAutocompleteResults,
-}, {
-	searchInputElement: null,
-	streetLineInputElement: null,
-	secondaryInputElement: null,
-	cityInputElement: null,
-	stateInputElement: null,
-	zipcodeInputElement: null,
-}, (state, eventHandlers) => {
-	state.eventDispatcher.addEventListener("SmartyAddress.receivedSmartyAddressConfig", eventHandlers.configureDomElements);
-	state.eventDispatcher.addEventListener("ApiServices.receivedAddressSuggestions", eventHandlers.updateAutocompleteResults);
-});
-
-
 const openDropdown = () => {
 
 };
@@ -91,6 +80,7 @@ const closeDropdown = () => {
 
 };
 
+// e.g. for secondaries
 const expandDropdown = () => {
 
 };
@@ -121,10 +111,4 @@ const handleAddressOnSelect = (event) => {
 
 const handleDropdownOnBlur = (event) => {
 
-};
-
-const findDomElement = (selector: string | undefined) => {
-	const element: HTMLElement | null = selector ? document.querySelector(selector) : null;
-
-	return element;
 };

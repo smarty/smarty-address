@@ -1,3 +1,5 @@
+import {EventDispatcher} from "./utils/EventDispatcher.ts";
+
 export interface SmartyAddressConfig {
 	embeddedKey:string,
 	theme?:string,
@@ -22,9 +24,24 @@ export interface AddressSuggestion {
 	metadata?: Record<string, any>;
 }
 
-export interface StateObject {
+export interface AbstractStateObject {
 	[index: string]: any;
 }
 
-export interface EventHandler {(event:CustomEvent, state?:StateObject, setState?:{(name:string, newState:unknown):void}):void}
+export interface BasicStateObject extends AbstractStateObject {
+	eventDispatcher: EventDispatcher,
+	eventHandlerWrapper: (eventHandler:EventHandler) =>EventHandler,
+}
 
+export interface UiStateObject extends BasicStateObject {
+	searchInputElement: HTMLInputElement,
+	streetLineInputElement: HTMLInputElement | null,
+	secondaryInputElement: HTMLInputElement | null,
+	cityInputElement: HTMLInputElement | null,
+	stateInputElement: HTMLInputElement | null,
+	zipcodeInputElement: HTMLInputElement | null,
+}
+
+export interface EventHandler {(event:CustomEvent, state?:AbstractStateObject, setState?:{(name:string, newState:unknown):void}):void}
+
+export interface EventHandlersObject {[index: string]:EventHandler}
