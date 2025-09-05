@@ -3,11 +3,15 @@ import {UiService} from "./services/UiService.ts";
 import {ApiService} from "./services/ApiService.ts";
 import {EventDispatcher} from "./utils/EventDispatcher.ts";
 import {defineService} from "./utils/services.ts";
+import {uiEventHandlers} from "./eventHandlers/uiEventHandlers.ts";
 
 export class SmartyAddress {
 	static defaultServices: {} = {
 		UiService,
 		ApiService,
+	};
+	static defaultEventHandlers = {
+		uiEventHandlers,
 	};
 
 	private eventDispatcher:EventDispatcher | undefined;

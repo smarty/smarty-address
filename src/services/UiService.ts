@@ -1,10 +1,6 @@
 import {EventHandlersObject, AbstractStateObject} from "../interfaces.ts";
 import {defineService} from "../utils/services.ts";
-import {
-	configureDomElements,
-	configureDomForAutocomplete,
-	updateAutocompleteResults,
-} from "../eventHandlers/uiEventHandlers.ts";
+import {uiEventHandlers} from "../eventHandlers/uiEventHandlers.ts";
 
 const uiServiceDefaultState = {
 	searchInputElement: null,
@@ -13,12 +9,6 @@ const uiServiceDefaultState = {
 	cityInputElement: null,
 	stateInputElement: null,
 	zipcodeInputElement: null,
-};
-
-const uiEventHandlers = {
-	configureDomElements,
-	configureDomForAutocomplete,
-	updateAutocompleteResults,
 };
 
 const uiServiceInit = (state:AbstractStateObject, eventHandlers:EventHandlersObject) => {

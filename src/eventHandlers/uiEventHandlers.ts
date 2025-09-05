@@ -108,3 +108,9 @@ const handleAddressOnSelect = (event) => {
 const handleDropdownOnBlur = (event) => {
 
 };
+
+export const uiEventHandlers = {
+	configureDomElements,
+	configureDomForAutocomplete,
+	updateAutocompleteResults,
+};
