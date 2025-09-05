@@ -1,10 +1,10 @@
-import {EventHandlersObject, AbstractStateObject} from "./interfaces.ts";
-import {defineService} from "./utils/services.ts";
+import {EventHandlersObject, AbstractStateObject} from "../interfaces.ts";
+import {defineService} from "../utils/services.ts";
 import {
 	configureDomElements,
 	configureDomForAutocomplete,
 	updateAutocompleteResults,
-} from "./eventHandlers/uiEventHandlers.ts";
+} from "../eventHandlers/uiEventHandlers.ts";
 
 const uiServiceDefaultState = {
 	searchInputElement: null,

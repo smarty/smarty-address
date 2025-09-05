@@ -1,5 +1,5 @@
 import {SmartyAddressConfig} from "./interfaces.ts";
-import {UiService} from "./UiServices.ts";
+import {UiService} from "./services/UiService.ts";
 import {ApiServices} from "./ApiServices.ts";
 import {EventDispatcher} from "./utils/EventDispatcher.ts";
 
