@@ -1,20 +1,31 @@
-import {EventHandlersObject, AbstractStateObject} from "../interfaces.ts";
-import {defineService} from "../utils/services.ts";
-import {uiEventHandlers} from "../eventHandlers/uiEventHandlers.ts";
+import {ServiceDefinition} from "../interfaces.ts";
+import {
+	configureDomElements,
+	configureDomForAutocomplete,
+	updateAutocompleteResults,
+} from "../eventHandlers/uiEventHandlers.ts";
 
-const uiServiceDefaultState = {
-	searchInputElement: null,
-	streetLineInputElement: null,
-	secondaryInputElement: null,
-	cityInputElement: null,
-	stateInputElement: null,
-	zipcodeInputElement: null,
+export const uiServiceDefinition: ServiceDefinition = {
+	initialState: {
+		searchInputElement: null,
+		streetLineInputElement: null,
+		secondaryInputElement: null,
+		cityInputElement: null,
+		stateInputElement: null,
+		zipcodeInputElement: null,
+	},
+	eventHandlersMap: [
+		{
+			handler: configureDomElements,
+			events: ["SmartyAddress.receivedSmartyAddressConfig"],
+		},
+		{
+			handler: configureDomForAutocomplete,
+			events: ["UiService.foundDomElements"],
+		},
+		{
+			handler: updateAutocompleteResults,
+			events: ["ApiServices.receivedAddressSuggestions"],
+		},
+	],
 };
-
-const uiServiceInit = (state:AbstractStateObject, eventHandlers:EventHandlersObject) => {
-	state.eventDispatcher.addEventListener("SmartyAddress.receivedSmartyAddressConfig", eventHandlers.configureDomElements);
-	state.eventDispatcher.addEventListener("UiService.foundDomElements", eventHandlers.configureDomForAutocomplete);
-	state.eventDispatcher.addEventListener("ApiServices.receivedAddressSuggestions", eventHandlers.updateAutocompleteResults);
-};
-
-export const UiService = defineService(uiEventHandlers, uiServiceDefaultState, uiServiceInit);

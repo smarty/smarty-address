@@ -1,21 +1,17 @@
-import {SmartyAddressConfig} from "./interfaces.ts";
-import {UiService} from "./services/UiService.ts";
-import {ApiService} from "./services/ApiService.ts";
+import {ServiceDefinitionMap, SmartyAddressConfig} from "./interfaces.ts";
+import {uiServiceDefinition} from "./services/UiService.ts";
+import {apiServiceDefinition} from "./services/ApiService.ts";
 import {EventDispatcher} from "./utils/EventDispatcher.ts";
-import {defineService} from "./utils/services.ts";
-import {uiEventHandlers} from "./eventHandlers/uiEventHandlers.ts";
+import {defineService} from "./utils/serviceFactory.ts";
 
 export class SmartyAddress {
-	static defaultServices: {} = {
-		UiService,
-		ApiService,
-	};
-	static defaultEventHandlers = {
-		uiEventHandlers,
+	static defaultServiceDefinitions:ServiceDefinitionMap = {
+		uiServiceDefinition,
+		apiServiceDefinition,
 	};
 
 	private eventDispatcher:EventDispatcher | undefined;
-	private services:{} = SmartyAddress.defaultServices;
+	private serviceDefinitions:{} = SmartyAddress.defaultServiceDefinitions;
 
 	constructor(config: SmartyAddressConfig) {
 		this.setup(config);
@@ -27,14 +23,12 @@ export class SmartyAddress {
 		this.eventDispatcher.dispatch("SmartyAddress.receivedSmartyAddressConfig", config);
 	}
 
-	setupServices = (services = {}) => {
-		Object.entries(services)?.forEach(([name, service]) => {
-			defineService(this.eventDispatcher, service.initialState, service.init);
-			this.services[name] = service;
+	setupServices = (services:ServiceDefinitionMap = {}) => {
+		Object.entries(services)?.forEach(([name, serviceDefinition]) => {
+			this.serviceDefinitions[name] = serviceDefinition;
 		});
-		Object.entries(this.services).forEach(([, service]) => {
-			const overrides = {};
-			service(this.eventDispatcher, overrides);
+		Object.entries(this.serviceDefinitions).forEach(([, serviceDefinition]) => {
+			defineService(serviceDefinition, this.eventDispatcher);
 		});
 	}
 }

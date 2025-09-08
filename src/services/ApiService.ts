@@ -1,16 +1,14 @@
-import {AbstractStateObject, AddressSuggestion, EventHandler, EventHandlersObject} from "../interfaces.ts";
-import {defineService} from "../utils/services.ts";
+import {
+	AddressSuggestion,
+	EventHandler,
+	ServiceDefinition
+} from "../interfaces.ts";
 
-const apiServiceDefaultState = {
-	autocompleteBaseUrl: "https://us-autocomplete-pro.api.smarty.com/lookup",
-	apiKey: "",
-};
-
-const setApiKey:EventHandler = (event:CustomEvent, state, setState) => {
+const setApiKey: EventHandler = (event: CustomEvent, state, setState) => {
 	setState("apiKey", event.detail.embeddedKey);
 };
 
-const fetchAddressSuggestions:EventHandler = async (event: CustomEvent, state) => {
+const fetchAddressSuggestions: EventHandler = async (event: CustomEvent, state) => {
 	const regionRestrictions = event.detail.regionRestrictions;
 	const search = event.detail.searchString;
 
@@ -18,7 +16,7 @@ const fetchAddressSuggestions:EventHandler = async (event: CustomEvent, state) =
 		const params = new URLSearchParams({
 			'auth-id': state.apiKey,
 			search,
-			...(regionRestrictions?.length ? { 'include_only_regions': regionRestrictions.join(',') } : {})
+			...(regionRestrictions?.length ? {'include_only_regions': regionRestrictions.join(',')} : {})
 		});
 
 		const response = await fetch(`${state.autocompleteBaseUrl}?${params}`);
@@ -27,7 +25,7 @@ const fetchAddressSuggestions:EventHandler = async (event: CustomEvent, state) =
 			throw new Error(`API request failed: ${response.statusText}`);
 		}
 
-		const data = await response.json() as {data:AddressSuggestion[]};
+		const data = await response.json() as { data: AddressSuggestion[] };
 
 		state.eventDispatcher.dispatch("ApiServices.receivedAddressSuggestions", {suggestions: data.suggestions});
 	} catch (error) {
@@ -43,14 +41,19 @@ const verifyAddress = async (address: AddressSuggestion): Promise<AddressSuggest
 	return address;
 };
 
-const apiEventHandlers = {
-	setApiKey,
-	fetchAddressSuggestions,
+export const apiServiceDefinition: ServiceDefinition = {
+	initialState: {
+		autocompleteBaseUrl: "https://us-autocomplete-pro.api.smarty.com/lookup",
+		apiKey: "",
+	},
+	eventHandlersMap: [
+		{
+			handler: setApiKey,
+			events: ["SmartyAddress.receivedSmartyAddressConfig"],
+		},
+		{
+			handler: fetchAddressSuggestions,
+			events: ["UiServices.requestedNewAddressSuggestions"],
+		}
+	]
 };
-
-const apiServiceInit = (state:AbstractStateObject, eventHandlers:EventHandlersObject) => {
-	state.eventDispatcher.addEventListener("SmartyAddress.receivedSmartyAddressConfig", eventHandlers.setApiKey);
-	state.eventDispatcher.addEventListener("UiServices.requestedNewAddressSuggestions", eventHandlers.fetchAddressSuggestions);
-};
-
-export const ApiService = defineService(apiEventHandlers, apiServiceDefaultState, apiServiceInit);

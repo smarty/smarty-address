@@ -10,7 +10,7 @@ export interface SmartyAddressConfig {
 	stateSelector?: string,
 	zipcodeSelector?: string,
 	handleAutocompleteElementOnChange?: string,
-	services?: {},
+	services?:ServiceDefinitionMap,
 }
 
 export interface AddressSuggestion {
@@ -49,3 +49,15 @@ export interface UiStateObject extends BasicStateObject {
 export interface EventHandler {(event:CustomEvent, state?:AbstractStateObject, setState?:{(name:string, newState:unknown):void}):void}
 
 export interface EventHandlersObject {[index: string]:EventHandler}
+
+export interface eventsToHandlersMap {
+	handler: EventHandler,
+	events: string[],
+}
+
+export interface ServiceDefinition {
+	initialState: AbstractStateObject,
+	eventHandlersMap: eventsToHandlersMap[],
+}
+
+export interface ServiceDefinitionMap {[index: string]:ServiceDefinition}
