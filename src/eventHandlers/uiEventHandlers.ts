@@ -1,7 +1,7 @@
-import {EventHandler, UiStateObject} from "../interfaces.ts";
+import {EventHandler} from "../interfaces.ts";
 import {findDomElement} from "../utils/uiUtils.ts";
 
-export const configureDomElements:EventHandler = (event, state:UiStateObject, setState) => {
+export const configureDomElements:EventHandler = ({event, state, setState}) => {
 	const {
 		searchInputSelector,
 		streetLineSelector,
@@ -21,7 +21,7 @@ export const configureDomElements:EventHandler = (event, state:UiStateObject, se
 	state.eventDispatcher.dispatch("UiService.foundDomElements");
 }
 
-export const configureDomForAutocomplete:EventHandler = (event, state:UiStateObject, setState) => {
+export const configureDomForAutocomplete:EventHandler = ({event, state}) => {
 	const searchInputElement = state.searchInputElement;
 	searchInputElement.addEventListener("input", state.eventHandlerWrapper(handleSearchInputOnChange));
 
@@ -31,14 +31,14 @@ export const configureDomForAutocomplete:EventHandler = (event, state:UiStateObj
 	}
 };
 
-export const updateAutocompleteResults:EventHandler = (event, state:UiStateObject, setState) => {
+export const updateAutocompleteResults:EventHandler = ({event, state}) => {
 	const formattedSuggestions = event.detail.suggestions.map(({street_line, secondary, city, state, zipcode}) => {
 		return `<li>${street_line}, ${city}, ${state} ${zipcode}</li>`;
 	});
 	state.dropdownWrapperElement.innerHTML = formattedSuggestions.join("");
 };
 
-const handleSearchInputOnChange: EventHandler = (event, state:UiStateObject) => {
+const handleSearchInputOnChange: EventHandler = ({event, state}) => {
 	state.eventDispatcher.dispatch("UiServices.requestedNewAddressSuggestions", {searchString: event.target?.value});
 };
 

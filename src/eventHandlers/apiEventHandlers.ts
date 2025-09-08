@@ -1,10 +1,10 @@
 import {AddressSuggestion, EventHandler} from "../interfaces.ts";
 
-export const setApiKey: EventHandler = (event: CustomEvent, state, setState) => {
+export const setApiKey: EventHandler = ({event, setState}) => {
 	setState("apiKey", event.detail.embeddedKey);
 };
 
-export const fetchAddressSuggestions: EventHandler = async (event: CustomEvent, state) => {
+export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 	const regionRestrictions = event.detail.regionRestrictions;
 	const search = event.detail.searchString;
 

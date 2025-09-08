@@ -24,10 +24,6 @@ export interface AddressSuggestion {
 	metadata?: Record<string, any>;
 }
 
-export interface Service {
-	(eventDispatcher:EventDispatcher, overrideEventHandlers:EventHandlersObject): void
-}
-
 export interface AbstractStateObject {
 	[index: string]: any;
 }
@@ -46,9 +42,13 @@ export interface UiStateObject extends BasicStateObject {
 	zipcodeInputElement: HTMLInputElement | null,
 }
 
-export interface EventHandler {(event:CustomEvent, state?:AbstractStateObject, setState?:{(name:string, newState:unknown):void}):void}
+export interface EventHandler {(props:EventHandlerObject):void}
 
-export interface EventHandlersObject {[index: string]:EventHandler}
+export interface EventHandlerObject {
+	event:CustomEvent,
+	state:AbstractStateObject,
+	setState: {(name:string, newState:unknown):void},
+}
 
 export interface eventsToHandlersMap {
 	handler: EventHandler,
