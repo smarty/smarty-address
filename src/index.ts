@@ -10,15 +10,14 @@ export class SmartyAddress {
 		apiServiceDefinition,
 	};
 
-	private eventDispatcher:EventDispatcher | undefined;
-	private serviceDefinitions:{} = SmartyAddress.defaultServiceDefinitions;
+	private eventDispatcher = new EventDispatcher();
+	private serviceDefinitions = SmartyAddress.defaultServiceDefinitions;
 
 	constructor(config: SmartyAddressConfig) {
 		this.setup(config);
 	}
 
 	setup = (config: SmartyAddressConfig) => {
-		this.eventDispatcher = new EventDispatcher();
 		this.setupServices(config.services);
 		this.eventDispatcher.dispatch("SmartyAddress.receivedSmartyAddressConfig", config);
 	}

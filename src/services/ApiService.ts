@@ -14,6 +14,6 @@ export const apiServiceDefinition: ServiceDefinition = {
 		{
 			handler: fetchAddressSuggestions,
 			events: ["UiServices.requestedNewAddressSuggestions"],
-		}
+		},
 	]
 };

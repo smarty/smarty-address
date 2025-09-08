@@ -46,7 +46,7 @@ export interface EventHandler {(props:EventHandlerObject):void}
 
 export interface EventHandlerObject {
 	event:CustomEvent,
-	state:AbstractStateObject,
+	state:BasicStateObject,
 	setState: {(name:string, newState:unknown):void},
 }
 

@@ -1,13 +1,13 @@
-import {EventHandler, Service, ServiceDefinition} from "../interfaces.ts";
+import {EventHandler, ServiceDefinition} from "../interfaces.ts";
 import {EventDispatcher} from "./EventDispatcher.ts";
 
 export const defineService = (
 	{eventHandlersMap, initialState}:ServiceDefinition,
 	eventDispatcher:EventDispatcher,
-):Service => {
+):void => {
 	const eventHandlerWrapper = (eventHandler: EventHandler) => {
 		return (event: CustomEvent) => {
-			eventHandler(event, state, setState);
+			eventHandler({event, state, setState});
 		};
 	};
 
