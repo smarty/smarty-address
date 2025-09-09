@@ -1,5 +1,5 @@
 import {BrowserEventHandler, EventHandler} from "../interfaces.ts";
-import {findDomElement} from "../utils/uiUtils.ts";
+import {createDomElement, findDomElement} from "../utils/uiUtils.ts";
 
 const STYLESHEET_HREF = "/styles/theme.css";
 
@@ -23,71 +23,56 @@ export const findInputElements:EventHandler = ({event, state, setState}) => {
 	state.eventDispatcher.dispatch("UiService_foundInputElements");
 };
 
-export const watchSearchInputForChanges:EventHandler = ({event, state, setState}) => {
+export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 	const searchInputElement = state.searchInputElement;
 	searchInputElement.addEventListener("input", (inputEvent:Event) => {
 		handleSearchInputOnChange({event: inputEvent, state, setState});
 	});
 };
 
-export const formatAddressSuggestions:EventHandler = ({event, state, setState}) => {
-	const formattedSuggestions = event.detail.suggestions.map(({street_line, secondary, city, state, zipcode}) => {
-		return `<li>${street_line}, ${city}, ${state} ${zipcode}</li>`;
+export const formatAddressSuggestions:EventHandler = ({event, state}) => {
+	const formattedSuggestions = event.detail.suggestions.map(({street_line, city, state, zipcode}) => {
+		return `<li class="smartyAddress__suggestion">${street_line}, ${city}, ${state} ${zipcode}</li>`;
 	});
 	state.eventDispatcher.dispatch("UiService_formattedAddressSuggestions", {formattedSuggestions});
 };
 
-export const updateDropdownSuggestions:EventHandler = ({event, state, setState}) => {
-	state.dropdownElement.innerHTML = event.detail.formattedSuggestions.join("");
+export const updateDropdownSuggestions:EventHandler = ({event, state}) => {
+	state.suggestionsElement.innerHTML = event.detail.formattedSuggestions.join("");
+	openDropdown(state.dropdownElement);
 };
 
-const handleSearchInputOnChange: BrowserEventHandler = ({event, state, setState}) => {
+const handleSearchInputOnChange: BrowserEventHandler = ({event, state}) => {
 	const searchInputValue = event.target?.value;
 	const eventName = searchInputValue.length ? "UiService_requestedNewAddressSuggestions" : "UiService_searchInputCleared";
 	state.eventDispatcher.dispatch(eventName, {searchString: searchInputValue});
 
 };
 
-export const createDropdownWrapperElement:EventHandler = ({event, state, setState}) => {
-	const dropdownWrapperElement = document.createElement("div");
-	const dropdownElement = createDropDownElement();
-	const poweredBySmartyElement = createPoweredBySmartyElement();
+export const createDropdownWrapperElement:EventHandler = ({state, setState}) => {
+	const suggestionsElement = createDomElement("ul", ["smartyAddress__suggestionsElement"]);
+	const poweredBySmartyElement = createDomElement("div", ["smartyAddress__poweredBy"]);
+	const dropdownElement = createDomElement("div", ["smartyAddress__dropdownElement", "smartyAddress__hidden"], [suggestionsElement, poweredBySmartyElement]);
+	const dropdownWrapperElement = createDomElement("div", ["smartyAddress__suggestionsWrapperElement"], [dropdownElement]);
 	const searchInputElement = state.searchInputElement;
 
-	dropdownWrapperElement.classList.add("smartyAddress__suggestionsWrapperElement");
-	dropdownWrapperElement.appendChild(dropdownElement);
-	dropdownWrapperElement.appendChild(poweredBySmartyElement);
+	dropdownElement.setAttribute('role', 'listbox');
+	poweredBySmartyElement.innerHTML = "Address suggestions powered by: Smarty";
 	searchInputElement?.parentNode?.insertBefore(dropdownWrapperElement, searchInputElement.nextSibling);
 
 	setState("dropdownWrapperElement", dropdownWrapperElement);
 	setState("dropdownElement", dropdownElement);
+	setState("suggestionsElement", suggestionsElement);
 	setState("poweredBySmartyElement", poweredBySmartyElement);
+
 	state.eventDispatcher.dispatch("UiService_createdEmptyDropdownElement", {dropdownElement});
 };
 
-const createDropDownElement = () => {
-	const dropdownElement = document.createElement("ul");
-
-	dropdownElement.classList.add("smartyAddress__suggestionsElement");
-	dropdownElement.classList.add("smartyAddress__hidden");
-	dropdownElement.setAttribute('role', 'listbox');
-
-	return dropdownElement;
-};
-
-const createPoweredBySmartyElement = () => {
-	const poweredBySmartyElement = document.createElement("div");
-	poweredBySmartyElement.classList.add("smartyAddress__poweredBy");
-	poweredBySmartyElement.innerHTML = "Address suggestions powered by: Smarty";
-
-	return poweredBySmartyElement;
-}
-
-export const notifyDomInitIsComplete:EventHandler = ({event, state, setState}) => {
+export const notifyDomInitIsComplete:EventHandler = ({state}) => {
 	state.eventDispatcher.dispatch("UiService_domReadyForAutocomplete");
 };
 
-export const loadStylesheet:EventHandler = ({event, state, setState}) => {
+export const loadStylesheet:EventHandler = ({state}) => {
 	const matchingStylesheets = Array.from(document.getElementsByTagName("link")).filter(link => link.rel === "stylesheet" && link.href === STYLESHEET_HREF);
 
 	if (!matchingStylesheets.length) {
@@ -103,8 +88,8 @@ export const loadStylesheet:EventHandler = ({event, state, setState}) => {
 	}
 };
 
-const openDropdown = () => {
-
+const openDropdown = (dropdownElement) => {
+	dropdownElement.classList.replace("smartyAddress__hidden", "smartyAddress__open");
 };
 
 const updateDropdown = () => {
@@ -115,8 +100,8 @@ const highlightAddress = () => {
 
 };
 
-const closeDropdown = () => {
-
+const closeDropdown = (dropdownElement) => {
+	dropdownElement.classList.replace("smartyAddress__open", "smartyAddress__hidden");
 };
 
 // e.g. for secondaries
@@ -137,16 +122,19 @@ const displaySuccess = () => {
 };
 
 export const setThemeFromConfig:EventHandler = ({event, state, setState}) => {
+	const previousTheme = state.theme;
 	const theme = event.detail?.theme;
 	setState("theme", theme);
-	state.eventDispatcher.dispatch("UiService_receivedNewTheme");
+	state.eventDispatcher.dispatch("UiService_receivedNewTheme", {previousTheme});
 };
 
-export const updateTheme:EventHandler = ({event, state, setState}) => {
+export const updateTheme:EventHandler = ({event, state}) => {
+	const previousTheme = event.detail?.previousTheme ?? [];
 	const dropdownWrapperElement = state.dropdownWrapperElement;
 
 	if (dropdownWrapperElement) {
-		dropdownWrapperElement.className = `smartyAddress__suggestionsWrapperElement ${state.theme?.join(" ")}`;
+		dropdownWrapperElement.classList.remove(...previousTheme);
+		dropdownWrapperElement.classList.add("smartyAddress__suggestionsWrapperElement", ...state.theme);
 	}
 };
 

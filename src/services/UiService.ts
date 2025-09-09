@@ -7,10 +7,15 @@ import {
 	createDropdownWrapperElement,
 	notifyDomInitIsComplete,
 	loadStylesheet,
+	setThemeFromConfig,
+	updateTheme,
 } from "../eventHandlers/uiEventHandlers.ts";
+import {themes} from "../themes.ts";
 
 export const uiServiceDefinition: ServiceDefinition = {
 	initialState: {
+		theme: themes.default,
+
 		searchInputElement: null,
 		streetLineInputElement: null,
 		secondaryInputElement: null,
@@ -18,13 +23,16 @@ export const uiServiceDefinition: ServiceDefinition = {
 		stateInputElement: null,
 		zipcodeInputElement: null,
 
-		dropdownElement: null,
 		dropdownWrapperElement: null,
+		dropdownElement: null,
+		suggestionsElement: null,
+		poweredBySmartyElement: null,
 	},
 	eventHandlersMap: {
 		SmartyAddress_receivedSmartyAddressConfig: [
 			findInputElements,
 			loadStylesheet,
+			setThemeFromConfig,
 		],
 		UiService_foundInputElements: [
 			createDropdownWrapperElement,
@@ -32,6 +40,10 @@ export const uiServiceDefinition: ServiceDefinition = {
 		],
 		UiService_createdEmptyDropdownElement: [
 			notifyDomInitIsComplete,
+			updateTheme,
+		],
+		UiService_receivedNewTheme: [
+			updateTheme
 		],
 		ApiService_receivedAddressSuggestions: [
 			formatAddressSuggestions,

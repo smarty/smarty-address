@@ -1,12 +1,25 @@
 @import "colors.css";
+@import "base.css";
 
-.smartyAddress__suggestionsElement {
+.smartyAddress__suggestionsWrapperElement {
+    position: var(--smartyAddress__wrapper-position);
+}
+
+.smartyAddress__hidden {
+    display: var(--smartyAddress__hidden-display);
+}
+
+.smartyAddress__dropdownElement {
     border-color: var(--smartyAddress__stroke-base-primary-color);
     background-color: var(--smartyAddress__surface-base-primary-color);
+    position: var(--smartyAddress__dropdown);
+    border-style: var(--smartyAddress__dropdown-border-style);
+    width: var(--smartyAddress__dropdown-width);
 }
 
 .smartyAddress__suggestion {
     color: var(--smartyAddress__text-base-primary-color);
+    cursor: var(--smartyAddress__cursor-style);
 }
 
 .smartyAddress__suggestion:hover {
