@@ -2,7 +2,7 @@ import {EventHandler, ServiceDefinition} from "../interfaces.ts";
 import {EventDispatcher} from "./EventDispatcher.ts";
 
 export const defineService = (
-	{eventHandlersMap, initialState}:ServiceDefinition,
+	{eventHandlersMap, initialState = {}}:ServiceDefinition,
 	eventDispatcher:EventDispatcher,
 ):void => {
 	const eventHandlerWrapper = (eventHandler: EventHandler) => {
@@ -11,7 +11,7 @@ export const defineService = (
 		};
 	};
 
-	const state = {eventDispatcher, eventHandlerWrapper, ...initialState};
+	const state = {eventDispatcher, ...initialState};
 
 	const setState = (name: string, newState: unknown) => {
 		// TODO: Make state updates more robust
@@ -19,9 +19,9 @@ export const defineService = (
 		state[name] = newState;
 	};
 
-	eventHandlersMap.forEach(({handler, events}) => {
-		events.forEach((eventName) => {
-			state.eventDispatcher.addEventListener(eventName, eventHandlerWrapper(handler));
+	Object.entries(eventHandlersMap).forEach(([eventName, eventHandlers]) => {
+		eventHandlers.forEach((eventHandler) => {
+			state.eventDispatcher.addEventListener(eventName, eventHandlerWrapper(eventHandler));
 		});
 	});
 };

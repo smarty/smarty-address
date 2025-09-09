@@ -6,14 +6,8 @@ export const apiServiceDefinition: ServiceDefinition = {
 		autocompleteBaseUrl: "https://us-autocomplete-pro.api.smarty.com/lookup",
 		apiKey: "",
 	},
-	eventHandlersMap: [
-		{
-			handler: setApiKey,
-			events: ["SmartyAddress.receivedSmartyAddressConfig"],
-		},
-		{
-			handler: fetchAddressSuggestions,
-			events: ["UiServices.requestedNewAddressSuggestions"],
-		},
-	]
+	eventHandlersMap: {
+		SmartyAddress_receivedSmartyAddressConfig: [setApiKey],
+		UiService_requestedNewAddressSuggestions: [fetchAddressSuggestions],
+	},
 };

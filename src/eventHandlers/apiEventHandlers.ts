@@ -22,11 +22,11 @@ export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 		}
 
 		const data = await response.json() as { data: AddressSuggestion[] };
-		state.eventDispatcher.dispatch("ApiServices.receivedAddressSuggestions", {suggestions: data.suggestions});
+		state.eventDispatcher.dispatch("ApiService_receivedAddressSuggestions", {suggestions: data.suggestions});
 	} catch (error) {
 		throw new Error(`Failed to fetch suggestions: ${error instanceof Error ? error.message : 'Unknown error'}`);
 	}
-}
+};
 
 const FetchSecondarySuggestions = async () => {
 

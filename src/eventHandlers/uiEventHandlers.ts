@@ -1,7 +1,7 @@
-import {EventHandler} from "../interfaces.ts";
+import {BrowserEventHandler, EventHandler} from "../interfaces.ts";
 import {findDomElement} from "../utils/uiUtils.ts";
 
-export const configureDomElements:EventHandler = ({event, state, setState}) => {
+export const findInputElements:EventHandler = ({event, state, setState}) => {
 	const {
 		searchInputSelector,
 		streetLineSelector,
@@ -18,36 +18,49 @@ export const configureDomElements:EventHandler = ({event, state, setState}) => {
 	setState("stateInputElement", stateSelector ? findDomElement(stateSelector) : null);
 	setState("zipcodeInputElement", zipcodeSelector ? findDomElement(zipcodeSelector) : null);
 
-	state.eventDispatcher.dispatch("UiService.foundDomElements");
-}
-
-export const configureDomForAutocomplete:EventHandler = ({event, state}) => {
-	const searchInputElement = state.searchInputElement;
-	searchInputElement.addEventListener("input", state.eventHandlerWrapper(handleSearchInputOnChange));
-
-	if (!state.dropdownWrapperElement) {
-		state.dropdownWrapperElement = createDropdownWrapperElement(state.searchInputElement as HTMLInputElement);
-		searchInputElement?.parentNode?.insertBefore(state.dropdownWrapperElement, searchInputElement.nextSibling);
-	}
+	state.eventDispatcher.dispatch("UiService_foundInputElements");
 };
 
-export const updateAutocompleteResults:EventHandler = ({event, state}) => {
+export const watchSearchInputForChanges:EventHandler = ({event, state, setState}) => {
+	const searchInputElement = state.searchInputElement;
+	searchInputElement.addEventListener("input", (inputEvent:Event) => {
+		handleSearchInputOnChange({event: inputEvent, state, setState});
+	});
+};
+
+export const formatAddressSuggestions:EventHandler = ({event, state, setState}) => {
 	const formattedSuggestions = event.detail.suggestions.map(({street_line, secondary, city, state, zipcode}) => {
 		return `<li>${street_line}, ${city}, ${state} ${zipcode}</li>`;
 	});
-	state.dropdownWrapperElement.innerHTML = formattedSuggestions.join("");
+	state.eventDispatcher.dispatch("UiService_formattedAddressSuggestions", {formattedSuggestions});
 };
 
-const handleSearchInputOnChange: EventHandler = ({event, state}) => {
-	state.eventDispatcher.dispatch("UiServices.requestedNewAddressSuggestions", {searchString: event.target?.value});
+export const updateDropdownSuggestions:EventHandler = ({event, state, setState}) => {
+	state.dropdownElement.innerHTML = event.detail.formattedSuggestions.join("");
 };
 
-const createDropdownWrapperElement = () => {
-	const dropdownWrapper = document.createElement("div");
-	dropdownWrapper.classList.add("smartyAddress__suggestionsWrapperElement");
-	dropdownWrapper.appendChild(createDropDownElement());
+const handleSearchInputOnChange: BrowserEventHandler = ({event, state, setState}) => {
+	const searchInputValue = event.target?.value;
+	const eventName = searchInputValue.length ? "UiService_requestedNewAddressSuggestions" : "UiService_searchInputCleared";
+	state.eventDispatcher.dispatch(eventName, {searchString: searchInputValue});
 
 	return dropdownWrapper;
+};
+
+export const createDropdownWrapperElement:EventHandler = ({event, state, setState}) => {
+	const dropdownWrapperElement = document.createElement("div");
+	const dropdownElement = createDropDownElement();
+	const poweredBySmartyElement = createPoweredBySmartyElement();
+	const searchInputElement = state.searchInputElement;
+
+	dropdownWrapperElement.classList.add("smartyAddress__suggestionsWrapperElement");
+	dropdownWrapperElement.appendChild(dropdownElement);
+	dropdownWrapperElement.appendChild(poweredBySmartyElement);
+	searchInputElement?.parentNode?.insertBefore(dropdownWrapperElement, searchInputElement.nextSibling);
+
+	setState("dropdownWrapperElement", dropdownWrapperElement);
+	setState("dropdownElement", dropdownElement);
+	state.eventDispatcher.dispatch("UiService_createdEmptyDropdownElement", {dropdownElement});
 };
 
 const createDropDownElement = () => {
@@ -60,6 +73,17 @@ const createDropDownElement = () => {
 	return dropdownElement;
 };
 
+const createPoweredBySmartyElement = () => {
+	const poweredBySmartyElement = document.createElement("div");
+	poweredBySmartyElement.classList.add("smartyAddress__poweredBy");
+	poweredBySmartyElement.innerHTML = "Address suggestions powered by: Smarty";
+
+	return poweredBySmartyElement;
+}
+
+export const notifyDomInitIsComplete:EventHandler = ({event, state, setState}) => {
+	state.eventDispatcher.dispatch("UiService_domReadyForAutocomplete");
+};
 const openDropdown = () => {
 
 };

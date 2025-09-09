@@ -30,7 +30,6 @@ export interface AbstractStateObject {
 
 export interface BasicStateObject extends AbstractStateObject {
 	eventDispatcher: EventDispatcher,
-	eventHandlerWrapper: (eventHandler:EventHandler) =>EventHandler,
 }
 
 export interface UiStateObject extends BasicStateObject {
@@ -42,22 +41,24 @@ export interface UiStateObject extends BasicStateObject {
 	zipcodeInputElement: HTMLInputElement | null,
 }
 
-export interface EventHandler {(props:EventHandlerObject):void}
+export interface EventHandler {(props:EventHandlerProps):void}
 
-export interface EventHandlerObject {
+export interface EventHandlerProps {
 	event:CustomEvent,
 	state:BasicStateObject,
 	setState: {(name:string, newState:unknown):void},
 }
 
-export interface eventsToHandlersMap {
-	handler: EventHandler,
-	events: string[],
+export interface BrowserEventHandler {(props:BrowserEventHandlerProps):void}
+export interface BrowserEventHandlerProps {
+	event:Event,
+	state:BasicStateObject,
+	setState: {(name:string, newState:unknown):void},
 }
 
 export interface ServiceDefinition {
 	initialState: AbstractStateObject,
-	eventHandlersMap: eventsToHandlersMap[],
+	eventHandlersMap: {[eventName: string]: EventHandler[]}
 }
 
-export interface ServiceDefinitionMap {[index: string]:ServiceDefinition}
+export interface ServiceDefinitionMap {[eventName: string]:ServiceDefinition}

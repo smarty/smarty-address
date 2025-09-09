@@ -19,7 +19,7 @@ export class SmartyAddress {
 
 	setup = (config: SmartyAddressConfig) => {
 		this.setupServices(config.services);
-		this.eventDispatcher.dispatch("SmartyAddress.receivedSmartyAddressConfig", config);
+		this.eventDispatcher.dispatch("SmartyAddress_receivedSmartyAddressConfig", config);
 	}
 
 	setupServices = (services:ServiceDefinitionMap = {}) => {

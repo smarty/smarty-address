@@ -1,8 +1,11 @@
 import {ServiceDefinition} from "../interfaces.ts";
 import {
-	configureDomElements,
-	configureDomForAutocomplete,
-	updateAutocompleteResults,
+	findInputElements,
+	watchSearchInputForChanges,
+	updateDropdownSuggestions,
+	formatAddressSuggestions,
+	createDropdownWrapperElement,
+	notifyDomInitIsComplete,
 } from "../eventHandlers/uiEventHandlers.ts";
 
 export const uiServiceDefinition: ServiceDefinition = {
@@ -13,19 +16,26 @@ export const uiServiceDefinition: ServiceDefinition = {
 		cityInputElement: null,
 		stateInputElement: null,
 		zipcodeInputElement: null,
+
+		dropdownElement: null,
+		dropdownWrapperElement: null,
 	},
-	eventHandlersMap: [
-		{
-			handler: configureDomElements,
-			events: ["SmartyAddress.receivedSmartyAddressConfig"],
-		},
-		{
-			handler: configureDomForAutocomplete,
-			events: ["UiService.foundDomElements"],
-		},
-		{
-			handler: updateAutocompleteResults,
-			events: ["ApiServices.receivedAddressSuggestions"],
-		},
-	],
+	eventHandlersMap: {
+		SmartyAddress_receivedSmartyAddressConfig: [
+			findInputElements,
+		],
+		UiService_foundInputElements: [
+			createDropdownWrapperElement,
+			watchSearchInputForChanges,
+		],
+		UiService_createdEmptyDropdownElement: [
+			notifyDomInitIsComplete,
+		],
+		ApiService_receivedAddressSuggestions: [
+			formatAddressSuggestions,
+		],
+		UiService_formattedAddressSuggestions: [
+			updateDropdownSuggestions,
+		],
+	},
 };
