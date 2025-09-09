@@ -1,6 +1,8 @@
 import {BrowserEventHandler, EventHandler} from "../interfaces.ts";
 import {findDomElement} from "../utils/uiUtils.ts";
 
+const STYLESHEET_HREF = "/styles/theme.css";
+
 export const findInputElements:EventHandler = ({event, state, setState}) => {
 	const {
 		searchInputSelector,
@@ -44,7 +46,6 @@ const handleSearchInputOnChange: BrowserEventHandler = ({event, state, setState}
 	const eventName = searchInputValue.length ? "UiService_requestedNewAddressSuggestions" : "UiService_searchInputCleared";
 	state.eventDispatcher.dispatch(eventName, {searchString: searchInputValue});
 
-	return dropdownWrapper;
 };
 
 export const createDropdownWrapperElement:EventHandler = ({event, state, setState}) => {
@@ -54,6 +55,7 @@ export const createDropdownWrapperElement:EventHandler = ({event, state, setStat
 	const searchInputElement = state.searchInputElement;
 
 	dropdownWrapperElement.classList.add("smartyAddress__suggestionsWrapperElement");
+	dropdownWrapperElement.classList.add("color_light");
 	dropdownWrapperElement.appendChild(dropdownElement);
 	dropdownWrapperElement.appendChild(poweredBySmartyElement);
 	searchInputElement?.parentNode?.insertBefore(dropdownWrapperElement, searchInputElement.nextSibling);
@@ -84,6 +86,23 @@ const createPoweredBySmartyElement = () => {
 export const notifyDomInitIsComplete:EventHandler = ({event, state, setState}) => {
 	state.eventDispatcher.dispatch("UiService_domReadyForAutocomplete");
 };
+
+export const loadStylesheet:EventHandler = ({event, state, setState}) => {
+	const matchingStylesheets = Array.from(document.getElementsByTagName("link")).filter(link => link.rel === "stylesheet" && link.href === STYLESHEET_HREF);
+
+	if (!matchingStylesheets.length) {
+		const head  = document.getElementsByTagName('head')[0];
+		const linkElement  = document.createElement('link');
+		linkElement.rel  = 'stylesheet';
+		linkElement.type = 'text/css';
+		linkElement.href = STYLESHEET_HREF;
+		linkElement.onload = () => {
+			state.eventDispatcher.dispatch("UiService_stylesheetLoaded");
+		};
+		head.appendChild(linkElement);
+	}
+};
+
 const openDropdown = () => {
 
 };

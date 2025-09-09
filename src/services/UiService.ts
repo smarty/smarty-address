@@ -6,6 +6,7 @@ import {
 	formatAddressSuggestions,
 	createDropdownWrapperElement,
 	notifyDomInitIsComplete,
+	loadStylesheet,
 } from "../eventHandlers/uiEventHandlers.ts";
 
 export const uiServiceDefinition: ServiceDefinition = {
@@ -23,6 +24,7 @@ export const uiServiceDefinition: ServiceDefinition = {
 	eventHandlersMap: {
 		SmartyAddress_receivedSmartyAddressConfig: [
 			findInputElements,
+			loadStylesheet,
 		],
 		UiService_foundInputElements: [
 			createDropdownWrapperElement,
