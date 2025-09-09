@@ -3,12 +3,15 @@ import {uiServiceDefinition} from "./services/UiService.ts";
 import {apiServiceDefinition} from "./services/ApiService.ts";
 import {EventDispatcher} from "./utils/EventDispatcher.ts";
 import {defineService} from "./utils/serviceFactory.ts";
+import {themes} from "./themes.ts";
 
 export class SmartyAddress {
 	static defaultServiceDefinitions:ServiceDefinitionMap = {
 		uiServiceDefinition,
 		apiServiceDefinition,
 	};
+
+	static themes = themes;
 
 	private eventDispatcher = new EventDispatcher();
 	private serviceDefinitions = SmartyAddress.defaultServiceDefinitions;

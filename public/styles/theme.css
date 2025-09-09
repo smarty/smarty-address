@@ -1,25 +1,18 @@
-.smartyAddress__suggestionsWrapperElement.color_dark {
-    /*TODO: update theme with the correct colors */
-    --smartyAddress__text-base-primary-color: #eee;
-    --smartyAddress__text-accent-color: #0066ff;
-
-    --smartyAddress__surface-base-primary-color: #111;
-    --smartyAddress__surface-base-secondary-color: #333;
-
-    --smartyAddress__stroke-base-primary-color: #666;
-}
-
-.smartyAddress__suggestionsWrapperElement.color_light {
-    /*TODO: update theme with the correct colors */
-    --smartyAddress__text-base-primary-color: #333;
-    --smartyAddress__text-accent-color: #0066ff;
-
-    --smartyAddress__surface-base-primary-color: #fcfcfc;
-    --smartyAddress__surface-base-secondary-color: #f3f3f3;
-
-    --smartyAddress__stroke-base-primary-color: #ccc;
-}
+@import "colors.css";
 
 .smartyAddress__suggestionsElement {
+    border-color: var(--smartyAddress__stroke-base-primary-color);
+    background-color: var(--smartyAddress__surface-base-primary-color);
+}
+
+.smartyAddress__suggestion {
     color: var(--smartyAddress__text-base-primary-color);
+}
+
+.smartyAddress__suggestion:hover {
+    background-color: var(--smartyAddress__surface-base-secondary-color);
+}
+
+.smartyAddress__poweredBy {
+    color: var(--smartyAddress__text-accent-color);
 }

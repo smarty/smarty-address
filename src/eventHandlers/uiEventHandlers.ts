@@ -55,13 +55,13 @@ export const createDropdownWrapperElement:EventHandler = ({event, state, setStat
 	const searchInputElement = state.searchInputElement;
 
 	dropdownWrapperElement.classList.add("smartyAddress__suggestionsWrapperElement");
-	dropdownWrapperElement.classList.add("color_light");
 	dropdownWrapperElement.appendChild(dropdownElement);
 	dropdownWrapperElement.appendChild(poweredBySmartyElement);
 	searchInputElement?.parentNode?.insertBefore(dropdownWrapperElement, searchInputElement.nextSibling);
 
 	setState("dropdownWrapperElement", dropdownWrapperElement);
 	setState("dropdownElement", dropdownElement);
+	setState("poweredBySmartyElement", poweredBySmartyElement);
 	state.eventDispatcher.dispatch("UiService_createdEmptyDropdownElement", {dropdownElement});
 };
 
@@ -136,8 +136,18 @@ const displaySuccess = () => {
 
 };
 
-const updateTheme = () => {
+export const setThemeFromConfig:EventHandler = ({event, state, setState}) => {
+	const theme = event.detail?.theme;
+	setState("theme", theme);
+	state.eventDispatcher.dispatch("UiService_receivedNewTheme");
+};
 
+export const updateTheme:EventHandler = ({event, state, setState}) => {
+	const dropdownWrapperElement = state.dropdownWrapperElement;
+
+	if (dropdownWrapperElement) {
+		dropdownWrapperElement.className = `smartyAddress__suggestionsWrapperElement ${state.theme?.join(" ")}`;
+	}
 };
 
 const handleHighlightedAddressOnChange = (event) => {
