@@ -1,0 +1,10 @@
+.smartyAddress__base_default {
+    --smartyAddress__wrapper-position: relative;
+    --smartyAddress__hidden-display: none;
+    --smartyAddress__dropdown-position: absolute;
+    --smartyAddress__dropdown-border-style: solid;
+    --smartyAddress__dropdown-width: 100%;
+    --smartyAddress__cursor-style: pointer;
+    --smartyAddress__box-sizing: border-box;
+}
+
