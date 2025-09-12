@@ -72,32 +72,14 @@ export const notifyDomInitIsComplete:EventHandler = ({state}) => {
 	state.eventDispatcher.dispatch("UiService_domReadyForAutocomplete");
 };
 
-export const loadStylesheet:EventHandler = ({state}) => {
-	const matchingStylesheets = Array.from(document.getElementsByTagName("link")).filter(link => link.rel === "stylesheet" && link.href === STYLESHEET_HREF);
-
-	if (!matchingStylesheets.length) {
-		const head  = document.getElementsByTagName('head')[0];
-		const linkElement  = document.createElement('link');
-		linkElement.rel  = 'stylesheet';
-		linkElement.type = 'text/css';
-		linkElement.href = STYLESHEET_HREF;
-		linkElement.onload = () => {
-			state.eventDispatcher.dispatch("UiService_stylesheetLoaded");
-		};
-		head.appendChild(linkElement);
-	}
-};
-
-const openDropdown = (dropdownElement) => {
-	dropdownElement.classList.replace("smartyAddress__hidden", "smartyAddress__open");
-};
-
 const updateDropdown = () => {
 
 };
 
 const highlightAddress = () => {
 
+const openDropdown = (dropdownElement) => {
+	dropdownElement.classList.replace("smartyAddress__hidden", "smartyAddress__open");
 };
 
 const closeDropdown = (dropdownElement) => {
@@ -135,6 +117,22 @@ export const updateTheme:EventHandler = ({event, state}) => {
 	if (dropdownWrapperElement) {
 		dropdownWrapperElement.classList.remove(...previousTheme);
 		dropdownWrapperElement.classList.add("smartyAddress__suggestionsWrapperElement", ...state.theme);
+	}
+};
+
+export const loadStylesheet:EventHandler = ({state}) => {
+	const matchingStylesheets = Array.from(document.getElementsByTagName("link")).filter(link => link.rel === "stylesheet" && link.href === STYLESHEET_HREF);
+
+	if (!matchingStylesheets.length) {
+		const head  = document.getElementsByTagName('head')[0];
+		const linkElement  = document.createElement('link');
+		linkElement.rel  = 'stylesheet';
+		linkElement.type = 'text/css';
+		linkElement.href = STYLESHEET_HREF;
+		linkElement.onload = () => {
+			state.eventDispatcher.dispatch("UiService_stylesheetLoaded");
+		};
+		head.appendChild(linkElement);
 	}
 };
 
