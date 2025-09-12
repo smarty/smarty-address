@@ -76,7 +76,13 @@ const updateDropdown = () => {
 
 };
 
-const highlightAddress = () => {
+const highlightNewAddress = (items:UiSuggestionItem[], currentIndex, setState, indexChange) => {
+	const newIndex = (currentIndex + indexChange + items.length) % items.length;
+	setState("highlightedSuggestionIndex", newIndex);
+	items.forEach((item, i) => {
+		item.suggestionElement.setAttribute("aria-selected", i === newIndex ? "true" : "false");
+	});
+};
 
 const openDropdown = (dropdownElement) => {
 	dropdownElement.classList.replace("smartyAddress__hidden", "smartyAddress__open");
