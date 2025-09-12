@@ -62,3 +62,8 @@ export interface ServiceDefinition {
 }
 
 export interface ServiceDefinitionMap {[eventName: string]:ServiceDefinition}
+
+export interface UiSuggestionItem {
+	address: AddressSuggestion,
+	suggestionElement: HTMLElement,
+}

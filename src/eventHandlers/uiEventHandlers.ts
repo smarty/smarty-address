@@ -1,4 +1,4 @@
-import {BrowserEventHandler, EventHandler} from "../interfaces.ts";
+import {BrowserEventHandler, EventHandler, UiSuggestionItem} from "../interfaces.ts";
 import {createDomElement, findDomElement} from "../utils/uiUtils.ts";
 
 const STYLESHEET_HREF = "/styles/theme.css";
@@ -50,14 +50,16 @@ const handleSearchInputOnChange: BrowserEventHandler = ({event, state}) => {
 };
 
 export const createDropdownWrapperElement:EventHandler = ({state, setState}) => {
+	const smartyLogoElement = createDomElement("img", ["smartyAddress__smartyLogo"]);
+	const poweredByText = document.createTextNode("Predicted address suggestions powered by");
 	const suggestionsElement = createDomElement("ul", ["smartyAddress__suggestionsElement"]);
-	const poweredBySmartyElement = createDomElement("div", ["smartyAddress__poweredBy"]);
+	const poweredBySmartyElement = createDomElement("div", ["smartyAddress__poweredBy"], [poweredByText, smartyLogoElement]);
 	const dropdownElement = createDomElement("div", ["smartyAddress__dropdownElement", "smartyAddress__hidden"], [suggestionsElement, poweredBySmartyElement]);
 	const dropdownWrapperElement = createDomElement("div", ["smartyAddress__suggestionsWrapperElement"], [dropdownElement]);
 	const searchInputElement = state.searchInputElement;
 
-	dropdownElement.setAttribute('role', 'listbox');
-	poweredBySmartyElement.innerHTML = "Address suggestions powered by: Smarty";
+	dropdownElement.setAttribute("role", "listbox");
+	smartyLogoElement.setAttribute("src", "/img/smarty-logo-blue.svg");
 	searchInputElement?.parentNode?.insertBefore(dropdownWrapperElement, searchInputElement.nextSibling);
 
 	setState("dropdownWrapperElement", dropdownWrapperElement);
