@@ -1,8 +1,10 @@
-@import "colors.css";
 @import "base.css";
+@import "colors.css";
+@import "spacing.css";
 
 .smartyAddress__suggestionsWrapperElement {
     position: var(--smartyAddress__wrapper-position);
+    z-index: 1000;
 }
 
 .smartyAddress__hidden {
@@ -11,21 +13,36 @@
 
 .smartyAddress__dropdownElement {
     border-color: var(--smartyAddress__stroke-base-primary-color);
-    background-color: var(--smartyAddress__surface-base-primary-color);
-    position: var(--smartyAddress__dropdown);
+    position: var(--smartyAddress__dropdown-position);
     border-style: var(--smartyAddress__dropdown-border-style);
+    box-sizing: var(--smartyAddress__box-sizing);
     width: var(--smartyAddress__dropdown-width);
 }
 
-.smartyAddress__suggestion {
-    color: var(--smartyAddress__text-base-primary-color);
-    cursor: var(--smartyAddress__cursor-style);
+.smartyAddress__suggestionsElement {
+    margin: 0;
+    padding: 0;
+    overflow-y: auto;
+    max-height: 400px;
 }
 
-.smartyAddress__suggestion:hover {
-    background-color: var(--smartyAddress__surface-base-secondary-color);
+.smartyAddress__suggestion {
+    cursor: var(--smartyAddress__cursor-style);
+    padding: var(--smartyAddress__suggestion-padding);
 }
 
 .smartyAddress__poweredBy {
-    color: var(--smartyAddress__text-accent-color);
+    color: var(--smartyAddress__text-base-secondary-color);
+    margin: 0;
+    padding: var(--smartyAddress__suggestion-padding);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: .7em;
+    gap: 8px;
+    text-transform: uppercase;
+}
+
+.smartyAddress__smartyLogo {
+    height: 3em;
 }

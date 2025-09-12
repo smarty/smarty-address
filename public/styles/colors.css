@@ -12,6 +12,7 @@
 .smartyAddress__color_light {
     /*TODO: update theme with the correct colors */
     --smartyAddress__text-base-primary-color: #333;
+    --smartyAddress__text-base-secondary-color: #777;
     --smartyAddress__text-accent-color: #0066ff;
 
     --smartyAddress__surface-base-primary-color: #fcfcfc;

@@ -3,13 +3,13 @@ export const themes: {[index: string]:string[]} = {
 		"smartyAddress__base_default",
 		"smartyAddress__color_light",
 		"smartyAddress__font_size_medium",
-		"smartyAddress__spacing_large",
+		"smartyAddress__spacing_medium",
 	],
 	dark: [
 		"smartyAddress__base_default",
 		"smartyAddress__color_dark",
 		"smartyAddress__font_size_medium",
-		"smartyAddress__spacing_large",
+		"smartyAddress__spacing_medium",
 	],
 	none: [],
 };
