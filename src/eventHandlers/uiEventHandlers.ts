@@ -28,6 +28,10 @@ export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 	searchInputElement.addEventListener("input", (inputEvent:Event) => {
 		handleSearchInputOnChange({event: inputEvent, state, setState});
 	});
+
+	searchInputElement.addEventListener("focusout", () => {
+		closeDropdown(state.dropdownElement);
+	});
 };
 
 export const formatAddressSuggestions:EventHandler = ({event, state}) => {
