@@ -32,6 +32,30 @@ export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 	searchInputElement.addEventListener("focusout", () => {
 		closeDropdown(state.dropdownElement);
 	});
+
+	searchInputElement.addEventListener("keydown", (inputEvent:Event) => {
+		handleAutocompleteKeydown({event: inputEvent, state, setState});
+	});
+};
+
+export const handleAutocompleteKeydown:EventHandler = ({event, state, setState}) => {
+	const items = state.addressSuggestionResults;
+	const currentIndex = state.highlightedSuggestionIndex;
+
+	switch (event.key) {
+		case 'ArrowDown':
+			event.preventDefault();
+			highlightNewAddress(items, currentIndex, setState, 1);
+			break;
+		case 'ArrowUp':
+			event.preventDefault();
+			highlightNewAddress(items, currentIndex, setState, -1);
+			break;
+		case 'Escape':
+			event.preventDefault();
+			closeDropdown(state.dropdownElement);
+			break;
+	}
 };
 
 export const formatAddressSuggestions:EventHandler = ({event, state}) => {
