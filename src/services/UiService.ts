@@ -9,6 +9,7 @@ import {
 	loadStylesheet,
 	setThemeFromConfig,
 	updateTheme,
+	setCustomStyles,
 } from "../eventHandlers/uiEventHandlers.ts";
 import {themes} from "../themes.ts";
 
@@ -37,6 +38,7 @@ export const uiServiceDefinition: ServiceDefinition = {
 		UiService_foundInputElements: [
 			createDropdownWrapperElement,
 			watchSearchInputForChanges,
+			setCustomStyles,
 		],
 		UiService_createdEmptyDropdownElement: [
 			notifyDomInitIsComplete,

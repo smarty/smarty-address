@@ -77,6 +77,10 @@ export const formatAddressSuggestions:EventHandler = ({event, state:uiState}) =>
 	});
 	uiState.eventDispatcher.dispatch("UiService_formattedAddressSuggestions", {addressSuggestions});
 };
+
+export const setCustomStyles:EventHandler = ({event, state, setState}) => {
+}
+
 const formatStyleBlock = (selector:string, styles:{}) => {
 	const stylesString = Object.entries(styles).map(([property, value]) => `${property}: ${value};`).join("\n");
 	return `${selector} {\n${stylesString}\n}`;
