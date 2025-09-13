@@ -51,6 +51,9 @@ export const handleAutocompleteKeydown:EventHandler = ({event, state, setState})
 			event.preventDefault();
 			highlightNewAddress(items, currentIndex, setState, -1);
 			break;
+		case 'Enter':
+			event.preventDefault();
+			break;
 		case 'Escape':
 			event.preventDefault();
 			closeDropdown(state.dropdownElement);
@@ -58,15 +61,32 @@ export const handleAutocompleteKeydown:EventHandler = ({event, state, setState})
 	}
 };
 
-export const formatAddressSuggestions:EventHandler = ({event, state}) => {
-	const formattedSuggestions = event.detail.suggestions.map(({street_line, city, state, zipcode}) => {
-		return `<li class="smartyAddress__suggestion">${street_line}, ${city}, ${state} ${zipcode}</li>`;
+
+export const formatAddressSuggestions:EventHandler = ({event, state:uiState}) => {
+	const addressSuggestions = event.detail.suggestions.map((suggestion):UiSuggestionItem => {
+		const {street_line, city, state, zipcode} = suggestion;
+		const suggestionString = `${street_line}, ${city}, ${state} ${zipcode}`;
+		const textNode = document.createTextNode(suggestionString);
+		const suggestionElement = createDomElement("li", ["smartyAddress__suggestion"], [textNode]);
+		suggestionElement.setAttribute("data-address", JSON.stringify(suggestion));
+
+		return {
+			address: suggestion,
+			suggestionElement,
+		};
 	});
-	state.eventDispatcher.dispatch("UiService_formattedAddressSuggestions", {formattedSuggestions});
+	uiState.eventDispatcher.dispatch("UiService_formattedAddressSuggestions", {addressSuggestions});
+};
 };
 
 export const updateDropdownSuggestions:EventHandler = ({event, state}) => {
 	state.suggestionsElement.innerHTML = event.detail.formattedSuggestions.join("");
+export const updateDropdownSuggestions:EventHandler = ({event, state, setState}) => {
+	const addressSuggestions = event.detail.addressSuggestions;
+	const suggestionElements = addressSuggestions.map(({suggestionElement}) => suggestionElement);
+	setState("addressSuggestionResults", addressSuggestions);
+	highlightNewAddress(state.addressSuggestionResults, 0, setState, 0);
+	state.suggestionsElement.replaceChildren(...suggestionElements);
 	openDropdown(state.dropdownElement);
 };
 
@@ -74,7 +94,6 @@ const handleSearchInputOnChange: BrowserEventHandler = ({event, state}) => {
 	const searchInputValue = event.target?.value;
 	const eventName = searchInputValue.length ? "UiService_requestedNewAddressSuggestions" : "UiService_searchInputCleared";
 	state.eventDispatcher.dispatch(eventName, {searchString: searchInputValue});
-
 };
 
 export const createDropdownWrapperElement:EventHandler = ({state, setState}) => {
