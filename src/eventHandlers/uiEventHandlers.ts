@@ -175,6 +175,13 @@ export const updateTheme:EventHandler = ({event, state}) => {
 	}
 };
 
+const getElementStyles = (element:HTMLElement) => {
+	return {
+		"color": window.getComputedStyle(element).color,
+		"background-color": window.getComputedStyle(element).backgroundColor,
+	};
+};
+
 export const loadStylesheet:EventHandler = ({state}) => {
 	const matchingStylesheets = Array.from(document.getElementsByTagName("link")).filter(link => link.rel === "stylesheet" && link.href === STYLESHEET_HREF);
 
