@@ -77,6 +77,11 @@ export const formatAddressSuggestions:EventHandler = ({event, state:uiState}) =>
 	});
 	uiState.eventDispatcher.dispatch("UiService_formattedAddressSuggestions", {addressSuggestions});
 };
+const formatStyleBlock = (selector:string, styles:{}) => {
+	const stylesString = Object.entries(styles).map(([property, value]) => `${property}: ${value};`).join("\n");
+	return `${selector} {\n${stylesString}\n}`;
+};
+
 const getColorBrightness = (color:string) => {
 	const DEFAULT_BRIGHTNESS = 255;
 	const match = color.match(/\d+/g);
