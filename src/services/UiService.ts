@@ -28,6 +28,8 @@ export const uiServiceDefinition: ServiceDefinition = {
 		dropdownElement: null,
 		suggestionsElement: null,
 		poweredBySmartyElement: null,
+
+		customStylesElement: null,
 	},
 	eventHandlersMap: {
 		SmartyAddress_receivedSmartyAddressConfig: [

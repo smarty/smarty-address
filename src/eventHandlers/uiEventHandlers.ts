@@ -79,6 +79,13 @@ export const formatAddressSuggestions:EventHandler = ({event, state:uiState}) =>
 };
 
 export const setCustomStyles:EventHandler = ({event, state, setState}) => {
+	if (!state.customStylesElement) {
+		const newStylesElement = document.createElement("style");
+		const head  = document.getElementsByTagName('head')[0];
+		head.appendChild(newStylesElement);
+		setState("customStylesElement", newStylesElement);
+	}
+
 }
 
 const formatStyleBlock = (selector:string, styles:{}) => {
