@@ -77,10 +77,18 @@ export const formatAddressSuggestions:EventHandler = ({event, state:uiState}) =>
 	});
 	uiState.eventDispatcher.dispatch("UiService_formattedAddressSuggestions", {addressSuggestions});
 };
+const getColorBrightness = (color:string) => {
+	const DEFAULT_BRIGHTNESS = 255;
+	const match = color.match(/\d+/g);
+	if (!match) return DEFAULT_BRIGHTNESS;
+
+	const [r, g, b] = match.map(Number);
+
+	const brightness = (0.299 * r + 0.587 * g + 0.114 * b);
+
+	return brightness;
 };
 
-export const updateDropdownSuggestions:EventHandler = ({event, state}) => {
-	state.suggestionsElement.innerHTML = event.detail.formattedSuggestions.join("");
 export const updateDropdownSuggestions:EventHandler = ({event, state, setState}) => {
 	const addressSuggestions = event.detail.addressSuggestions;
 	const suggestionElements = addressSuggestions.map(({suggestionElement}) => suggestionElement);
