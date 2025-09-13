@@ -29,6 +29,8 @@ export const uiServiceDefinition: ServiceDefinition = {
 		suggestionsElement: null,
 		poweredBySmartyElement: null,
 
+		highlightedSuggestionIndex: 0,
+		addressSuggestionResults: [],
 		customStylesElement: null,
 	},
 	eventHandlersMap: {

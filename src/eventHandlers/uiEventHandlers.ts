@@ -86,6 +86,22 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 		setState("customStylesElement", newStylesElement);
 	}
 
+	const stylesElement = state.customStylesElement;
+	const customStyles = getElementStyles(state.searchInputElement);
+	const backgroundColorBrightness = getColorBrightness(customStyles["background-color"]);
+	const hoverMixColor = backgroundColorBrightness > 128 ? "#000" : "#fff";
+	const hoverMixPercentage = backgroundColorBrightness > 128 ? "92%" : "85%";
+	const colorMix = `color-mix(in srgb, ${customStyles["background-color"]}  ${hoverMixPercentage}, ${hoverMixColor})`;
+	const hoverStyles = {
+		"background-color": colorMix,
+	};
+
+
+	const dropdownElementStyles = formatStyleBlock(".smartyAddress__dropdownElement", customStyles);
+	const suggestionStyles = formatStyleBlock(".smartyAddress__suggestion", customStyles);
+	const suggestionHoverStyles = formatStyleBlock(".smartyAddress__suggestion:hover, .smartyAddress__suggestion[aria-selected=\"true\"]", hoverStyles);
+
+	stylesElement.innerHTML = dropdownElementStyles + suggestionStyles + suggestionHoverStyles;
 }
 
 const formatStyleBlock = (selector:string, styles:{}) => {
