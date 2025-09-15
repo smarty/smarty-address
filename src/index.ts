@@ -12,9 +12,11 @@ export class SmartyAddress {
 	};
 
 	static themes = themes;
+	static instances = 0;
 
 	private eventDispatcher = new EventDispatcher();
 	private serviceDefinitions = SmartyAddress.defaultServiceDefinitions;
+	private instanceId = SmartyAddress.instances++;
 
 	constructor(config: SmartyAddressConfig) {
 		this.setup(config);
@@ -30,7 +32,7 @@ export class SmartyAddress {
 			this.serviceDefinitions[name] = serviceDefinition;
 		});
 		Object.entries(this.serviceDefinitions).forEach(([, serviceDefinition]) => {
-			defineService(serviceDefinition, this.eventDispatcher);
+			defineService(serviceDefinition, this.eventDispatcher, this.instanceId);
 		});
 	}
 }

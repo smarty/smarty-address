@@ -137,12 +137,13 @@ const handleSearchInputOnChange: BrowserEventHandler = ({event, state}) => {
 };
 
 export const createDropdownWrapperElement:EventHandler = ({state, setState}) => {
+	const instanceClass = `smartyAddress__instance_${state.instanceId}`;
 	const smartyLogoElement = createDomElement("img", ["smartyAddress__smartyLogo"]);
 	const poweredByText = document.createTextNode("Predicted address suggestions powered by");
 	const suggestionsElement = createDomElement("ul", ["smartyAddress__suggestionsElement"]);
 	const poweredBySmartyElement = createDomElement("div", ["smartyAddress__poweredBy"], [poweredByText, smartyLogoElement]);
 	const dropdownElement = createDomElement("div", ["smartyAddress__dropdownElement", "smartyAddress__hidden"], [suggestionsElement, poweredBySmartyElement]);
-	const dropdownWrapperElement = createDomElement("div", ["smartyAddress__suggestionsWrapperElement"], [dropdownElement]);
+	const dropdownWrapperElement = createDomElement("div", ["smartyAddress__suggestionsWrapperElement", instanceClass], [dropdownElement]);
 	const searchInputElement = state.searchInputElement;
 
 	dropdownElement.setAttribute("role", "listbox");

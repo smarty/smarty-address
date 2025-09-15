@@ -4,6 +4,7 @@ import {EventDispatcher} from "./EventDispatcher.ts";
 export const defineService = (
 	{eventHandlersMap, initialState = {}}:ServiceDefinition,
 	eventDispatcher:EventDispatcher,
+	instanceId:number,
 ):void => {
 	const eventHandlerWrapper = (eventHandler: EventHandler) => {
 		return (event: CustomEvent) => {
@@ -11,7 +12,7 @@ export const defineService = (
 		};
 	};
 
-	const state = {eventDispatcher, ...initialState};
+	const state = {eventDispatcher, instanceId, ...initialState};
 
 	const setState = (name: string, newState: unknown) => {
 		// TODO: Make state updates more robust
@@ -25,3 +26,4 @@ export const defineService = (
 		});
 	});
 };
+ 
