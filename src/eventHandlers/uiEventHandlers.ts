@@ -88,20 +88,18 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 
 	const stylesElement = state.customStylesElement;
 	const customStyles = getElementStyles(state.searchInputElement);
-	const backgroundColorBrightness = getColorBrightness(customStyles["background-color"]);
+	const backgroundColorBrightness = getColorBrightness(customStyles.backgroundColor);
 	const hoverMixColor = backgroundColorBrightness > 128 ? "#000" : "#fff";
 	const hoverMixPercentage = backgroundColorBrightness > 128 ? "92%" : "85%";
-	const colorMix = `color-mix(in srgb, ${customStyles["background-color"]}  ${hoverMixPercentage}, ${hoverMixColor})`;
-	const hoverStyles = {
-		"background-color": colorMix,
+
+	const dynamicStyleValues = {
+		"--smartyAddress__text-base-primary-color": customStyles.color,
+		"--smartyAddress__surface-base-primary-color": customStyles.backgroundColor,
+		"--smartyAddress__color-mix-percentage": hoverMixPercentage,
+		"--smartyAddress__surface-inverse-extreme-color": hoverMixColor,
 	};
 
-
-	const dropdownElementStyles = formatStyleBlock(".smartyAddress__dropdownElement", customStyles);
-	const suggestionStyles = formatStyleBlock(".smartyAddress__suggestion", customStyles);
-	const suggestionHoverStyles = formatStyleBlock(".smartyAddress__suggestion:hover, .smartyAddress__suggestion[aria-selected=\"true\"]", hoverStyles);
-
-	stylesElement.innerHTML = dropdownElementStyles + suggestionStyles + suggestionHoverStyles;
+	stylesElement.innerHTML = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(state.instanceId)}`, dynamicStyleValues);;
 }
 
 const formatStyleBlock = (selector:string, styles:{}) => {
@@ -136,8 +134,12 @@ const handleSearchInputOnChange: BrowserEventHandler = ({event, state}) => {
 	state.eventDispatcher.dispatch(eventName, {searchString: searchInputValue});
 };
 
+const getInstanceClassName = (instanceId:number) => {
+	return `smartyAddress__instance_${instanceId}`;
+};
+
 export const createDropdownWrapperElement:EventHandler = ({state, setState}) => {
-	const instanceClass = `smartyAddress__instance_${state.instanceId}`;
+	const instanceClass = getInstanceClassName(state.instanceId);
 	const smartyLogoElement = createDomElement("img", ["smartyAddress__smartyLogo"]);
 	const poweredByText = document.createTextNode("Predicted address suggestions powered by");
 	const suggestionsElement = createDomElement("ul", ["smartyAddress__suggestionsElement"]);
@@ -219,7 +221,7 @@ export const updateTheme:EventHandler = ({event, state}) => {
 const getElementStyles = (element:HTMLElement) => {
 	return {
 		"color": window.getComputedStyle(element).color,
-		"background-color": window.getComputedStyle(element).backgroundColor,
+		"backgroundColor": window.getComputedStyle(element).backgroundColor,
 	};
 };
 

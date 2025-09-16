@@ -1,4 +1,10 @@
 export const themes: {[index: string]:string[]} = {
+	default: [
+		"smartyAddress__base_default",
+		"smartyAddress__color_dynamic",
+		"smartyAddress__font_size_medium",
+		"smartyAddress__spacing_medium",
+	],
 	light: [
 		"smartyAddress__base_default",
 		"smartyAddress__color_light",
@@ -13,5 +19,3 @@ export const themes: {[index: string]:string[]} = {
 	],
 	none: [],
 };
-
-themes.default = themes.light;

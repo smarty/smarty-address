@@ -5,6 +5,7 @@
 .smartyAddress__suggestionsWrapperElement {
     position: var(--smartyAddress__wrapper-position);
     z-index: 1000;
+    font-weight: normal;
 }
 
 .smartyAddress__hidden {
@@ -12,11 +13,12 @@
 }
 
 .smartyAddress__dropdownElement {
-    border-color: var(--smartyAddress__stroke-base-primary-color);
     position: var(--smartyAddress__dropdown-position);
-    border-style: var(--smartyAddress__dropdown-border-style);
     box-sizing: var(--smartyAddress__box-sizing);
     width: var(--smartyAddress__dropdown-width);
+    box-shadow: 0 12px 24px 0 rgba(4, 34, 75, 0.10), 0 20px 40px 0 rgba(21, 27, 35, 0.06);
+    color: var(--smartyAddress__text-base-primary-color);
+    background-color: var(--smartyAddress__surface-base-primary-color);
 }
 
 .smartyAddress__suggestionsElement {
@@ -29,6 +31,13 @@
 .smartyAddress__suggestion {
     cursor: var(--smartyAddress__cursor-style);
     padding: var(--smartyAddress__suggestion-padding);
+    color: var(--smartyAddress__text-base-primary-color);
+    background-color: var(--smartyAddress__surface-base-primary-color);
+}
+
+.smartyAddress__suggestion:hover,
+.smartyAddress__suggestion[aria-selected="true"] {
+    background-color: color-mix(in srgb, var(--smartyAddress__surface-base-primary-color)  var(--smartyAddress__color-mix-percentage), var(--smartyAddress__surface-inverse-extreme-color));
 }
 
 .smartyAddress__poweredBy {
@@ -38,11 +47,11 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    font-size: .7em;
+    font-size: .75em;
     gap: 8px;
     text-transform: uppercase;
 }
 
 .smartyAddress__smartyLogo {
-    height: 3em;
+    height: 2.5em;
 }
