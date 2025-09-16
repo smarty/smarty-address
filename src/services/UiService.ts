@@ -6,14 +6,13 @@ import {
 	formatAddressSuggestions,
 	createDropdownWrapperElement,
 	notifyDomInitIsComplete,
-	loadStylesheet,
 	setThemeFromConfig,
 	updateTheme,
 	setCustomStyles,
 } from "../eventHandlers/uiEventHandlers.ts";
 import {themes} from "../themes.ts";
 
-export const uiServiceDefinition: ServiceDefinition = {
+export const uiService: ServiceDefinition = {
 	initialState: {
 		theme: themes.default,
 
@@ -36,7 +35,6 @@ export const uiServiceDefinition: ServiceDefinition = {
 	eventHandlersMap: {
 		SmartyAddress_receivedSmartyAddressConfig: [
 			findInputElements,
-			loadStylesheet,
 			setThemeFromConfig,
 		],
 		UiService_foundInputElements: [

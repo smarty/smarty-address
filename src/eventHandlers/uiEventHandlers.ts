@@ -1,7 +1,6 @@
 import {BrowserEventHandler, EventHandler, UiSuggestionItem} from "../interfaces.ts";
 import {createDomElement, findDomElement} from "../utils/uiUtils.ts";
 
-const STYLESHEET_HREF = "/styles/theme.css";
 
 export const findInputElements:EventHandler = ({event, state, setState}) => {
 	const {
@@ -223,22 +222,6 @@ const getElementStyles = (element:HTMLElement) => {
 		"color": window.getComputedStyle(element).color,
 		"backgroundColor": window.getComputedStyle(element).backgroundColor,
 	};
-};
-
-export const loadStylesheet:EventHandler = ({state}) => {
-	const matchingStylesheets = Array.from(document.getElementsByTagName("link")).filter(link => link.rel === "stylesheet" && link.href === STYLESHEET_HREF);
-
-	if (!matchingStylesheets.length) {
-		const head  = document.getElementsByTagName('head')[0];
-		const linkElement  = document.createElement('link');
-		linkElement.rel  = 'stylesheet';
-		linkElement.type = 'text/css';
-		linkElement.href = STYLESHEET_HREF;
-		linkElement.onload = () => {
-			state.eventDispatcher.dispatch("UiService_stylesheetLoaded");
-		};
-		head.appendChild(linkElement);
-	}
 };
 
 const handleHighlightedAddressOnChange = (event) => {

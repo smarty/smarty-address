@@ -1,16 +1,18 @@
 import {EventDispatcher} from "./utils/EventDispatcher.ts";
 
-export interface SmartyAddressConfig {
+export interface DefaultSmartyAddressConfig {
+	services?:ServiceDefinitionMap,
+	theme?:string[],
+}
+
+export interface SmartyAddressConfig extends DefaultSmartyAddressConfig{
 	embeddedKey:string,
-	theme?:string,
 	searchInputSelector?:string,
 	streetLineSelector?: string,
 	secondarySelector?: string,
 	citySelector?: string,
 	stateSelector?: string,
 	zipcodeSelector?: string,
-	handleAutocompleteElementOnChange?: string,
-	services?:ServiceDefinitionMap,
 }
 
 export interface AddressSuggestion {
