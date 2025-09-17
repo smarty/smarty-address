@@ -137,7 +137,7 @@ const getInstanceClassName = (instanceId:number) => {
 	return `smartyAddress__instance_${instanceId}`;
 };
 
-export const createDropdownWrapperElement:EventHandler = ({state, setState}) => {
+export const buildDomElements:EventHandler = ({state, setState}) => {
 	const instanceClass = getInstanceClassName(state.instanceId);
 	const smartyLogoElement = createDomElement("img", ["smartyAddress__smartyLogo"]);
 	const poweredByText = document.createTextNode("Powered by");
@@ -156,7 +156,7 @@ export const createDropdownWrapperElement:EventHandler = ({state, setState}) => 
 	setState("suggestionsElement", suggestionsElement);
 	setState("poweredBySmartyElement", poweredBySmartyElement);
 
-	state.eventDispatcher.dispatch("UiService_createdEmptyDropdownElement", {dropdownElement});
+	state.eventDispatcher.dispatch("UiService_builtDomElements", {dropdownElement});
 };
 
 export const notifyDomInitIsComplete:EventHandler = ({state}) => {
@@ -213,7 +213,7 @@ export const updateTheme:EventHandler = ({event, state}) => {
 
 	if (dropdownWrapperElement) {
 		dropdownWrapperElement.classList.remove(...previousTheme);
-		dropdownWrapperElement.classList.add("smartyAddress__suggestionsWrapperElement", ...state.theme);
+		dropdownWrapperElement.classList.add(...state.theme);
 	}
 };
 

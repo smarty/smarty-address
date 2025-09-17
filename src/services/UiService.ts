@@ -4,7 +4,7 @@ import {
 	watchSearchInputForChanges,
 	updateDropdownSuggestions,
 	formatAddressSuggestions,
-	createDropdownWrapperElement,
+	buildDomElements,
 	notifyDomInitIsComplete,
 	setThemeFromConfig,
 	updateTheme,
@@ -38,11 +38,11 @@ export const uiService: ServiceDefinition = {
 			setThemeFromConfig,
 		],
 		UiService_foundInputElements: [
-			createDropdownWrapperElement,
+			buildDomElements,
 			watchSearchInputForChanges,
 			setCustomStyles,
 		],
-		UiService_createdEmptyDropdownElement: [
+		UiService_builtDomElements: [
 			notifyDomInitIsComplete,
 			updateTheme,
 		],
