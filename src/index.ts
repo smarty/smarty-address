@@ -15,15 +15,8 @@ export class SmartyAddress {
 	};
 
 	static themes = themes;
-
 	private static instances:SmartyAddress[] = [];
-	private static stylesheetIsLoaded = false;
-	private static notifyStylesheetLoaded = () => {
-		SmartyAddress.stylesheetIsLoaded = true;
-		SmartyAddress.instances.forEach((instance) => {
-			instance.eventDispatcher.dispatch("SmartyAddress_stylesheetLoaded");
-		});
-	};
+	private static stylesheetPromise:undefined | Promise<Event>;
 
 	private eventDispatcher = new EventDispatcher();
 	private instanceId;
@@ -31,12 +24,14 @@ export class SmartyAddress {
 	constructor(config: SmartyAddressConfig) {
 		SmartyAddress.instances.push(this);
 		this.instanceId = SmartyAddress.instances.length;
-		this.setup({...SmartyAddress.defaultConfigValues, ...config});
+		this.init(config);
 	}
 
-	setup = (config: SmartyAddressConfig) => {
+	init = async (config: SmartyAddressConfig) => {
+		config = {...SmartyAddress.defaultConfigValues, ...config};
 		this.setupServices(config.services);
 		this.loadStylesheet();
+		await SmartyAddress.stylesheetPromise;
 
 		this.eventDispatcher.dispatch("SmartyAddress_receivedSmartyAddressConfig", config);
 	}
@@ -50,19 +45,18 @@ export class SmartyAddress {
 
 	loadStylesheet = () => {
 		if (this.instanceId === 1) {
-			const STYLESHEET_HREF = "/styles/theme.css";
+			SmartyAddress.stylesheetPromise = new Promise((resolve, reject) => {
+				const STYLESHEET_HREF = "/styles/theme.css";
 
-			const head  = document.getElementsByTagName('head')[0];
-			const linkElement  = document.createElement('link');
-			linkElement.rel  = 'stylesheet';
-			linkElement.type = 'text/css';
-			linkElement.href = STYLESHEET_HREF;
-			linkElement.onload = SmartyAddress.notifyStylesheetLoaded;
-			head.appendChild(linkElement);
-		} else {
-			if (SmartyAddress.stylesheetIsLoaded) {
-				this.eventDispatcher.dispatch("SmartyAddress_stylesheetLoaded");
-			}
+				const head  = document.getElementsByTagName('head')[0];
+				const linkElement  = document.createElement('link');
+				linkElement.rel  = 'stylesheet';
+				linkElement.type = 'text/css';
+				linkElement.href = STYLESHEET_HREF;
+				linkElement.onload = resolve;
+				linkElement.onerror = reject;
+				head.appendChild(linkElement);
+			});
 		}
 	}
 }
