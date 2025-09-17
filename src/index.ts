@@ -25,23 +25,19 @@ export class SmartyAddress {
 		});
 	};
 
-
 	private eventDispatcher = new EventDispatcher();
 	private instanceId;
 
 	constructor(config: SmartyAddressConfig) {
 		SmartyAddress.instances.push(this);
 		this.instanceId = SmartyAddress.instances.length;
-		this.setup(config);
+		this.setup({...SmartyAddress.defaultConfigValues, ...config});
 	}
 
 	setup = (config: SmartyAddressConfig) => {
-		config = {...SmartyAddress.defaultConfigValues, ...config};
-
 		this.setupServices(config.services);
-		if (this.instanceId === 1) {
-			loadStylesheet(SmartyAddress.notifyStylesheetLoaded);
-		}
+		this.loadStylesheet();
+
 		this.eventDispatcher.dispatch("SmartyAddress_receivedSmartyAddressConfig", config);
 	}
 
@@ -51,15 +47,23 @@ export class SmartyAddress {
 			defineService(serviceDefinition, this.eventDispatcher, this.instanceId);
 		});
 	}
-}
-const loadStylesheet = (onload:EventHandler) => {
-	const STYLESHEET_HREF = "/styles/theme.css";
 
-	const head  = document.getElementsByTagName('head')[0];
-	const linkElement  = document.createElement('link');
-	linkElement.rel  = 'stylesheet';
-	linkElement.type = 'text/css';
-	linkElement.href = STYLESHEET_HREF;
-	linkElement.onload = onload;
-	head.appendChild(linkElement);
-};
+	loadStylesheet = () => {
+		if (this.instanceId === 1) {
+			const STYLESHEET_HREF = "/styles/theme.css";
+
+			const head  = document.getElementsByTagName('head')[0];
+			const linkElement  = document.createElement('link');
+			linkElement.rel  = 'stylesheet';
+			linkElement.type = 'text/css';
+			linkElement.href = STYLESHEET_HREF;
+			linkElement.onload = SmartyAddress.notifyStylesheetLoaded;
+			head.appendChild(linkElement);
+		} else {
+			if (SmartyAddress.stylesheetIsLoaded) {
+				this.eventDispatcher.dispatch("SmartyAddress_stylesheetLoaded");
+			}
+		}
+	}
+}
+

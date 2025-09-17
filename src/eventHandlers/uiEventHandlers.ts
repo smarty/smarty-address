@@ -140,7 +140,7 @@ const getInstanceClassName = (instanceId:number) => {
 export const createDropdownWrapperElement:EventHandler = ({state, setState}) => {
 	const instanceClass = getInstanceClassName(state.instanceId);
 	const smartyLogoElement = createDomElement("img", ["smartyAddress__smartyLogo"]);
-	const poweredByText = document.createTextNode("Predicted address suggestions powered by");
+	const poweredByText = document.createTextNode("Powered by");
 	const suggestionsElement = createDomElement("ul", ["smartyAddress__suggestionsElement"]);
 	const poweredBySmartyElement = createDomElement("div", ["smartyAddress__poweredBy"], [poweredByText, smartyLogoElement]);
 	const dropdownElement = createDomElement("div", ["smartyAddress__dropdownElement", "smartyAddress__hidden"], [suggestionsElement, poweredBySmartyElement]);
