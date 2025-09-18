@@ -5,7 +5,7 @@ import {createDomElement, findDomElement} from "../utils/uiUtils.ts";
 export const findInputElements:EventHandler = ({event, state, setState}) => {
 	const {
 		searchInputSelector,
-		streetLineSelector,
+		streetSelector,
 		secondarySelector,
 		citySelector,
 		stateSelector,
@@ -13,7 +13,7 @@ export const findInputElements:EventHandler = ({event, state, setState}) => {
 	} = event.detail;
 
 	setState("searchInputElement", searchInputSelector ? findDomElement(searchInputSelector) : null);
-	setState("streetLineInputElement", streetLineSelector ? findDomElement(streetLineSelector) : null);
+	setState("streetLineInputElement", streetSelector ? findDomElement(streetSelector) : null);
 	setState("secondaryInputElement", secondarySelector ? findDomElement(secondarySelector) : null);
 	setState("cityInputElement", citySelector ? findDomElement(citySelector) : null);
 	setState("stateInputElement", stateSelector ? findDomElement(stateSelector) : null);
@@ -52,6 +52,10 @@ export const handleAutocompleteKeydown:EventHandler = ({event, state, setState})
 			break;
 		case 'Enter':
 			event.preventDefault();
+			const selectedAddress = items[state.highlightedSuggestionIndex];
+			if (selectedAddress) {
+				state.eventDispatcher.dispatch("UiService_addressSelected", {selectedAddress});
+			}
 			break;
 		case 'Escape':
 			event.preventDefault();
@@ -60,14 +64,29 @@ export const handleAutocompleteKeydown:EventHandler = ({event, state, setState})
 	}
 };
 
+export const selectAddress:EventHandler = ({event, state:uiState, setState}) => {
+	const selectedAddress = event.detail.selectedAddress;
+	setState("selectedAddress", selectedAddress);
+
+	const {street_line, secondary, city, state:addressState, zipcode} = selectedAddress.address;
+	uiState.streetLineInputElement.value = street_line;
+	uiState.cityInputElement.value = city;
+	uiState.stateInputElement.value = addressState;
+	uiState.zipcodeInputElement.value = zipcode;
+
+	closeDropdown(uiState.dropdownElement);
+};
 
 export const formatAddressSuggestions:EventHandler = ({event, state:uiState}) => {
-	const addressSuggestions = event.detail.suggestions.map((suggestion):UiSuggestionItem => {
+	const addressSuggestions = event.detail.suggestions.map((suggestion, index):UiSuggestionItem => {
 		const {street_line, city, state, zipcode} = suggestion;
 		const suggestionString = `${street_line}, ${city}, ${state} ${zipcode}`;
 		const textNode = document.createTextNode(suggestionString);
 		const suggestionElement = createDomElement("li", ["smartyAddress__suggestion"], [textNode]);
 		suggestionElement.setAttribute("data-address", JSON.stringify(suggestion));
+		suggestionElement.addEventListener("click", () => {
+			uiState.eventDispatcher.dispatch("UiService_addressSelected", {selectedAddress: uiState.addressSuggestionResults[index]});
+		});
 
 		return {
 			address: suggestion,

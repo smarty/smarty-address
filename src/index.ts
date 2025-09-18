@@ -1,4 +1,4 @@
-import {DefaultSmartyAddressConfig, EventHandler, ServiceDefinitionMap, SmartyAddressConfig} from "./interfaces.ts";
+import {DefaultSmartyAddressConfig, ServiceDefinitionMap, SmartyAddressConfig} from "./interfaces.ts";
 import {uiService} from "./services/UiService.ts";
 import {apiService} from "./services/ApiService.ts";
 import {EventDispatcher} from "./utils/EventDispatcher.ts";
