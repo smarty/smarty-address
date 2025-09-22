@@ -32,11 +32,13 @@ export const uiService: ServiceDefinition = {
 		highlightedSuggestionIndex: 0,
 		addressSuggestionResults: [],
 		customStylesElement: null,
+		smartyLogoDark: "null",
+		smartyLogoLight: "null",
 	},
 	eventHandlersMap: {
 		SmartyAddress_receivedSmartyAddressConfig: [
-			findInputElements,
 			setThemeFromConfig,
+			findInputElements,
 		],
 		UiService_foundInputElements: [
 			buildDomElements,

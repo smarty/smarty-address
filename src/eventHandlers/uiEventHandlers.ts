@@ -168,7 +168,7 @@ export const buildDomElements:EventHandler = ({state, setState}) => {
 	const searchInputElement = state.searchInputElement;
 
 	dropdownElement.setAttribute("role", "listbox");
-	smartyLogoElement.setAttribute("src", "/img/smarty-logo-blue.svg");
+	smartyLogoElement.setAttribute("src", state.smartyLogoDark);
 	searchInputElement?.parentNode?.insertBefore(dropdownWrapperElement, searchInputElement.nextSibling);
 
 	setState("dropdownWrapperElement", dropdownWrapperElement);
@@ -222,9 +222,13 @@ const displaySuccess = () => {
 
 export const setThemeFromConfig:EventHandler = ({event, state, setState}) => {
 	const previousTheme = state.theme;
-	const theme = event.detail?.theme;
-	setState("theme", theme);
-	state.eventDispatcher.dispatch("UiService_receivedNewTheme", {previousTheme});
+	setState("theme", event.detail?.theme);
+	setState("smartyLogoDark", event.detail?.smartyLogoDark);
+	setState("smartyLogoLight", event.detail?.smartyLogoLight);
+
+	if (previousTheme !== state.theme) {
+		state.eventDispatcher.dispatch("UiService_receivedNewTheme", {previousTheme});
+	}
 };
 
 export const updateTheme:EventHandler = ({event, state}) => {

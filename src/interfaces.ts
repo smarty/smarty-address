@@ -3,6 +3,8 @@ import {EventDispatcher} from "./utils/EventDispatcher.ts";
 export interface DefaultSmartyAddressConfig {
 	services?:ServiceDefinitionMap,
 	theme?:string[],
+	smartyLogoDark?:string,
+	smartyLogoLight?:string,
 }
 
 export interface SmartyAddressConfig extends DefaultSmartyAddressConfig{
