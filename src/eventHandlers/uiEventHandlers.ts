@@ -1,5 +1,11 @@
 import {BrowserEventHandler, EventHandler, UiSuggestionItem} from "../interfaces.ts";
-import {createDomElement, findDomElement} from "../utils/uiUtils.ts";
+import {
+	createDomElement,
+	findDomElement,
+	formatStyleBlock,
+	getColorBrightness, getElementStyles,
+	getInstanceClassName
+} from "../utils/uiUtils.ts";
 
 
 export const findInputElements:EventHandler = ({event, state, setState}) => {
@@ -121,23 +127,6 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 	stylesElement.innerHTML = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(state.instanceId)}`, dynamicStyleValues);;
 }
 
-const formatStyleBlock = (selector:string, styles:{}) => {
-	const stylesString = Object.entries(styles).map(([property, value]) => `${property}: ${value};`).join("\n");
-	return `${selector} {\n${stylesString}\n}`;
-};
-
-const getColorBrightness = (color:string) => {
-	const DEFAULT_BRIGHTNESS = 255;
-	const match = color.match(/\d+/g);
-	if (!match) return DEFAULT_BRIGHTNESS;
-
-	const [r, g, b] = match.map(Number);
-
-	const brightness = (0.299 * r + 0.587 * g + 0.114 * b);
-
-	return brightness;
-};
-
 export const updateDropdownSuggestions:EventHandler = ({event, state, setState}) => {
 	const addressSuggestions = event.detail.addressSuggestions;
 	const suggestionElements = addressSuggestions.map(({suggestionElement}) => suggestionElement);
@@ -151,10 +140,6 @@ const handleSearchInputOnChange: BrowserEventHandler = ({event, state}) => {
 	const searchInputValue = event.target?.value;
 	const eventName = searchInputValue.length ? "UiService_requestedNewAddressSuggestions" : "UiService_searchInputCleared";
 	state.eventDispatcher.dispatch(eventName, {searchString: searchInputValue});
-};
-
-const getInstanceClassName = (instanceId:number) => {
-	return `smartyAddress__instance_${instanceId}`;
 };
 
 export const buildDomElements:EventHandler = ({state, setState}) => {
@@ -187,7 +172,7 @@ const updateDropdown = () => {
 
 };
 
-const highlightNewAddress = (items:UiSuggestionItem[], currentIndex, setState, indexChange) => {
+const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:number, setState, indexChange:number) => {
 	const newIndex = (currentIndex + indexChange + items.length) % items.length;
 	setState("highlightedSuggestionIndex", newIndex);
 	items.forEach((item, i) => {
@@ -239,13 +224,6 @@ export const updateTheme:EventHandler = ({event, state}) => {
 		dropdownWrapperElement.classList.remove(...previousTheme);
 		dropdownWrapperElement.classList.add(...state.theme);
 	}
-};
-
-const getElementStyles = (element:HTMLElement) => {
-	return {
-		"color": window.getComputedStyle(element).color,
-		"backgroundColor": window.getComputedStyle(element).backgroundColor,
-	};
 };
 
 const handleHighlightedAddressOnChange = (event) => {
