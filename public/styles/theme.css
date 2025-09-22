@@ -35,11 +35,17 @@
     padding: var(--smartyAddress__spacing_medium_3);
     color: var(--smartyAddress__text-base-primary-color);
     background-color: var(--smartyAddress__surface-base-primary-color);
+    display: flex;
+    justify-content: space-between;
 }
 
 .smartyAddress__suggestion:hover,
 .smartyAddress__suggestion[aria-selected="true"] {
     background-color: color-mix(in srgb, var(--smartyAddress__surface-base-primary-color)  var(--smartyAddress__color-mix-percentage), var(--smartyAddress__surface-inverse-extreme-color));
+}
+
+.smartyAddress__suggestionEntries {
+    color: var(--smartyAddress__text-accent-color, #0066ff);
 }
 
 .smartyAddress__poweredBy {
