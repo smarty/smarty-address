@@ -115,6 +115,7 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 		"--smartyAddress__surface-base-primary-color": customStyles.backgroundColor,
 		"--smartyAddress__color-mix-percentage": hoverMixPercentage,
 		"--smartyAddress__surface-inverse-extreme-color": hoverMixColor,
+		"--smartyAddress__surface-base-primary-inverse-color": customStyles.color,
 	};
 
 	stylesElement.innerHTML = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(state.instanceId)}`, dynamicStyleValues);;

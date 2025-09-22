@@ -25,12 +25,14 @@
     margin: 0;
     padding: 0;
     overflow-y: auto;
-    max-height: 400px;
+    max-height: 500px;
+    scrollbar-color: var(--smartyAddress__surface-base-primary-inverse-color) var(--smartyAddress__surface-base-primary-color);
+    scrollbar-width: thin;
 }
 
 .smartyAddress__suggestion {
     cursor: var(--smartyAddress__cursor-style);
-    padding: var(--smartyAddress__suggestion-padding);
+    padding: var(--smartyAddress__spacing_medium_3);
     color: var(--smartyAddress__text-base-primary-color);
     background-color: var(--smartyAddress__surface-base-primary-color);
 }
@@ -43,7 +45,7 @@
 .smartyAddress__poweredBy {
     color: var(--smartyAddress__text-base-secondary-color);
     margin: 0;
-    padding: var(--smartyAddress__suggestion-padding);
+    padding: var(--smartyAddress__spacing_medium_3);
     display: flex;
     align-items: center;
     justify-content: flex-end;

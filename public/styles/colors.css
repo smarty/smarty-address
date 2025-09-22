@@ -5,6 +5,8 @@
 
     --smartyAddress__surface-base-primary-color: #111;
     --smartyAddress__surface-base-secondary-color: #333;
+    --smartyAddress__surface-base-primary-inverse-color: #eee;
+
     --smartyAddress__stroke-base-primary-color: #666;
     --smartyAddress__color-mix-percentage: 85%;
     --smartyAddress__surface-inverse-extreme-color: #fff;
@@ -18,6 +20,7 @@
 
     --smartyAddress__surface-base-primary-color: #fcfcfc;
     --smartyAddress__surface-base-secondary-color: #f3f3f3;
+    --smartyAddress__surface-base-primary-inverse-color: #333;
 
     --smartyAddress__stroke-base-primary-color: #ccc;
     --smartyAddress__color-mix-percentage: 92%;
