@@ -7,11 +7,13 @@ export const setApiKey: EventHandler = ({event, setState}) => {
 export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 	const regionRestrictions = event.detail.regionRestrictions;
 	const search = event.detail.searchString;
+	const selected = event.detail.selected ?? "";
 
 	try {
 		const params = new URLSearchParams({
 			'auth-id': state.apiKey,
 			search,
+			selected,
 			...(regionRestrictions?.length ? {'include_only_regions': regionRestrictions.join(',')} : {})
 		});
 
@@ -22,6 +24,7 @@ export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 		}
 
 		const data = await response.json() as { data: AddressSuggestion[] };
+
 		state.eventDispatcher.dispatch("ApiService_receivedAddressSuggestions", {suggestions: data.suggestions});
 	} catch (error) {
 		throw new Error(`Failed to fetch suggestions: ${error instanceof Error ? error.message : 'Unknown error'}`);

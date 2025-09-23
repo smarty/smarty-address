@@ -3,7 +3,8 @@ import {
 	createDomElement,
 	findDomElement,
 	formatStyleBlock,
-	getColorBrightness, getElementStyles,
+	getColorBrightness,
+	getElementStyles,
 	getInstanceClassName
 } from "../utils/uiUtils.ts";
 
@@ -71,23 +72,39 @@ export const handleAutocompleteKeydown:EventHandler = ({event, state, setState})
 
 export const selectAddress:EventHandler = ({event, state:uiState, setState}) => {
 	const selectedAddress = event.detail.selectedAddress;
-	setState("selectedAddress", selectedAddress);
+	const {street_line, secondary = "", city, state:addressState, zipcode, entries = 0} = selectedAddress.address;
+	const searchInputElement = uiState.searchInputElement;
 
-	const {street_line, secondary = "", city, state:addressState, zipcode} = selectedAddress.address;
-	uiState.streetLineInputElement.value = street_line;
-	if (uiState.secondaryInputElement) {
-		uiState.secondaryInputElement.value = secondary;
+	if (entries > 1) {
+		const newSearchTerm = `${street_line} ${secondary}`;
+		const selectedAddressText = `${street_line} ${secondary} (${entries}) ${city} ${addressState} ${zipcode}`;
+
+		searchInputElement.value = newSearchTerm;
+		uiState.eventDispatcher.dispatch(
+			"UiService_requestedNewAddressSuggestions",
+			{
+				searchString: newSearchTerm,
+				selected: selectedAddressText,
+			}
+		);
+	} else {
+		setState("selectedAddress", selectedAddress);
+
+		uiState.streetLineInputElement.value = street_line;
+		if (uiState.secondaryInputElement) {
+			uiState.secondaryInputElement.value = secondary;
+		}
+		uiState.cityInputElement.value = city;
+		uiState.stateInputElement.value = addressState;
+		uiState.zipcodeInputElement.value = zipcode;
+
+		closeDropdown(uiState.dropdownElement);
 	}
-	uiState.cityInputElement.value = city;
-	uiState.stateInputElement.value = addressState;
-	uiState.zipcodeInputElement.value = zipcode;
-
-	closeDropdown(uiState.dropdownElement);
 };
 
 export const formatAddressSuggestions:EventHandler = ({event, state:uiState}) => {
 	const addressSuggestions = event.detail.suggestions.map((suggestion, index):UiSuggestionItem => {
-		const {street_line, secondary = "", city, state, zipcode, entries} = suggestion;
+		const {street_line, secondary = "", city, state, zipcode, entries = 0} = suggestion;
 		const suggestionString = `${street_line} ${secondary}, ${city}, ${state} ${zipcode}`;
 		const entriesString = entries > 1 ? `${entries} entries` : "";
 		const suggestionTextNode = document.createTextNode(suggestionString);
