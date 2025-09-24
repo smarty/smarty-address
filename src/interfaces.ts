@@ -8,12 +8,14 @@ export interface DefaultSmartyAddressConfig {
 }
 
 export interface SmartyAddressConfig extends DefaultSmartyAddressConfig{
+	// TODO: Talk to Jeffrey and Adam about correct naming of fields/properties
 	embeddedKey:string,
 	searchInputSelector:string,
 	streetLineSelector?: string,
 	secondarySelector?: string,
 	citySelector?: string,
 	stateSelector?: string,
+	// TODO: Should this be renamed to "postalCodeSelector"?
 	zipcodeSelector?: string,
 }
 
@@ -36,6 +38,7 @@ export interface BasicStateObject extends AbstractStateObject {
 	eventDispatcher: EventDispatcher,
 }
 
+// TODO: Figure out the "state" typing for specific services
 export interface UiStateObject extends BasicStateObject {
 	searchInputElement: HTMLInputElement,
 	streetLineInputElement: HTMLInputElement | null,

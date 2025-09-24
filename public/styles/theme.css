@@ -1,9 +1,12 @@
 @import "base.css";
 @import "colors.css";
 @import "spacing.css";
+/* TODO: Pull out all non-variable values and set them in base.css */
 
 .smartyAddress__suggestionsWrapperElement {
     position: var(--smartyAddress__wrapper-position);
+    /* TODO: Need to automatically calculate this value based on the margin-bottom of the input */
+    top: -5px;
     z-index: 1000;
     font-weight: normal;
 }
@@ -16,6 +19,7 @@
     position: var(--smartyAddress__dropdown-position);
     box-sizing: var(--smartyAddress__box-sizing);
     width: var(--smartyAddress__dropdown-width);
+    /*TODO: Make box-shadow customizable based on the theme or dynamic website colors */
     box-shadow: 0 12px 24px 0 rgba(4, 34, 75, 0.10), 0 20px 40px 0 rgba(21, 27, 35, 0.06);
     color: var(--smartyAddress__text-base-primary-color);
     background-color: var(--smartyAddress__surface-base-primary-color);
@@ -26,11 +30,13 @@
     padding: 0;
     overflow-y: auto;
     max-height: 500px;
+    /*TODO: Fix the scrollbar styling */
     scrollbar-color: var(--smartyAddress__surface-base-primary-inverse-color) var(--smartyAddress__surface-base-primary-color);
     scrollbar-width: thin;
 }
 
 .smartyAddress__suggestion {
+    /* TODO: Handle addresses that are wider than the dropdown */
     cursor: var(--smartyAddress__cursor-style);
     padding: var(--smartyAddress__spacing_medium_3);
     color: var(--smartyAddress__text-base-primary-color);
@@ -45,6 +51,7 @@
 }
 
 .smartyAddress__suggestionEntries {
+    /* TODO: Figure out fallback colors (or we could just make sure we never run into that scenario) */
     color: var(--smartyAddress__text-accent-color, #0066ff);
 }
 
@@ -60,6 +67,7 @@
     text-transform: uppercase;
 }
 
+/*TODO: Need to specify logo dynamically (i.e. light or dark logo depending on background color)*/
 .smartyAddress__smartyLogo {
     height: 2.5em;
 }

@@ -36,7 +36,9 @@ export const uiService: ServiceDefinition = {
 		smartyLogoLight: "null",
 	},
 	eventHandlersMap: {
+		// TODO: Refactor this to have a 1:1 mapping of events to handlers (for easier "pluginableness" for users)
 		SmartyAddress_receivedSmartyAddressConfig: [
+			// TODO: This is a race condition. Logos don't load if the events don't fire in this order. Need to fix
 			setThemeFromConfig,
 			findInputElements,
 		],

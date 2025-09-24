@@ -8,6 +8,7 @@ import {
 	getInstanceClassName
 } from "../utils/uiUtils.ts";
 
+// TODO: Handle case when there are no results returned
 
 export const findInputElements:EventHandler = ({event, state, setState}) => {
 	const {
@@ -18,6 +19,7 @@ export const findInputElements:EventHandler = ({event, state, setState}) => {
 		stateSelector,
 		zipcodeSelector,
 	} = event.detail;
+	// TODO: default "searchInputSelector" to "streetSelector" (or vice versa)
 	setState("searchInputElement", searchInputSelector ? findDomElement(searchInputSelector) : null);
 	setState("streetLineInputElement", streetSelector ? findDomElement(streetSelector) : null);
 	setState("secondaryInputElement", secondarySelector ? findDomElement(secondarySelector) : null);
@@ -30,12 +32,14 @@ export const findInputElements:EventHandler = ({event, state, setState}) => {
 
 export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 	const searchInputElement = state.searchInputElement;
+	// TODO: Add event listeners for other DOM elements
 	searchInputElement.addEventListener("input", (inputEvent:Event) => {
 		handleSearchInputOnChange({event: inputEvent, state, setState});
 	});
 
 	searchInputElement.addEventListener("focusout", () => {
-		closeDropdown(state.dropdownElement);
+		// TODO: Re-enable this later
+		// closeDropdown(state.dropdownElement);
 	});
 
 	searchInputElement.addEventListener("keydown", (inputEvent:Event) => {
@@ -44,9 +48,11 @@ export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 };
 
 export const handleAutocompleteKeydown:EventHandler = ({event, state, setState}) => {
+	// TODO: Handle scrolling within the dropdown as the user arrows up/down
 	const items = state.addressSuggestionResults;
 	const currentIndex = state.highlightedSuggestionIndex;
 
+	// TODO: Only run these actions if the dropdown is open
 	switch (event.key) {
 		case 'ArrowDown':
 			event.preventDefault();
@@ -71,12 +77,15 @@ export const handleAutocompleteKeydown:EventHandler = ({event, state, setState})
 };
 
 export const handleSelectDropdownItem:EventHandler = ({event, state:uiState, setState}) => {
+	// TODO: Figure out what to do when the form only has a subset of possible fields (e.g. no secondary, nothing except street address, no zip code, etc.)
 	const selectedAddress = event.detail.selectedAddress;
 	const {street_line, secondary = "", city, state:addressState, zipcode, entries = 0} = selectedAddress.address;
 	const searchInputElement = uiState.searchInputElement;
 
 	if (entries > 1) {
 		const newSearchTerm = `${street_line} ${secondary}`;
+		// TODO: Set selectedAddress to state so subsequent typing by the user doesn't "revert" back out to a broader search
+		// TODO: How do users "back out" of the secondary address search?
 
 		searchInputElement.value = newSearchTerm;
 		uiState.eventDispatcher.dispatch(
@@ -90,6 +99,7 @@ export const handleSelectDropdownItem:EventHandler = ({event, state:uiState, set
 		setState("selectedAddress", selectedAddress);
 
 		uiState.streetLineInputElement.value = street_line;
+		// TODO: Handle logic around secondaries better
 		if (uiState.secondaryInputElement) {
 			uiState.secondaryInputElement.value = secondary;
 		}
@@ -97,6 +107,7 @@ export const handleSelectDropdownItem:EventHandler = ({event, state:uiState, set
 		uiState.stateInputElement.value = addressState;
 		uiState.zipcodeInputElement.value = zipcode;
 
+		// TODO: Add verification so we can get the full zip code
 		closeDropdown(uiState.dropdownElement);
 	}
 };
@@ -149,6 +160,7 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 	stylesElement.innerHTML = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(state.instanceId)}`, dynamicStyleValues);;
 }
 
+// TODO: Does this really need its own event or can we just merge it with formatAddressSuggestions?
 export const updateDropdownSuggestions:EventHandler = ({event, state, setState}) => {
 	const addressSuggestions = event.detail.addressSuggestions;
 	const suggestionElements = addressSuggestions.map(({suggestionElement}) => suggestionElement);
@@ -158,6 +170,7 @@ export const updateDropdownSuggestions:EventHandler = ({event, state, setState})
 	openDropdown(state.dropdownElement);
 };
 
+// TODO: Compare with the AI-generated plugin to see what we can leverage from it
 const handleSearchInputOnChange: BrowserEventHandler = ({event, state}) => {
 	const searchInputValue = event.target?.value;
 	const eventName = searchInputValue.length ? "UiService_requestedNewAddressSuggestions" : "UiService_searchInputCleared";
@@ -203,6 +216,7 @@ const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:number, setS
 };
 
 const openDropdown = (dropdownElement) => {
+	// TODO: Create a single place to store all class names
 	dropdownElement.classList.replace("smartyAddress__hidden", "smartyAddress__open");
 };
 
@@ -227,6 +241,7 @@ const displaySuccess = () => {
 
 };
 
+// TODO: Handle config modifications generically instead of having specific handlers for each config element
 export const setThemeFromConfig:EventHandler = ({event, state, setState}) => {
 	const previousTheme = state.theme;
 	setState("theme", event.detail?.theme);
