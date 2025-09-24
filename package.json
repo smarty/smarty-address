@@ -32,7 +32,7 @@
   },
   "exports": {
     ".": "./src/index.ts",
-    "./public/*": "./public/*"
+    "./assets/*": "./assets/*"
   },
   "devDependencies": {
     "typescript": "^5.2.2",

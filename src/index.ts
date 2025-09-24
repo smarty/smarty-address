@@ -17,9 +17,9 @@ import {themes} from "./themes.ts";
 // TODO: Add testing
 // TODO: Build in accessibility (see https://smartystreets.slack.com/archives/D07C2G81HRD/p1758644912463549)
 
-const SMARTY_LOGO_DARK_URL = "../public/img/smarty-logo-blue.svg";
-const SMARTY_LOGO_LIGHT_URL = "../public/img/smarty-logo-white.svg";
-const STYLESHEET_HREF = "../public/styles/theme.css";
+const SMARTY_LOGO_DARK_URL = "../assets/img/smarty-logo-blue.svg";
+const SMARTY_LOGO_LIGHT_URL = "../assets/img/smarty-logo-white.svg";
+const STYLESHEET_HREF = "../assets/styles/theme.css";
 
 export default class SmartyAddress {
 	static defaultServiceDefinitions:ServiceDefinitionMap = {
