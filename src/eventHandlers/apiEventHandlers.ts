@@ -5,18 +5,15 @@ export const setApiKey: EventHandler = ({event, setState}) => {
 };
 
 export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
-	const regionRestrictions = event.detail.regionRestrictions;
-	const search = event.detail.searchString;
-	const selected = event.detail.selected ?? "";
-
 	try {
-		const params = new URLSearchParams({
+		const selectedAddress = event.detail.selectedAddress;
+		const requestData = {
 			'auth-id': state.apiKey,
-			search,
-			selected,
-			...(regionRestrictions?.length ? {'include_only_regions': regionRestrictions.join(',')} : {})
-		});
+			search: event.detail.searchString,
+			selected: selectedAddress ? formatSelectedAddress(selectedAddress) : "",
+		};
 
+		const params = new URLSearchParams(requestData);
 		const response = await fetch(`${state.autocompleteBaseUrl}?${params}`);
 
 		if (!response.ok) {
@@ -31,8 +28,8 @@ export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 	}
 };
 
-const FetchSecondarySuggestions = async () => {
-
+const formatSelectedAddress = ({street_line, secondary = "", city, state, zipcode, entries}:AddressSuggestion) => {
+	return `${street_line} ${secondary} (${entries}) ${city} ${state} ${zipcode}`;
 };
 
 const verifyAddress = async (address: AddressSuggestion): Promise<AddressSuggestion> => {

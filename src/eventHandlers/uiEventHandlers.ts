@@ -70,21 +70,20 @@ export const handleAutocompleteKeydown:EventHandler = ({event, state, setState})
 	}
 };
 
-export const selectAddress:EventHandler = ({event, state:uiState, setState}) => {
+export const handleSelectDropdownItem:EventHandler = ({event, state:uiState, setState}) => {
 	const selectedAddress = event.detail.selectedAddress;
 	const {street_line, secondary = "", city, state:addressState, zipcode, entries = 0} = selectedAddress.address;
 	const searchInputElement = uiState.searchInputElement;
 
 	if (entries > 1) {
 		const newSearchTerm = `${street_line} ${secondary}`;
-		const selectedAddressText = `${street_line} ${secondary} (${entries}) ${city} ${addressState} ${zipcode}`;
 
 		searchInputElement.value = newSearchTerm;
 		uiState.eventDispatcher.dispatch(
 			"UiService_requestedNewAddressSuggestions",
 			{
 				searchString: newSearchTerm,
-				selected: selectedAddressText,
+				selectedAddress: selectedAddress.address,
 			}
 		);
 	} else {

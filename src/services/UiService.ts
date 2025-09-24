@@ -9,7 +9,7 @@ import {
 	setThemeFromConfig,
 	updateTheme,
 	setCustomStyles,
-	selectAddress,
+	handleSelectDropdownItem,
 } from "../eventHandlers/uiEventHandlers.ts";
 import {themes} from "../themes.ts";
 
@@ -59,7 +59,7 @@ export const uiService: ServiceDefinition = {
 			updateDropdownSuggestions,
 		],
 		UiService_addressSelected: [
-			selectAddress,
+			handleSelectDropdownItem,
 		],
 	},
 };
