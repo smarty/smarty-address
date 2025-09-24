@@ -1,4 +1,5 @@
 import {AddressSuggestion, EventHandler} from "../interfaces.ts";
+import {formatSelectedAddress} from "../utils/apiUtils.ts";
 // TODO: Add user-agent string to track source of lookups (see https://smartystreets.slack.com/archives/C096BMWCWJW/p1756307680322609)
 
 export const setApiKey: EventHandler = ({event, setState}) => {
@@ -29,11 +30,6 @@ export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 	} catch (error) {
 		throw new Error(`Failed to fetch suggestions: ${error instanceof Error ? error.message : 'Unknown error'}`);
 	}
-};
-
-// TODO: Move this to utils
-const formatSelectedAddress = ({street_line, secondary = "", city, state, zipcode, entries}:AddressSuggestion) => {
-	return `${street_line} ${secondary} (${entries}) ${city} ${state} ${zipcode}`;
 };
 
 const verifyAddress = async (address: AddressSuggestion): Promise<AddressSuggestion> => {
