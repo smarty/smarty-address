@@ -9,7 +9,7 @@ export interface DefaultSmartyAddressConfig {
 
 export interface SmartyAddressConfig extends DefaultSmartyAddressConfig{
 	embeddedKey:string,
-	searchInputSelector?:string,
+	searchInputSelector:string,
 	streetLineSelector?: string,
 	secondarySelector?: string,
 	citySelector?: string,
