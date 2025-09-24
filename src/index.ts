@@ -2,7 +2,7 @@ import {DefaultSmartyAddressConfig, ServiceDefinitionMap, SmartyAddressConfig} f
 import {uiService} from "./services/UiService.ts";
 import {apiService} from "./services/ApiService.ts";
 import {EventDispatcher} from "./utils/EventDispatcher.ts";
-import {defineService} from "./utils/serviceFactory.ts";
+import {initService} from "./utils/serviceFactory.ts";
 import {themes} from "./themes.ts";
 // TODO: Update readme
 // TODO: Update tsconfig.json (borrow from storefront-2)
@@ -60,7 +60,7 @@ export default class SmartyAddress {
 	setupServices = (services:ServiceDefinitionMap = {}) => {
 		const serviceDefinitions = {...SmartyAddress.defaultServiceDefinitions, ...services};
 		Object.entries(serviceDefinitions).forEach(([, serviceDefinition]) => {
-			defineService(serviceDefinition, this.eventDispatcher, this.instanceId);
+			initService(serviceDefinition, this.eventDispatcher, this.instanceId);
 		});
 	}
 
