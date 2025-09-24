@@ -1,6 +1,8 @@
 import {AddressSuggestion, EventHandler} from "../interfaces.ts";
 import {formatSelectedAddress} from "../utils/apiUtils.ts";
-// TODO: Add user-agent string to track source of lookups (see https://smartystreets.slack.com/archives/C096BMWCWJW/p1756307680322609)
+
+// TODO: Dynamically update the version to match `package.json`
+const USER_AGENT = "name:smarty-address-plugin,version:0.1.0";
 
 export const setApiKey: EventHandler = ({event, setState}) => {
 	setState("apiKey", event.detail.embeddedKey);
@@ -11,7 +13,8 @@ export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 	try {
 		const selectedAddress = event.detail.selectedAddress;
 		const requestData = {
-			'auth-id': state.apiKey,
+			"auth-id": state.apiKey,
+			"user-agent": USER_AGENT,
 			search: event.detail.searchString,
 			selected: selectedAddress ? formatSelectedAddress(selectedAddress) : "",
 		};
