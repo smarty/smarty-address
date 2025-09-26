@@ -178,12 +178,13 @@ export const updateDropdownSuggestions:EventHandler = ({event, state, setState})
 };
 
 // TODO: Compare with the AI-generated plugin to see what we can leverage from it
-const handleSearchInputOnChange: BrowserEventHandler = ({event, state}) => {
+const handleSearchInputOnChange:BrowserEventHandler = ({event, state}) => {
 	const searchInputValue = event.target?.value;
 	const eventName = searchInputValue.length ? "UiService_requestedNewAddressSuggestions" : "UiService_searchInputCleared";
 	state.eventDispatcher.dispatch(eventName, {searchString: searchInputValue});
 };
 
+// TODO: Split this out into smaller functions
 export const buildDomElements:EventHandler = ({state, setState}) => {
 	const instanceClass = getInstanceClassName(state.instanceId);
 	const smartyLogoDarkElement = createDomElement("img", ["smartyAddress__smartyLogoDark"]);
@@ -217,6 +218,7 @@ const updateDropdown = () => {
 };
 
 // TODO: Figure out how to simplify the params in this function (e.g. merge indexes, eliminate state/setState params)
+// TODO: After this gets cleaned up, it should also be moved into uiUtils.ts
 const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:number, state, setState, indexChange:number) => {
 	const newIndex = (currentIndex + indexChange + items.length) % items.length;
 	setState("highlightedSuggestionIndex", newIndex);
