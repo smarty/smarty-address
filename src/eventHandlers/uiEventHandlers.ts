@@ -214,6 +214,7 @@ const updateDropdown = () => {
 
 };
 
+// TODO: Figure out how to simplify the params in this function (e.g. merge indexes, eliminate state/setState params)
 const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:number, state, setState, indexChange:number) => {
 	const newIndex = (currentIndex + indexChange + items.length) % items.length;
 	setState("highlightedSuggestionIndex", newIndex);

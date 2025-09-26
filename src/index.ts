@@ -4,7 +4,7 @@ import {apiService} from "./services/ApiService.ts";
 import {EventDispatcher} from "./utils/EventDispatcher.ts";
 import {initService} from "./utils/serviceFactory.ts";
 import {themes} from "./themes.ts";
-import {getResourceUrl} from "./utils/appUtils.ts";
+import {getResourceUrl, loadStylesheet} from "./utils/appUtils.ts";
 // TODO: Update readme
 // TODO: Update tsconfig.json (borrow from storefront-2)
 // TODO: Add ability to destroy an instance of SmartyAddress (and remove all associated elements from DOM)
@@ -37,7 +37,7 @@ export default class SmartyAddress {
 
 	static themes = themes;
 	private static instances:SmartyAddress[] = [];
-	private static stylesheetPromise:undefined | Promise<Event>;
+	private static stylesheetPromise:undefined | Promise<Event> = loadStylesheet(getResourceUrl(STYLESHEET_HREF).href);
 
 	private eventDispatcher = new EventDispatcher();
 	private instanceId;
@@ -53,9 +53,7 @@ export default class SmartyAddress {
 	init = async (config: SmartyAddressConfig) => {
 		config = {...SmartyAddress.defaultConfigValues, ...config};
 		this.setupServices(config.services);
-		this.loadStylesheet();
 		await SmartyAddress.stylesheetPromise;
-
 		this.eventDispatcher.dispatch("SmartyAddress_receivedSmartyAddressConfig", config);
 	}
 
@@ -64,22 +62,5 @@ export default class SmartyAddress {
 		Object.entries(serviceDefinitions).forEach(([, serviceDefinition]) => {
 			initService(serviceDefinition, this.eventDispatcher, this.instanceId);
 		});
-	}
-
-	loadStylesheet = () => {
-		if (this.instanceId === 1) {
-			SmartyAddress.stylesheetPromise = new Promise((resolve, reject) => {
-				const stylesUrl = getResourceUrl(STYLESHEET_HREF);
-				const head  = document.getElementsByTagName('head')[0];
-				const linkElement  = document.createElement('link');
-				linkElement.rel  = 'stylesheet';
-				linkElement.type = 'text/css';
-				linkElement.href = stylesUrl.href;
-				linkElement.onload = resolve;
-				// TODO: the onerror event doesn't actually fire (at least, in most cases)
-				linkElement.onerror = reject;
-				head.appendChild(linkElement);
-			});
-		}
 	}
 }
