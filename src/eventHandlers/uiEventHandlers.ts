@@ -5,7 +5,8 @@ import {
 	formatStyleBlock,
 	getColorBrightness,
 	getElementStyles,
-	getInstanceClassName
+	getInstanceClassName,
+	scrollToHighlightedSuggestion
 } from "../utils/uiUtils.ts";
 
 // TODO: Handle case when there are no results returned
@@ -49,18 +50,18 @@ export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 
 export const handleAutocompleteKeydown:EventHandler = ({event, state, setState}) => {
 	// TODO: Handle scrolling within the dropdown as the user arrows up/down
-	const items = state.addressSuggestionResults;
+	const items = state.addressSuggestionResults ?? [];
 	const currentIndex = state.highlightedSuggestionIndex;
 
 	// TODO: Only run these actions if the dropdown is open
 	switch (event.key) {
 		case 'ArrowDown':
 			event.preventDefault();
-			highlightNewAddress(items, currentIndex, setState, 1);
+			highlightNewAddress(items, currentIndex, state, setState, 1);
 			break;
 		case 'ArrowUp':
 			event.preventDefault();
-			highlightNewAddress(items, currentIndex, setState, -1);
+			highlightNewAddress(items, currentIndex, state, setState, -1);
 			break;
 		case 'Enter':
 			event.preventDefault();
@@ -166,9 +167,10 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 // TODO: Does this really need its own event or can we just merge it with formatAddressSuggestions?
 export const updateDropdownSuggestions:EventHandler = ({event, state, setState}) => {
 	const addressSuggestions = event.detail.addressSuggestions;
-	const suggestionElements = addressSuggestions.map(({suggestionElement}) => suggestionElement);
-	setState("addressSuggestionResults", addressSuggestions);
-	highlightNewAddress(state.addressSuggestionResults, 0, setState, 0);
+	const suggestionItems = addressSuggestions ?? [];
+	const suggestionElements = suggestionItems.map(({suggestionElement}) => suggestionElement);
+	setState("addressSuggestionResults", suggestionItems);
+	highlightNewAddress(suggestionItems, 0, state, setState, 0);
 	state.suggestionsElement.replaceChildren(...suggestionElements);
 	openDropdown(state.dropdownElement);
 };
@@ -212,12 +214,15 @@ const updateDropdown = () => {
 
 };
 
-const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:number, setState, indexChange:number) => {
+const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:number, state, setState, indexChange:number) => {
 	const newIndex = (currentIndex + indexChange + items.length) % items.length;
 	setState("highlightedSuggestionIndex", newIndex);
+
 	items.forEach((item, i) => {
 		item.suggestionElement.setAttribute("aria-selected", i === newIndex ? "true" : "false");
 	});
+
+	scrollToHighlightedSuggestion(items[newIndex].suggestionElement, state.suggestionsElement);
 };
 
 const openDropdown = (dropdownElement:HTMLElement) => {

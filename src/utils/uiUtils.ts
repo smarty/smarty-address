@@ -43,3 +43,16 @@ export const getElementStyles = (element:HTMLElement) => {
 		"backgroundColor": window.getComputedStyle(element).backgroundColor,
 	};
 };
+
+export const scrollToHighlightedSuggestion = (highlightedElement:HTMLElement, container:HTMLElement) => {
+	const elementTop = highlightedElement.offsetTop;
+	const elementBottom = elementTop + highlightedElement.offsetHeight;
+	const containerTop = container.scrollTop;
+	const containerBottom = containerTop + container.offsetHeight;
+
+	if (elementTop < containerTop) {
+		container.scrollTop = elementTop;
+	} else if (elementBottom > containerBottom) {
+		container.scrollTop = elementBottom - container.offsetHeight;
+	}
+};
