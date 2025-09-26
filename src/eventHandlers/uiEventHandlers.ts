@@ -220,12 +220,12 @@ const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:number, setS
 	});
 };
 
-const openDropdown = (dropdownElement) => {
+const openDropdown = (dropdownElement:HTMLElement) => {
 	// TODO: Create a single place to store all class names
 	dropdownElement.classList.replace("smartyAddress__hidden", "smartyAddress__open");
 };
 
-const closeDropdown = (dropdownElement) => {
+const closeDropdown = (dropdownElement:HTMLElement) => {
 	dropdownElement.classList.replace("smartyAddress__open", "smartyAddress__hidden");
 };
 

@@ -17,6 +17,7 @@ import {getResourceUrl} from "./utils/appUtils.ts";
 // TODO: Add error handling (what does the UI look like?)
 // TODO: Add testing
 // TODO: Build in accessibility (see https://smartystreets.slack.com/archives/D07C2G81HRD/p1758644912463549)
+// TODO: See how plugin performs with MUI inputs and other widely-used libraries
 
 const SMARTY_LOGO_DARK_URL = "/assets/img/smarty-logo-blue.svg";
 const SMARTY_LOGO_LIGHT_URL = "/assets/img/smarty-logo-white.svg";
