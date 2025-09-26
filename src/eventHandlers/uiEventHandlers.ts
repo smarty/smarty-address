@@ -146,8 +146,9 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 	const stylesElement = state.customStylesElement;
 	const customStyles = getElementStyles(state.searchInputElement);
 	const backgroundColorBrightness = getColorBrightness(customStyles.backgroundColor);
-	const hoverMixColor = backgroundColorBrightness > 128 ? "#000" : "#fff";
-	const hoverMixPercentage = backgroundColorBrightness > 128 ? "92%" : "85%";
+	const isLightMode = backgroundColorBrightness > 128 ? true : false;
+	const hoverMixColor = isLightMode ? "#000" : "#fff";
+	const hoverMixPercentage = isLightMode ? "92%" : "85%";
 
 	const dynamicStyleValues = {
 		"--smartyAddress__text-base-primary-color": customStyles.color,
@@ -155,6 +156,8 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 		"--smartyAddress__color-mix-percentage": hoverMixPercentage,
 		"--smartyAddress__surface-inverse-extreme-color": hoverMixColor,
 		"--smartyAddress__surface-base-primary-inverse-color": customStyles.color,
+		"--smartyAddress__logo-dark-display": isLightMode ? "block" : "none",
+		"--smartyAddress__logo-light-display": isLightMode ? "none" : "block",
 	};
 
 	stylesElement.innerHTML = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(state.instanceId)}`, dynamicStyleValues);;
@@ -179,16 +182,18 @@ const handleSearchInputOnChange: BrowserEventHandler = ({event, state}) => {
 
 export const buildDomElements:EventHandler = ({state, setState}) => {
 	const instanceClass = getInstanceClassName(state.instanceId);
-	const smartyLogoElement = createDomElement("img", ["smartyAddress__smartyLogo"]);
+	const smartyLogoDarkElement = createDomElement("img", ["smartyAddress__smartyLogoDark"]);
+	const smartyLogoLightElement = createDomElement("img", ["smartyAddress__smartyLogoLight"]);
 	const poweredByText = document.createTextNode("Powered by");
 	const suggestionsElement = createDomElement("ul", ["smartyAddress__suggestionsElement"]);
-	const poweredBySmartyElement = createDomElement("div", ["smartyAddress__poweredBy"], [poweredByText, smartyLogoElement]);
+	const poweredBySmartyElement = createDomElement("div", ["smartyAddress__poweredBy"], [poweredByText, smartyLogoDarkElement, smartyLogoLightElement]);
 	const dropdownElement = createDomElement("div", ["smartyAddress__dropdownElement", "smartyAddress__hidden"], [suggestionsElement, poweredBySmartyElement]);
 	const dropdownWrapperElement = createDomElement("div", ["smartyAddress__suggestionsWrapperElement", instanceClass], [dropdownElement]);
 	const searchInputElement = state.searchInputElement;
 
 	dropdownElement.setAttribute("role", "listbox");
-	smartyLogoElement.setAttribute("src", state.smartyLogoDark);
+	smartyLogoDarkElement.setAttribute("src", state.smartyLogoDark);
+	smartyLogoLightElement.setAttribute("src", state.smartyLogoLight);
 	searchInputElement?.parentNode?.insertBefore(dropdownWrapperElement, searchInputElement.nextSibling);
 
 	setState("dropdownWrapperElement", dropdownWrapperElement);

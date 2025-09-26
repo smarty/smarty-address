@@ -37,6 +37,7 @@
 
 .smartyAddress__suggestion {
     /* TODO: Handle addresses that are wider than the dropdown */
+    /* TODO: Handle long addresses with secondaries (currently causes "entries" text to wrap onto next line). To reproduce, type "542" into the address field */
     cursor: var(--smartyAddress__cursor-style);
     padding: var(--smartyAddress__spacing_medium_3);
     color: var(--smartyAddress__text-base-primary-color);
@@ -67,7 +68,15 @@
     text-transform: uppercase;
 }
 
-/*TODO: Need to specify logo dynamically (i.e. light or dark logo depending on background color)*/
-.smartyAddress__smartyLogo {
+.smartyAddress__smartyLogoDark,
+.smartyAddress__smartyLogoLight {
     height: 2.5em;
+}
+
+.smartyAddress__smartyLogoDark {
+    display: var(--smartyAddress__logo-dark-display);
+}
+
+.smartyAddress__smartyLogoLight {
+    display: var(--smartyAddress__logo-light-display);
 }
