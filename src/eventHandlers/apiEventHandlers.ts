@@ -9,7 +9,7 @@ export const setApiKey: EventHandler = ({event, setState}) => {
 };
 
 export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
-	// TODO: Add support for additional input fields (e.g. max_results, include_only_zip_codes, etc.)
+	// TODO: Add support for additional input fields (e.g. max_results, include_only_zip_codes, etc.). These would likely be set as "config" values
 	try {
 		const selectedAddress = event.detail.selectedAddress;
 		const requestData = {

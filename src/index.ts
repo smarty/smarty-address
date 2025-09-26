@@ -4,6 +4,7 @@ import {apiService} from "./services/ApiService.ts";
 import {EventDispatcher} from "./utils/EventDispatcher.ts";
 import {initService} from "./utils/serviceFactory.ts";
 import {themes} from "./themes.ts";
+import {getResourceUrl} from "./utils/appUtils.ts";
 // TODO: Update readme
 // TODO: Update tsconfig.json (borrow from storefront-2)
 // TODO: Add ability to destroy an instance of SmartyAddress (and remove all associated elements from DOM)
@@ -17,9 +18,9 @@ import {themes} from "./themes.ts";
 // TODO: Add testing
 // TODO: Build in accessibility (see https://smartystreets.slack.com/archives/D07C2G81HRD/p1758644912463549)
 
-const SMARTY_LOGO_DARK_URL = "../assets/img/smarty-logo-blue.svg";
-const SMARTY_LOGO_LIGHT_URL = "../assets/img/smarty-logo-white.svg";
-const STYLESHEET_HREF = "../assets/styles/theme.css";
+const SMARTY_LOGO_DARK_URL = "/assets/img/smarty-logo-blue.svg";
+const SMARTY_LOGO_LIGHT_URL = "/assets/img/smarty-logo-white.svg";
+const STYLESHEET_HREF = "/assets/styles/theme.css";
 
 export default class SmartyAddress {
 	static defaultServiceDefinitions:ServiceDefinitionMap = {
@@ -29,8 +30,8 @@ export default class SmartyAddress {
 	static defaultConfigValues:DefaultSmartyAddressConfig = {
 		theme: themes.default,
 		// TODO: Why aren't these actual URLs? (the contents of the file are just directly embedded)
-		smartyLogoDark: new URL(SMARTY_LOGO_DARK_URL, import.meta.url).href,
-		smartyLogoLight: new URL(SMARTY_LOGO_LIGHT_URL, import.meta.url).href,
+		smartyLogoDark: getResourceUrl(SMARTY_LOGO_DARK_URL).href,
+		smartyLogoLight: getResourceUrl(SMARTY_LOGO_LIGHT_URL).href,
 	};
 
 	static themes = themes;
@@ -67,7 +68,7 @@ export default class SmartyAddress {
 	loadStylesheet = () => {
 		if (this.instanceId === 1) {
 			SmartyAddress.stylesheetPromise = new Promise((resolve, reject) => {
-				const stylesUrl = new URL(STYLESHEET_HREF, import.meta.url);
+				const stylesUrl = getResourceUrl(STYLESHEET_HREF);
 				const head  = document.getElementsByTagName('head')[0];
 				const linkElement  = document.createElement('link');
 				linkElement.rel  = 'stylesheet';
