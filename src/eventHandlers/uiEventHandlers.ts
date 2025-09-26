@@ -6,7 +6,9 @@ import {
 	getColorBrightness,
 	getElementStyles,
 	getInstanceClassName,
-	scrollToHighlightedSuggestion
+	scrollToHighlightedSuggestion,
+	openDropdown,
+	closeDropdown,
 } from "../utils/uiUtils.ts";
 
 // TODO: Handle case when there are no results returned
@@ -224,15 +226,6 @@ const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:number, stat
 	});
 
 	scrollToHighlightedSuggestion(items[newIndex].suggestionElement, state.suggestionsElement);
-};
-
-const openDropdown = (dropdownElement:HTMLElement) => {
-	// TODO: Create a single place to store all class names
-	dropdownElement.classList.replace("smartyAddress__hidden", "smartyAddress__open");
-};
-
-const closeDropdown = (dropdownElement:HTMLElement) => {
-	dropdownElement.classList.replace("smartyAddress__open", "smartyAddress__hidden");
 };
 
 // e.g. for secondaries

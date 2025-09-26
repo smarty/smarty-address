@@ -56,3 +56,12 @@ export const scrollToHighlightedSuggestion = (highlightedElement:HTMLElement, co
 		container.scrollTop = elementBottom - container.offsetHeight;
 	}
 };
+
+export const openDropdown = (dropdownElement:HTMLElement) => {
+	// TODO: Create a single place to store all class names
+	dropdownElement.classList.replace("smartyAddress__hidden", "smartyAddress__visible");
+};
+
+export const closeDropdown = (dropdownElement:HTMLElement) => {
+	dropdownElement.classList.replace("smartyAddress__visible", "smartyAddress__hidden");
+};
