@@ -4,7 +4,10 @@
     --smartyAddress__dropdownPosition: absolute;
     --smartyAddress__dropdownWidth: 100%;
     --smartyAddress__cursorStyle: pointer;
-    --smartyAddress__boxSizing: border-box;
+    --smartyAddress__DropdownBoxSizing: border-box;
     --smartyAddress__dropdownZIndex: 1000;
+    --smartyAddress__dropdownFontWeight: normal;
+
+    --smartyAddress__largeShadow: 0 12px 24px 0 rgba(4, 34, 75, 0.10), 0 20px 40px 0 rgba(21, 27, 35, 0.06);
 }
 

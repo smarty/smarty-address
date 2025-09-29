@@ -8,7 +8,7 @@
     /* TODO: Need to automatically calculate this value based on the margin-bottom of the input */
     top: -5px;
     z-index: var(--smartyAddress__dropdownZIndex);
-    font-weight: normal;
+    font-weight: var(--smartyAddress__dropdownFontWeight);
 }
 
 .smartyAddress__hidden {
@@ -17,10 +17,10 @@
 
 .smartyAddress__dropdownElement {
     position: var(--smartyAddress__dropdownPosition);
-    box-sizing: var(--smartyAddress__boxSizing);
+    box-sizing: var(--smartyAddress__DropdownBoxSizing);
     width: var(--smartyAddress__dropdownWidth);
     /*TODO: Make box-shadow customizable based on the theme or dynamic website colors */
-    box-shadow: 0 12px 24px 0 rgba(4, 34, 75, 0.10), 0 20px 40px 0 rgba(21, 27, 35, 0.06);
+    box-shadow: var(--smartyAddress__largeShadow);
     color: var(--smartyAddress__textBasePrimaryColor);
     background-color: var(--smartyAddress__surfaceBasePrimaryColor);
 }
@@ -48,7 +48,7 @@
 
 .smartyAddress__suggestion:hover,
 .smartyAddress__suggestion[aria-selected="true"] {
-    background-color: color-mix(in srgb, var(--smartyAddress__surfaceBasePrimaryColor)  var(--smartyAddress__colorMixPercentage), var(--smartyAddress__surfaceInverseExtremeColor));
+    background-color: color-mix(in srgb, var(--smartyAddress__surfaceBasePrimaryColor)  var(--smartyAddress__colorContrastMedium1), var(--smartyAddress__surfaceInverseExtremeColor));
 }
 
 .smartyAddress__suggestionEntries {

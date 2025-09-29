@@ -9,8 +9,11 @@
     --smartyAddress__surfaceBasePrimaryInverseColor: #eee;
 
     --smartyAddress__strokeBasePrimaryColor: #666;
-    --smartyAddress__colorMixPercentage: 85%;
     --smartyAddress__surfaceInverseExtremeColor: #fff;
+
+    --smartyAddress__colorContrastLow1: 80%;
+    --smartyAddress__colorContrastMedium1: 85%;
+    --smartyAddress__colorContrastHigh1: 90%;
 
     --smartyAddress__logoDarkDisplay: none;
     --smartyAddress__logoLightDisplay: block;
@@ -27,8 +30,11 @@
     --smartyAddress__surfaceBasePrimaryInverseColor: #333;
 
     --smartyAddress__strokeBasePrimaryColor: #ccc;
-    --smartyAddress__colorMixPercentage: 92%;
     --smartyAddress__surfaceInverseExtremeColor: #000;
+
+    --smartyAddress__colorContrastLow1: 89%;
+    --smartyAddress__colorContrastMedium1: 92%;
+    --smartyAddress__colorContrastHigh1: 95%;
 
     --smartyAddress__logoDarkDisplay: block;
     --smartyAddress__logoLightDisplay: none;

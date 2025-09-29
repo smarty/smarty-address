@@ -156,17 +156,17 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 	const hoverMixColor = isLightMode ? "#000" : "#fff";
 	const hoverMixPercentage = isLightMode ? "92%" : "85%";
 
-	const dynamicStyleValues = {
+	const dynamicColorStyles = {
 		"--smartyAddress__text-basePrimaryColor": customStyles.color,
 		"--smartyAddress__surfaceBasePrimaryColor": customStyles.backgroundColor,
-		"--smartyAddress__colorMixPercentage": hoverMixPercentage,
+		"--smartyAddress__colorContrastMedium1": hoverMixPercentage,
 		"--smartyAddress__surfaceInverseExtremeColor": hoverMixColor,
 		"--smartyAddress__surfaceBasePrimaryInverseColor": customStyles.color,
 		"--smartyAddress__logoDarkDisplay": isLightMode ? "block" : "none",
 		"--smartyAddress__logoLightDisplay": isLightMode ? "none" : "block",
 	};
 
-	stylesElement.innerHTML = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(state.instanceId)}`, dynamicStyleValues);;
+	stylesElement.innerHTML = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(state.instanceId)}`, dynamicColorStyles);;
 }
 
 // TODO: Does this really need its own event or can we just merge it with formatAddressSuggestions?
