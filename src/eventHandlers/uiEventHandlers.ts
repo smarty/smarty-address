@@ -9,6 +9,7 @@ import {
 	scrollToHighlightedSuggestion,
 	openDropdown,
 	closeDropdown,
+	getHslFromRgbColor,
 } from "../utils/uiUtils.ts";
 
 // TODO: Handle case when there are no results returned
@@ -148,8 +149,10 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 
 	const stylesElement = state.customStylesElement;
 	const customStyles = getElementStyles(state.searchInputElement);
+
+	const backgroundLightness = getHslFromRgbColor(customStyles.backgroundColor).lightness;
 	const backgroundColorBrightness = getColorBrightness(customStyles.backgroundColor);
-	const isLightMode = backgroundColorBrightness > 128 ? true : false;
+	const isLightMode = backgroundLightness  > 75;
 	const hoverMixColor = isLightMode ? "#000" : "#fff";
 	const hoverMixPercentage = isLightMode ? "92%" : "85%";
 

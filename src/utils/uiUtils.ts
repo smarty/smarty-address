@@ -65,3 +65,45 @@ export const openDropdown = (dropdownElement:HTMLElement) => {
 export const closeDropdown = (dropdownElement:HTMLElement) => {
 	dropdownElement.classList.replace("smartyAddress__visible", "smartyAddress__hidden");
 };
+
+export const getHslFromRgbColor = (rgbColor:string) => {
+	const match = rgbColor.match(/\d+/g);
+	const [red, green, blue] = (match ?? [255, 255, 255]).map((numString) => {
+		return Number(numString) / 255;
+	});
+
+	const cmin = Math.min(red, green, blue);
+	const cmax = Math.max(red, green, blue);
+	const delta = cmax - cmin;
+	const minMaxAverage = (cmin + cmax) / 2;
+
+	let	hue = 0;
+	const lightness = convertDecimalToPercentage(minMaxAverage);
+	const saturation = convertDecimalToPercentage(delta === 0 ? 0 : delta / (1 - Math.abs(2 * minMaxAverage - 1)));
+
+	if (delta === 0) {
+		hue = 0;
+	}
+	else if (cmax === red) {
+		hue = ((green - blue) / delta) % 6;
+	}
+	else if (cmax === green) {
+		hue = (blue - red) / delta + 2;
+	}
+	else {
+		hue = (red - green) / delta + 4;
+	}
+
+	hue = Math.round(hue * 60);
+
+	if (hue < 0) {
+		hue += 360;
+	}
+
+	return {hue, saturation, lightness};
+};
+
+export const convertDecimalToPercentage = (decimal:number) => {
+	return +(decimal * 100).toFixed(1);
+};
+
