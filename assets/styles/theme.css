@@ -4,25 +4,25 @@
 /* TODO: Pull out all non-variable values and set them in base.css */
 
 .smartyAddress__suggestionsWrapperElement {
-    position: var(--smartyAddress__wrapper-position);
+    position: var(--smartyAddress__wrapperPosition);
     /* TODO: Need to automatically calculate this value based on the margin-bottom of the input */
     top: -5px;
-    z-index: 1000;
+    z-index: var(--smartyAddress__dropdownZIndex);
     font-weight: normal;
 }
 
 .smartyAddress__hidden {
-    display: var(--smartyAddress__hidden-display);
+    display: var(--smartyAddress__hiddenDisplay);
 }
 
 .smartyAddress__dropdownElement {
-    position: var(--smartyAddress__dropdown-position);
-    box-sizing: var(--smartyAddress__box-sizing);
-    width: var(--smartyAddress__dropdown-width);
+    position: var(--smartyAddress__dropdownPosition);
+    box-sizing: var(--smartyAddress__boxSizing);
+    width: var(--smartyAddress__dropdownWidth);
     /*TODO: Make box-shadow customizable based on the theme or dynamic website colors */
     box-shadow: 0 12px 24px 0 rgba(4, 34, 75, 0.10), 0 20px 40px 0 rgba(21, 27, 35, 0.06);
-    color: var(--smartyAddress__text-base-primary-color);
-    background-color: var(--smartyAddress__surface-base-primary-color);
+    color: var(--smartyAddress__textBasePrimaryColor);
+    background-color: var(--smartyAddress__surfaceBasePrimaryColor);
 }
 
 .smartyAddress__suggestionsElement {
@@ -31,35 +31,35 @@
     overflow-y: auto;
     max-height: 500px;
     /*TODO: Fix the scrollbar styling */
-    scrollbar-color: var(--smartyAddress__surface-base-primary-inverse-color) var(--smartyAddress__surface-base-primary-color);
+    scrollbar-color: var(--smartyAddress__surfaceBasePrimaryInverseColor) var(--smartyAddress__surfaceBasePrimaryColor);
     scrollbar-width: thin;
 }
 
 .smartyAddress__suggestion {
     /* TODO: Handle addresses that are wider than the dropdown */
     /* TODO: Handle long addresses with secondaries (currently causes "entries" text to wrap onto next line). To reproduce, type "542" into the address field */
-    cursor: var(--smartyAddress__cursor-style);
-    padding: var(--smartyAddress__spacing_medium_3);
-    color: var(--smartyAddress__text-base-primary-color);
-    background-color: var(--smartyAddress__surface-base-primary-color);
+    cursor: var(--smartyAddress__cursorStyle);
+    padding: var(--smartyAddress__spacingMedium3);
+    color: var(--smartyAddress__textBasePrimaryColor);
+    background-color: var(--smartyAddress__surfaceBasePrimaryColor);
     display: flex;
     justify-content: space-between;
 }
 
 .smartyAddress__suggestion:hover,
 .smartyAddress__suggestion[aria-selected="true"] {
-    background-color: color-mix(in srgb, var(--smartyAddress__surface-base-primary-color)  var(--smartyAddress__color-mix-percentage), var(--smartyAddress__surface-inverse-extreme-color));
+    background-color: color-mix(in srgb, var(--smartyAddress__surfaceBasePrimaryColor)  var(--smartyAddress__colorMixPercentage), var(--smartyAddress__surfaceInverseExtremeColor));
 }
 
 .smartyAddress__suggestionEntries {
     /* TODO: Figure out fallback colors (or we could just make sure we never run into that scenario) */
-    color: var(--smartyAddress__text-accent-color, #0066ff);
+    color: var(--smartyAddress__textAccentColor, #0066ff);
 }
 
 .smartyAddress__poweredBy {
-    color: var(--smartyAddress__text-base-secondary-color);
+    color: var(--smartyAddress__textBaseSecondaryColor);
     margin: 0;
-    padding: var(--smartyAddress__spacing_medium_3);
+    padding: var(--smartyAddress__spacingMedium3);
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -74,9 +74,9 @@
 }
 
 .smartyAddress__smartyLogoDark {
-    display: var(--smartyAddress__logo-dark-display);
+    display: var(--smartyAddress__logoDarkDisplay);
 }
 
 .smartyAddress__smartyLogoLight {
-    display: var(--smartyAddress__logo-light-display);
+    display: var(--smartyAddress__logoLightDisplay);
 }

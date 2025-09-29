@@ -1,35 +1,35 @@
 
 .smartyAddress__color_dark {
     /*TODO: update theme with the correct colors */
-    --smartyAddress__text-base-primary-color: #eee;
-    --smartyAddress__text-accent-color: #6699ff;
+    --smartyAddress__textBasePrimaryColor: #eee;
+    --smartyAddress__textAccentColor: #6699ff;
 
-    --smartyAddress__surface-base-primary-color: #111;
-    --smartyAddress__surface-base-secondary-color: #333;
-    --smartyAddress__surface-base-primary-inverse-color: #eee;
+    --smartyAddress__surfaceBasePrimaryColor: #111;
+    --smartyAddress__surfaceBaseSecondaryColor: #333;
+    --smartyAddress__surfaceBasePrimaryInverseColor: #eee;
 
-    --smartyAddress__stroke-base-primary-color: #666;
-    --smartyAddress__color-mix-percentage: 85%;
-    --smartyAddress__surface-inverse-extreme-color: #fff;
+    --smartyAddress__strokeBasePrimaryColor: #666;
+    --smartyAddress__colorMixPercentage: 85%;
+    --smartyAddress__surfaceInverseExtremeColor: #fff;
 
-    --smartyAddress__logo-dark-display: none;
-    --smartyAddress__logo-light-display: block;
+    --smartyAddress__logoDarkDisplay: none;
+    --smartyAddress__logoLightDisplay: block;
 }
 
 .smartyAddress__color_light {
     /*TODO: update theme with the correct colors */
-    --smartyAddress__text-base-primary-color: #333;
-    --smartyAddress__text-base-secondary-color: #777;
-    --smartyAddress__text-accent-color: #0066ff;
+    --smartyAddress__textBasePrimaryColor: #333;
+    --smartyAddress__textBaseSecondaryColor: #777;
+    --smartyAddress__textAccentColor: #0066ff;
 
-    --smartyAddress__surface-base-primary-color: #fcfcfc;
-    --smartyAddress__surface-base-secondary-color: #f3f3f3;
-    --smartyAddress__surface-base-primary-inverse-color: #333;
+    --smartyAddress__surfaceBasePrimaryColor: #fcfcfc;
+    --smartyAddress__surfaceBaseSecondaryColor: #f3f3f3;
+    --smartyAddress__surfaceBasePrimaryInverseColor: #333;
 
-    --smartyAddress__stroke-base-primary-color: #ccc;
-    --smartyAddress__color-mix-percentage: 92%;
-    --smartyAddress__surface-inverse-extreme-color: #000;
+    --smartyAddress__strokeBasePrimaryColor: #ccc;
+    --smartyAddress__colorMixPercentage: 92%;
+    --smartyAddress__surfaceInverseExtremeColor: #000;
 
-    --smartyAddress__logo-dark-display: block;
-    --smartyAddress__logo-light-display: none;
+    --smartyAddress__logoDarkDisplay: block;
+    --smartyAddress__logoLightDisplay: none;
 }
