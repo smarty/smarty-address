@@ -157,13 +157,13 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 	const hoverMixPercentage = isLightMode ? "92%" : "85%";
 
 	const dynamicStyleValues = {
-		"--smartyAddress__text-base-primary-color": customStyles.color,
-		"--smartyAddress__surface-base-primary-color": customStyles.backgroundColor,
-		"--smartyAddress__color-mix-percentage": hoverMixPercentage,
-		"--smartyAddress__surface-inverse-extreme-color": hoverMixColor,
-		"--smartyAddress__surface-base-primary-inverse-color": customStyles.color,
-		"--smartyAddress__logo-dark-display": isLightMode ? "block" : "none",
-		"--smartyAddress__logo-light-display": isLightMode ? "none" : "block",
+		"--smartyAddress__text-basePrimaryColor": customStyles.color,
+		"--smartyAddress__surfaceBasePrimaryColor": customStyles.backgroundColor,
+		"--smartyAddress__colorMixPercentage": hoverMixPercentage,
+		"--smartyAddress__surfaceInverseExtremeColor": hoverMixColor,
+		"--smartyAddress__surfaceBasePrimaryInverseColor": customStyles.color,
+		"--smartyAddress__logoDarkDisplay": isLightMode ? "block" : "none",
+		"--smartyAddress__logoLightDisplay": isLightMode ? "none" : "block",
 	};
 
 	stylesElement.innerHTML = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(state.instanceId)}`, dynamicStyleValues);;
