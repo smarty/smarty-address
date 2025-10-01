@@ -57,13 +57,13 @@ export const scrollToHighlightedSuggestion = (highlightedElement:HTMLElement, co
 	}
 };
 
-export const openDropdown = (dropdownElement:HTMLElement) => {
+export const showElement = (element:HTMLElement) => {
 	// TODO: Create a single place to store all class names
-	dropdownElement.classList.replace("smartyAddress__hidden", "smartyAddress__visible");
+	element.classList.replace("smartyAddress__hidden", "smartyAddress__visible");
 };
 
-export const closeDropdown = (dropdownElement:HTMLElement) => {
-	dropdownElement.classList.replace("smartyAddress__visible", "smartyAddress__hidden");
+export const hideElement = (element:HTMLElement) => {
+	element.classList.replace("smartyAddress__visible", "smartyAddress__hidden");
 };
 
 export const getHslFromRgbColor = (rgbColor:string) => {

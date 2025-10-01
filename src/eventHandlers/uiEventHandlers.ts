@@ -7,8 +7,8 @@ import {
 	getElementStyles,
 	getInstanceClassName,
 	scrollToHighlightedSuggestion,
-	openDropdown,
-	closeDropdown,
+	showElement,
+	hideElement,
 	getHslFromRgbColor,
 } from "../utils/uiUtils.ts";
 
@@ -75,7 +75,7 @@ export const handleAutocompleteKeydown:EventHandler = ({event, state, setState})
 			break;
 		case 'Escape':
 			event.preventDefault();
-			closeDropdown(state.dropdownElement);
+			hideElement(state.dropdownElement);
 			break;
 	}
 };
@@ -112,7 +112,7 @@ export const handleSelectDropdownItem:EventHandler = ({event, state:uiState, set
 		uiState.zipcodeInputElement.value = zipcode;
 
 		// TODO: Add verification so we can get the full zip code
-		closeDropdown(uiState.dropdownElement);
+		hideElement(uiState.dropdownElement);
 	}
 };
 
@@ -192,7 +192,7 @@ export const updateDropdownSuggestions:EventHandler = ({event, state, setState})
 	setState("addressSuggestionResults", suggestionItems);
 	highlightNewAddress(suggestionItems, 0, state, setState, 0);
 	state.suggestionsElement.replaceChildren(...suggestionElements);
-	openDropdown(state.dropdownElement);
+	showElement(state.dropdownElement);
 };
 
 // TODO: Compare with the AI-generated plugin to see what we can leverage from it
