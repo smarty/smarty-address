@@ -1,6 +1,7 @@
 @import "base.css";
 @import "colors.css";
 @import "spacing.css";
+@import "typography.css";
 /* TODO: Pull out all non-variable values and set them in base.css */
 
 .smartyAddress__suggestionsWrapperElement {
@@ -17,21 +18,20 @@
 
 .smartyAddress__dropdownElement {
     position: var(--smartyAddress__dropdownPosition);
-    box-sizing: var(--smartyAddress__DropdownBoxSizing);
+    box-sizing: var(--smartyAddress__dropdownBoxSizing);
     width: var(--smartyAddress__dropdownWidth);
-    /*TODO: Make box-shadow customizable based on the theme or dynamic website colors */
     box-shadow: var(--smartyAddress__largeShadow1), var(--smartyAddress__largeShadow2);
     color: var(--smartyAddress__textBasePrimaryColor);
     background-color: var(--smartyAddress__surfaceBasePrimaryColor);
 }
 
 .smartyAddress__suggestionsElement {
-    margin: 0;
-    padding: 0;
-    overflow-y: auto;
+    margin: var(--smartyAddress__spacingNone);
+    padding: var(--smartyAddress__spacingNone);
+    overflow-y: var(--smartyAddress__dropdownOverflowY);
     max-height: var(--smartyAddress__heightLarge1);
     scrollbar-color: var(--smartyAddress__surfaceBaseTertiaryColor) var(--smartyAddress__surfaceBasePrimaryColor);
-    scrollbar-width: thin;
+    scrollbar-width: var(--smartyAddress__scrollbarWidth);
 }
 
 .smartyAddress__suggestion {
@@ -41,8 +41,8 @@
     padding: var(--smartyAddress__spacingMedium3);
     color: var(--smartyAddress__textBasePrimaryColor);
     background-color: var(--smartyAddress__surfaceBasePrimaryColor);
-    display: flex;
-    justify-content: space-between;
+    display: var(--smartyAddress__suggestionDisplay);
+    justify-content: var(--smartyAddress__suggestionJustifyContent);
 }
 
 .smartyAddress__suggestion:hover,
@@ -57,19 +57,19 @@
 
 .smartyAddress__poweredBy {
     color: var(--smartyAddress__textBaseSecondaryColor);
-    margin: 0;
+    margin: var(--smartyAddress__spacingNone);
     padding: var(--smartyAddress__spacingMedium3);
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    font-size: .75em;
+    display: var(--smartyAddress__poweredByDisplay);
+    align-items: var(--smartyAddress__poweredByAlignItems);
+    justify-content: var(--smartyAddress__poweredByJustifyContent);
+    font-size: var(--smartyAddress__fontSizeSmall1);
     gap: 8px;
     text-transform: uppercase;
 }
 
 .smartyAddress__smartyLogoDark,
 .smartyAddress__smartyLogoLight {
-    height: 2.5em;
+    height: 2.2em;
 }
 
 .smartyAddress__smartyLogoDark {

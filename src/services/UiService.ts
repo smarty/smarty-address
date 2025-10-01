@@ -52,7 +52,7 @@ export const uiService: ServiceDefinition = {
 			updateTheme,
 		],
 		UiService_receivedNewTheme: [
-			updateTheme
+			updateTheme,
 		],
 		ApiService_receivedAddressSuggestions: [
 			formatAddressSuggestions,
