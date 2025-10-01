@@ -190,8 +190,12 @@ export const updateDropdownSuggestions:EventHandler = ({event, state, setState})
 	const suggestionItems = addressSuggestions ?? [];
 	const suggestionElements = suggestionItems.map(({suggestionElement}) => suggestionElement);
 	setState("addressSuggestionResults", suggestionItems);
-	highlightNewAddress(suggestionItems, 0, state, setState, 0);
 	state.suggestionsElement.replaceChildren(...suggestionElements);
+
+	if(suggestionItems.length) {
+		highlightNewAddress(suggestionItems, 0, state, setState, 0);
+	}
+
 	showElement(state.dropdownElement);
 };
 
