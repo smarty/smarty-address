@@ -164,9 +164,11 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 		"--smartyAddress__surfaceBasePrimaryInverseColor": customStyles.color,
 		"--smartyAddress__logoDarkDisplay": isLightMode ? "block" : "none",
 		"--smartyAddress__logoLightDisplay": isLightMode ? "none" : "block",
+		"--smartyAddress__largeShadow1": "0 12px 24px 0 rgba(4, 34, 75, 0.10)",
+		"--smartyAddress__largeShadow2": "0 20px 40px 0 rgba(21, 27, 35, 0.06)",
 	};
 
-	stylesElement.innerHTML = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(state.instanceId)}`, dynamicColorStyles);;
+	stylesElement.innerHTML = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(state.instanceId)}`, dynamicColorStyles);
 }
 
 // TODO: Does this really need its own event or can we just merge it with formatAddressSuggestions?

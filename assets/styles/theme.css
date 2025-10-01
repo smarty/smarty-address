@@ -20,7 +20,7 @@
     box-sizing: var(--smartyAddress__DropdownBoxSizing);
     width: var(--smartyAddress__dropdownWidth);
     /*TODO: Make box-shadow customizable based on the theme or dynamic website colors */
-    box-shadow: var(--smartyAddress__largeShadow);
+    box-shadow: var(--smartyAddress__largeShadow1), var(--smartyAddress__largeShadow2);
     color: var(--smartyAddress__textBasePrimaryColor);
     background-color: var(--smartyAddress__surfaceBasePrimaryColor);
 }

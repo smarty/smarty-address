@@ -17,6 +17,9 @@
 
     --smartyAddress__logoDarkDisplay: none;
     --smartyAddress__logoLightDisplay: block;
+
+    --smartyAddress__largeShadow1: 0 12px 24px 0 rgba(4, 34, 75, 0.10);
+    --smartyAddress__largeShadow2: 0 20px 40px 0 rgba(21, 27, 35, 0.06);
 }
 
 .smartyAddress__color_light {
@@ -38,4 +41,7 @@
 
     --smartyAddress__logoDarkDisplay: block;
     --smartyAddress__logoLightDisplay: none;
+
+    --smartyAddress__largeShadow1: 0 12px 24px 0 rgba(4, 34, 75, 0.10);
+    --smartyAddress__largeShadow2: 0 20px 40px 0 rgba(21, 27, 35, 0.06);
 }
