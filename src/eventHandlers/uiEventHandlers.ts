@@ -212,11 +212,9 @@ export const buildDomElements:EventHandler = ({state, setState}) => {
 	const smartyLogoDarkElement = createDomElement("img", ["smartyAddress__smartyLogoDark"]);
 	const smartyLogoLightElement = createDomElement("img", ["smartyAddress__smartyLogoLight"]);
 	const poweredByText = document.createTextNode("Powered by");
-	const noResultsText = document.createTextNode("No results found");
-	const noResultsElement = createDomElement("div", ["smartyAddress__noResults"], [noResultsText]);
 	const suggestionsElement = createDomElement("ul", ["smartyAddress__suggestionsElement"]);
 	const poweredBySmartyElement = createDomElement("div", ["smartyAddress__poweredBy"], [poweredByText, smartyLogoDarkElement, smartyLogoLightElement]);
-	const dropdownElement = createDomElement("div", ["smartyAddress__dropdownElement", "smartyAddress__hidden"], [suggestionsElement, noResultsElement, poweredBySmartyElement]);
+	const dropdownElement = createDomElement("div", ["smartyAddress__dropdownElement", "smartyAddress__hidden"], [suggestionsElement, poweredBySmartyElement]);
 	const dropdownWrapperElement = createDomElement("div", ["smartyAddress__suggestionsWrapperElement", instanceClass], [dropdownElement]);
 	const searchInputElement = state.searchInputElement;
 
