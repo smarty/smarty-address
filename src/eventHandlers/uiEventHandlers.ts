@@ -166,7 +166,6 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 		"--smartyAddress__surfaceBasePrimaryColor": customStyles.backgroundColor,
 		"--smartyAddress__surfaceBaseSecondaryColor": highlightColor,
 		"--smartyAddress__surfaceBaseTertiaryColor": scrollbarColor,
-		"--smartyAddress__textAccentColor": "Highlight",
 		"--smartyAddress__colorContrastLow1": colorContrastLow1,
 		"--smartyAddress__colorContrastMedium1": colorContrastMedium1,
 		"--smartyAddress__colorContrastHigh1": colorContrastHigh1,

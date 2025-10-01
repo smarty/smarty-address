@@ -50,9 +50,16 @@
     background-color: var(--smartyAddress__surfaceBaseSecondaryColor);
 }
 
+.smartyAddress__autocompleteAddress {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow-x: hidden;
+}
+
 .smartyAddress__suggestionEntries {
     /* TODO: Figure out fallback colors (or we could just make sure we never run into that scenario) */
     color: var(--smartyAddress__textAccentColor, #0066ff);
+    white-space: nowrap;
 }
 
 .smartyAddress__poweredBy {
