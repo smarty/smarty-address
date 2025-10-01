@@ -16,5 +16,8 @@
     --smartyAddress__poweredByTextTransform: uppercase;
     /*TODO: Should the logo height be made independent from the "powered by" font-size? */
     --smartyAddress__poweredByLogoHeight: 2.2em;
+    --smartyAddress__suggestionWhitespace: nowrap;
+    --smartyAddress__suggestionOverflow: ellipsis;
+    --smartyAddress__suggestionOverflowX: hidden;
 }
 

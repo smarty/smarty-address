@@ -35,8 +35,6 @@
 }
 
 .smartyAddress__suggestion {
-    /* TODO: Handle addresses that are wider than the dropdown */
-    /* TODO: Handle long addresses with secondaries (currently causes "entries" text to wrap onto next line). To reproduce, type "542" into the address field */
     cursor: var(--smartyAddress__cursorStyle);
     padding: var(--smartyAddress__spacingMedium3);
     color: var(--smartyAddress__textBasePrimaryColor);
@@ -51,15 +49,15 @@
 }
 
 .smartyAddress__autocompleteAddress {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow-x: hidden;
+    white-space: var(--smartyAddress__suggestionWhitespace);
+    text-overflow: var(--smartyAddress__suggestionOverflow);
+    overflow-x: var(--smartyAddress__suggestionOverflowX);
 }
 
 .smartyAddress__suggestionEntries {
     /* TODO: Figure out fallback colors (or we could just make sure we never run into that scenario) */
     color: var(--smartyAddress__textAccentColor, #0066ff);
-    white-space: nowrap;
+    white-space: var(--smartyAddress__suggestionWhitespace);
 }
 
 .smartyAddress__poweredBy {
