@@ -59,11 +59,11 @@ export const scrollToHighlightedSuggestion = (highlightedElement:HTMLElement, co
 
 export const showElement = (element:HTMLElement) => {
 	// TODO: Create a single place to store all class names
-	element.classList.replace("smartyAddress__hidden", "smartyAddress__visible");
+	element.classList.remove("smartyAddress__hidden");
 };
 
 export const hideElement = (element:HTMLElement) => {
-	element.classList.replace("smartyAddress__visible", "smartyAddress__hidden");
+	element.classList.add("smartyAddress__hidden");
 };
 
 export const getHslFromRgbColor = (rgbColor:string) => {
