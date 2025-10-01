@@ -29,7 +29,6 @@ export const getColorBrightness = (color:string) => {
 
 	const brightness = (0.299 * r + 0.587 * g + 0.114 * b);
 
-	// TODO: Decide threshold: 128 is the midpoint of 0–255
 	return brightness;
 };
 

@@ -12,8 +12,6 @@ import {
 	getHslFromRgbColor,
 } from "../utils/uiUtils.ts";
 
-// TODO: Handle case when there are no results returned
-
 export const findInputElements:EventHandler = ({event, state, setState}) => {
 	const {
 		searchInputSelector,
@@ -52,7 +50,6 @@ export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 };
 
 export const handleAutocompleteKeydown:EventHandler = ({event, state, setState}) => {
-	// TODO: Handle scrolling within the dropdown as the user arrows up/down
 	const items = state.addressSuggestionResults ?? [];
 	const currentIndex = state.highlightedSuggestionIndex;
 

@@ -63,13 +63,13 @@
     align-items: var(--smartyAddress__poweredByAlignItems);
     justify-content: var(--smartyAddress__poweredByJustifyContent);
     font-size: var(--smartyAddress__fontSizeSmall1);
-    gap: 8px;
-    text-transform: uppercase;
+    gap: var(--smartyAddress__spacingSmall3);
+    text-transform: var(--smartyAddress__poweredByTextTransform);
 }
 
 .smartyAddress__smartyLogoDark,
 .smartyAddress__smartyLogoLight {
-    height: 2.2em;
+    height: var(--smartyAddress__poweredByLogoHeight);
 }
 
 .smartyAddress__smartyLogoDark {

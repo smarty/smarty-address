@@ -13,5 +13,8 @@
     --smartyAddress__poweredByDisplay: flex;
     --smartyAddress__poweredByAlignItems: center;
     --smartyAddress__poweredByJustifyContent: flex-end;
+    --smartyAddress__poweredByTextTransform: uppercase;
+    /*TODO: Should the logo height be made independent from the "powered by" font-size? */
+    --smartyAddress__poweredByLogoHeight: 2.2em;
 }
 
