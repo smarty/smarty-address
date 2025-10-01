@@ -150,20 +150,33 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 	const stylesElement = state.customStylesElement;
 	const customStyles = getElementStyles(state.searchInputElement);
 
-	const backgroundLightness = getHslFromRgbColor(customStyles.backgroundColor).lightness;
-	const backgroundColorBrightness = getColorBrightness(customStyles.backgroundColor);
-	const isLightMode = backgroundLightness  > 75;
-	const hoverMixColor = isLightMode ? "#000" : "#fff";
-	const hoverMixPercentage = isLightMode ? "92%" : "85%";
+	const {hue, saturation, lightness} = getHslFromRgbColor(customStyles.backgroundColor);
+	const isLightMode = lightness  > 50;
+	const useBlueLogo = lightness  > 75;
 
+	const highlightLightness = isLightMode ? lightness - 10 : lightness + 10;
+	const scrollbarLightness = isLightMode ? lightness - 20 : lightness + 20;
+	const highlightColor = `hsl(${hue} ${saturation}% ${highlightLightness}%)`;
+	const scrollbarColor = `hsl(${hue} ${saturation}% ${scrollbarLightness}%)`;
+	const hoverMixColor = isLightMode ? "#000" : "#fff";
+	const colorContrastLow1 = isLightMode ? "92%" : "85%";
+	const colorContrastMedium1 = isLightMode ? "80%" : "65%";
+	const colorContrastHigh1 = isLightMode ? "70%" : "55%";
+
+	// TODO: Need to define all the missing vars here (see colors.css)
 	const dynamicColorStyles = {
 		"--smartyAddress__text-basePrimaryColor": customStyles.color,
 		"--smartyAddress__surfaceBasePrimaryColor": customStyles.backgroundColor,
-		"--smartyAddress__colorContrastMedium1": hoverMixPercentage,
+		"--smartyAddress__surfaceBaseSecondaryColor": highlightColor,
+		"--smartyAddress__surfaceBaseTertiaryColor": scrollbarColor,
+		"--smartyAddress__textAccentColor": "Highlight",
+		"--smartyAddress__colorContrastLow1": colorContrastLow1,
+		"--smartyAddress__colorContrastMedium1": colorContrastMedium1,
+		"--smartyAddress__colorContrastHigh1": colorContrastHigh1,
 		"--smartyAddress__surfaceInverseExtremeColor": hoverMixColor,
 		"--smartyAddress__surfaceBasePrimaryInverseColor": customStyles.color,
-		"--smartyAddress__logoDarkDisplay": isLightMode ? "block" : "none",
-		"--smartyAddress__logoLightDisplay": isLightMode ? "none" : "block",
+		"--smartyAddress__logoDarkDisplay": useBlueLogo ? "block" : "none",
+		"--smartyAddress__logoLightDisplay": useBlueLogo ? "none" : "block",
 		"--smartyAddress__largeShadow1": "0 12px 24px 0 rgba(4, 34, 75, 0.10)",
 		"--smartyAddress__largeShadow2": "0 20px 40px 0 rgba(21, 27, 35, 0.06)",
 	};

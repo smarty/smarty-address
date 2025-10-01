@@ -2,18 +2,20 @@
 .smartyAddress__color_dark {
     /*TODO: update theme with the correct colors */
     --smartyAddress__textBasePrimaryColor: #eee;
+    /*TODO: figure out how to compute the accent color */
     --smartyAddress__textAccentColor: #6699ff;
 
     --smartyAddress__surfaceBasePrimaryColor: #111;
     --smartyAddress__surfaceBaseSecondaryColor: #333;
+    --smartyAddress__surfaceBaseTertiaryColor: #666;
     --smartyAddress__surfaceBasePrimaryInverseColor: #eee;
 
     --smartyAddress__strokeBasePrimaryColor: #666;
     --smartyAddress__surfaceInverseExtremeColor: #fff;
 
-    --smartyAddress__colorContrastLow1: 80%;
-    --smartyAddress__colorContrastMedium1: 85%;
-    --smartyAddress__colorContrastHigh1: 90%;
+    --smartyAddress__colorContrastLow1: 85%;
+    --smartyAddress__colorContrastMedium1: 65%;
+    --smartyAddress__colorContrastHigh1: 55%;
 
     --smartyAddress__logoDarkDisplay: none;
     --smartyAddress__logoLightDisplay: block;
@@ -30,14 +32,15 @@
 
     --smartyAddress__surfaceBasePrimaryColor: #fcfcfc;
     --smartyAddress__surfaceBaseSecondaryColor: #f3f3f3;
+    --smartyAddress__surfaceBaseTertiaryColor: #eeeeee;
     --smartyAddress__surfaceBasePrimaryInverseColor: #333;
 
     --smartyAddress__strokeBasePrimaryColor: #ccc;
     --smartyAddress__surfaceInverseExtremeColor: #000;
 
-    --smartyAddress__colorContrastLow1: 89%;
-    --smartyAddress__colorContrastMedium1: 92%;
-    --smartyAddress__colorContrastHigh1: 95%;
+    --smartyAddress__colorContrastLow1: 92%;
+    --smartyAddress__colorContrastMedium1: 80%;
+    --smartyAddress__colorContrastHigh1: 70%;
 
     --smartyAddress__logoDarkDisplay: block;
     --smartyAddress__logoLightDisplay: none;

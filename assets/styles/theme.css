@@ -30,8 +30,7 @@
     padding: 0;
     overflow-y: auto;
     max-height: 500px;
-    /*TODO: Fix the scrollbar styling */
-    scrollbar-color: var(--smartyAddress__surfaceBasePrimaryInverseColor) var(--smartyAddress__surfaceBasePrimaryColor);
+    scrollbar-color: var(--smartyAddress__surfaceBaseTertiaryColor) var(--smartyAddress__surfaceBasePrimaryColor);
     scrollbar-width: thin;
 }
 
@@ -48,7 +47,7 @@
 
 .smartyAddress__suggestion:hover,
 .smartyAddress__suggestion[aria-selected="true"] {
-    background-color: color-mix(in srgb, var(--smartyAddress__surfaceBasePrimaryColor)  var(--smartyAddress__colorContrastMedium1), var(--smartyAddress__surfaceInverseExtremeColor));
+    background-color: var(--smartyAddress__surfaceBaseSecondaryColor);
 }
 
 .smartyAddress__suggestionEntries {
