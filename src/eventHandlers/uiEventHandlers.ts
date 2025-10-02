@@ -1,6 +1,4 @@
 import {
-	AddressSuggestion,
-	BasicStateObject,
 	BrowserEventHandler,
 	EventHandler,
 	UiSuggestionItem
@@ -16,6 +14,7 @@ import {
 	showElement,
 	hideElement,
 	getHslFromRgbColor,
+	getStreetLineFormValue
 } from "../utils/uiUtils.ts";
 
 export const findInputElements:EventHandler = ({event, state, setState}) => {
@@ -124,22 +123,6 @@ export const handleSelectDropdownItem:EventHandler = ({event, state:uiState, set
 		// TODO: Add verification so we can get the full zip code
 		hideElement(uiState.dropdownElement);
 	}
-};
-
-const getStreetLineFormValue = ({secondaryInputElement, cityInputElement, stateInputElement, zipcodeInputElement}:BasicStateObject, address:AddressSuggestion) => {
-	const streetLineValues = [address.street_line];
-
-	if (!secondaryInputElement && address.secondary?.length) {
-		streetLineValues.push(address.secondary || "");
-	}
-
-	if (!secondaryInputElement && !cityInputElement && !stateInputElement && !zipcodeInputElement) {
-		[address.city, address.state, address.zipcode].forEach((value) => {
-			value.length && streetLineValues.push(value);
-		});
-	}
-
-	return streetLineValues.join(", ");
 };
 
 export const formatAddressSuggestions:EventHandler = ({event, state:uiState}) => {

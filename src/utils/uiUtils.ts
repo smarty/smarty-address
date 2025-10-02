@@ -1,3 +1,4 @@
+import {AddressSuggestion, BasicStateObject} from "../interfaces.ts";
 
 export const findDomElement = (selector: string | undefined) => {
 	const element:HTMLElement|null = selector ? document.querySelector(selector) : null;
@@ -54,6 +55,22 @@ export const scrollToHighlightedSuggestion = (highlightedElement:HTMLElement, co
 	} else if (elementBottom > containerBottom) {
 		container.scrollTop = elementBottom - container.offsetHeight;
 	}
+};
+
+export const getStreetLineFormValue = ({secondaryInputElement, cityInputElement, stateInputElement, zipcodeInputElement}:BasicStateObject, address:AddressSuggestion) => {
+	const streetLineValues = [address.street_line];
+
+	if (!secondaryInputElement && address.secondary?.length) {
+		streetLineValues.push(address.secondary || "");
+	}
+
+	if (!secondaryInputElement && !cityInputElement && !stateInputElement && !zipcodeInputElement) {
+		[address.city, address.state, address.zipcode].forEach((value) => {
+			value.length && streetLineValues.push(value);
+		});
+	}
+
+	return streetLineValues.join(", ");
 };
 
 export const showElement = (element:HTMLElement) => {
