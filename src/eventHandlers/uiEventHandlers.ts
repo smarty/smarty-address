@@ -307,3 +307,7 @@ const handleAddressOnSelect = (event) => {
 const handleDropdownOnBlur = (event) => {
 
 };
+
+export const handleAutocompleteError:EventHandler = ({event, state, setState}) => {
+	console.log("handleAutocompleteError", event.detail?.errorName);
+};

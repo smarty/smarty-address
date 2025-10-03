@@ -10,6 +10,7 @@ import {
 	updateTheme,
 	setCustomStyles,
 	handleSelectDropdownItem,
+	handleAutocompleteError,
 } from "../eventHandlers/uiEventHandlers.ts";
 import {themes} from "../themes.ts";
 
@@ -62,6 +63,9 @@ export const uiService: ServiceDefinition = {
 		],
 		UiService_addressSelected: [
 			handleSelectDropdownItem,
+		],
+		ApiService_receivedApiErrorFetchingAddressSuggestions: [
+			handleAutocompleteError,
 		],
 	},
 };

@@ -1,5 +1,5 @@
-import {AddressSuggestion, EventHandler} from "../interfaces.ts";
-import {formatSelectedAddress} from "../utils/apiUtils.ts";
+import {AddressSuggestion, ApiErrorResponse, EventHandler} from "../interfaces.ts";
+import {formatSelectedAddress, getApiErrorName} from "../utils/apiUtils.ts";
 
 // TODO: Dynamically update the version to match `package.json`
 const USER_AGENT = "name:smarty-address-plugin,version:0.1.0";
@@ -22,16 +22,17 @@ export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 		const params = new URLSearchParams(requestData);
 		const response = await fetch(`${state.autocompleteBaseUrl}?${params}`);
 
-		// TODO: Improve error handling
-		if (!response.ok) {
-			throw new Error(`API request failed: ${response.statusText}`);
+		if (response.ok) {
+			const {suggestions} = await response.json() as { suggestions: AddressSuggestion[] };
+			state.eventDispatcher.dispatch("ApiService_receivedAddressSuggestions", {suggestions});
+		} else {
+			const errorResponse = await response.json() as { errors: ApiErrorResponse[] };
+			const errorName = getApiErrorName(response.status, errorResponse);
+
+			state.eventDispatcher.dispatch("ApiService_receivedApiErrorFetchingAddressSuggestions", {errorName});
 		}
-
-		const data = await response.json() as { data: AddressSuggestion[] };
-
-		state.eventDispatcher.dispatch("ApiService_receivedAddressSuggestions", {suggestions: data.suggestions});
 	} catch (error) {
-		throw new Error(`Failed to fetch suggestions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+		state.eventDispatcher.dispatch("ApiService_experiencedUnknownErrorFetchingAddressSuggestions");
 	}
 };
 

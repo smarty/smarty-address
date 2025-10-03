@@ -30,6 +30,11 @@ export interface AddressSuggestion {
 	metadata?: Record<string, any>;
 }
 
+export interface ApiErrorResponse {
+	id: number;
+	message: string;
+}
+
 export interface AbstractStateObject {
 	[index: string]: any;
 }
