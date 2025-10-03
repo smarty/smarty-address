@@ -27,12 +27,13 @@ export const findInputElements:EventHandler = ({event, state, setState}) => {
 		zipcodeSelector,
 	} = event.detail;
 	// TODO: default "searchInputSelector" to "streetSelector" (or vice versa)
-	setState("searchInputElement", searchInputSelector ? findDomElement(searchInputSelector) : null);
+
 	setState("streetLineInputElement", streetSelector ? findDomElement(streetSelector) : null);
 	setState("secondaryInputElement", secondarySelector ? findDomElement(secondarySelector) : null);
 	setState("cityInputElement", citySelector ? findDomElement(citySelector) : null);
 	setState("stateInputElement", stateSelector ? findDomElement(stateSelector) : null);
 	setState("zipcodeInputElement", zipcodeSelector ? findDomElement(zipcodeSelector) : null);
+	setState("searchInputElement", searchInputSelector ? findDomElement(searchInputSelector) : state.streetLineInputElement);
 
 	state.eventDispatcher.dispatch("UiService_foundInputElements");
 };
