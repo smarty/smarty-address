@@ -11,7 +11,7 @@ export const createDomElement = (tagName: string, classList?: string[] = [], chi
 	element.classList.add(...classList);
 	children.forEach((child) => {
 		element.appendChild(child);
-	})
+	});
 
 	return element;
 };
