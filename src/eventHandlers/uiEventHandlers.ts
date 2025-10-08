@@ -16,6 +16,7 @@ import {
 	getHslFromRgbColor,
 	getStreetLineFormValue
 } from "../utils/uiUtils.ts";
+// TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
 export const findInputElements:EventHandler = ({event, state, setState}) => {
 	const {
@@ -84,7 +85,6 @@ export const handleAutocompleteKeydown:EventHandler = ({event, state, setState})
 };
 
 export const handleSelectDropdownItem:EventHandler = ({event, state:uiState, setState}) => {
-	// TODO: Figure out what to do when the form only has a subset of possible fields (e.g. no secondary, nothing except street address, no zip code, etc.)
 	const selectedAddress = event.detail.selectedAddress;
 	const {street_line, secondary = "", city, state:addressState, zipcode, entries = 0} = selectedAddress.address;
 	const searchInputElement = uiState.searchInputElement;
@@ -159,6 +159,8 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 
 	const stylesElement = state.customStylesElement;
 	const customStyles = getElementStyles(state.searchInputElement);
+	// TODO: Recalculate these values whenever anything changes (e.g. screen size)
+	const {left, bottom, width} = state.searchInputElement.getBoundingClientRect();
 
 	const {hue, saturation, lightness} = getHslFromRgbColor(customStyles.backgroundColor);
 	const isLightMode = lightness  > 50;
@@ -169,6 +171,8 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 	const highlightColor = `hsl(${hue} ${saturation}% ${highlightLightness}%)`;
 	const scrollbarColor = `hsl(${hue} ${saturation}% ${scrollbarLightness}%)`;
 	const hoverMixColor = isLightMode ? "#000" : "#fff";
+
+	// TODO: I think we can remove these, but make sure they aren't being used (and won't be needed elsewhere).
 	const colorContrastLow1 = isLightMode ? "92%" : "85%";
 	const colorContrastMedium1 = isLightMode ? "80%" : "65%";
 	const colorContrastHigh1 = isLightMode ? "70%" : "55%";
@@ -190,7 +194,15 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 		"--smartyAddress__largeShadow2": "0 20px 40px 0 rgba(21, 27, 35, 0.06)",
 	};
 
-	stylesElement.innerHTML = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(state.instanceId)}`, dynamicColorStyles);
+	const dynamicPositionStyles = {
+		"--smartyAddress__dropdownPositionTop": `${bottom}px`,
+		"--smartyAddress__dropdownPositionLeft": `${left}px`,
+		"--smartyAddress__dropdownWidth": `${width}px`,
+	};
+
+	const colorsStyleBlock = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(state.instanceId)}`, dynamicColorStyles)
+	const positionStyleBlock = formatStyleBlock(`.smartyAddress__position_dynamic.${getInstanceClassName(state.instanceId)}`, dynamicPositionStyles)
+	stylesElement.innerHTML = `${colorsStyleBlock} ${positionStyleBlock}`;
 }
 
 // TODO: Does this really need its own event or can we just merge it with formatAddressSuggestions?
@@ -225,12 +237,11 @@ export const buildDomElements:EventHandler = ({state, setState}) => {
 	const poweredBySmartyElement = createDomElement("div", ["smartyAddress__poweredBy"], [poweredByText, smartyLogoDarkElement, smartyLogoLightElement]);
 	const dropdownElement = createDomElement("div", ["smartyAddress__dropdownElement", "smartyAddress__hidden"], [suggestionsElement, poweredBySmartyElement]);
 	const dropdownWrapperElement = createDomElement("div", ["smartyAddress__suggestionsWrapperElement", instanceClass], [dropdownElement]);
-	const searchInputElement = state.searchInputElement;
 
 	dropdownElement.setAttribute("role", "listbox");
 	smartyLogoDarkElement.setAttribute("src", state.smartyLogoDark);
 	smartyLogoLightElement.setAttribute("src", state.smartyLogoLight);
-	searchInputElement?.parentNode?.insertBefore(dropdownWrapperElement, searchInputElement.nextSibling);
+	document.body.appendChild(dropdownWrapperElement);
 
 	setState("dropdownWrapperElement", dropdownWrapperElement);
 	setState("dropdownElement", dropdownElement);

@@ -1,12 +1,12 @@
 @import "base.css";
 @import "colors.css";
 @import "spacing.css";
-@import "typography.css";
+@import "misc.css";
 
 .smartyAddress__suggestionsWrapperElement {
+    top: var(--smartyAddress__dropdownPositionTop);
+    left: var(--smartyAddress__dropdownPositionLeft);
     position: var(--smartyAddress__wrapperPosition);
-    /* TODO: Need to automatically calculate this value based on the margin-bottom of the input */
-    top: -5px;
     z-index: var(--smartyAddress__dropdownZIndex);
     font-weight: var(--smartyAddress__dropdownFontWeight);
 }
