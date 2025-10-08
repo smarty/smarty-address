@@ -1,5 +1,5 @@
 import {AddressSuggestion, ApiErrorResponse, EventHandler} from "../interfaces.ts";
-import {formatSelectedAddress, getApiErrorName} from "../utils/apiUtils.ts";
+import {formatSelectedAddress, getApiError} from "../utils/apiUtils.ts";
 
 // TODO: Dynamically update the version to match `package.json`
 const USER_AGENT = "name:smarty-address-plugin,version:0.1.0";
@@ -27,9 +27,10 @@ export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 			state.eventDispatcher.dispatch("ApiService_receivedAddressSuggestions", {suggestions});
 		} else {
 			const errorResponse = await response.json() as { errors: ApiErrorResponse[] };
-			const errorName = getApiErrorName(response.status, errorResponse);
+			const error = getApiError(response.status, errorResponse);
 
-			state.eventDispatcher.dispatch("ApiService_receivedApiErrorFetchingAddressSuggestions", {errorName});
+
+			state.eventDispatcher.dispatch("ApiService_receivedApiErrorFetchingAddressSuggestions", {errorName: error.name});
 		}
 	} catch (error) {
 		state.eventDispatcher.dispatch("ApiService_experiencedUnknownErrorFetchingAddressSuggestions");

@@ -22,6 +22,7 @@
     box-shadow: var(--smartyAddress__largeShadow1), var(--smartyAddress__largeShadow2);
     color: var(--smartyAddress__textBasePrimaryColor);
     background-color: var(--smartyAddress__surfaceBasePrimaryColor);
+    /*TODO: This border color is too much contrast for light mode, and too little contrast for dark mode. */
     border: 1px solid var(--smartyAddress__surfaceBaseSecondaryColor);
     border-top: none;
 }

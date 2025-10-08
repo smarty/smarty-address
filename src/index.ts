@@ -19,6 +19,8 @@ import {getResourceUrl, loadStylesheet} from "./utils/appUtils.ts";
 // TODO: Build in accessibility (see https://smartystreets.slack.com/archives/D07C2G81HRD/p1758644912463549)
 // TODO: See how plugin performs with MUI inputs and other widely-used libraries
 // TODO: Update code to use international names for address fields, variable names, etc. (e.g. postal code instead of zipcode)
+// TODO: Add "backoff" for autocomplete results (add config option to make this customizable)
+// TODO: Add config option for "min characters" before api request is sent
 
 const SMARTY_LOGO_DARK_URL = "/assets/img/smarty-logo-blue.svg";
 const SMARTY_LOGO_LIGHT_URL = "/assets/img/smarty-logo-white.svg";
