@@ -1,4 +1,5 @@
 import {AddressSuggestion, BasicStateObject} from "../interfaces.ts";
+import Color from "color";
 
 export const findDomElement = (selector: string | undefined) => {
 	const element:HTMLElement|null = selector ? document.querySelector(selector) : null;
@@ -89,6 +90,7 @@ export const getHslFromRgbColor = (rgbColor:string) => {
 		return Number(numString) / 255;
 	});
 
+const rgbToHsl = ([red, green, blue]:number[]) => {
 	const cmin = Math.min(red, green, blue);
 	const cmax = Math.max(red, green, blue);
 	const delta = cmax - cmin;
@@ -124,3 +126,27 @@ export const convertDecimalToPercentage = (decimal:number) => {
 	return +(decimal * 100).toFixed(1);
 };
 
+function getRGBAString(value:string) {
+	const canvas = document.createElement('canvas');
+	canvas.width = 1; canvas.height = 1;
+	const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+	ctx.globalCompositeOperation = 'copy';
+	ctx.fillStyle = value;
+	ctx.fillRect(0, 0, 1, 1);
+
+	const [r, g, b, aByte] = ctx.getImageData(0, 0, 1, 1).data;
+	const a = Math.round((aByte / 255) * 1000) / 1000;
+
+	return [r,g,b,a];
+}
+
+export const getHslColorsFromElement = (element:HTMLElement) => {
+	const inputStyles = getElementStyles(element);
+	const [r,g,b,alpha] = getRGBAString(inputStyles.backgroundColor);
+	// TODO: Should we use the "rgbToHsl()" function instead of the "color" npm package?
+	const {h, s, l} = Color({r,g,b,alpha}).hsl().object();
+	return {
+		backgroundColor: {hue: h, saturation: s, lightness: l},
+	};
+};
