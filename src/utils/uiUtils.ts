@@ -37,10 +37,11 @@ export const getInstanceClassName = (instanceId:number) => {
 	return `smartyAddress__instance_${instanceId}`;
 };
 
-export const getElementStyles = (element:HTMLElement) => {
+export const getElementStyles = (element:HTMLElement):{color:string, backgroundColor:string} => {
+	const {color, backgroundColor} = window.getComputedStyle(element);
 	return {
-		"color": window.getComputedStyle(element).color,
-		"backgroundColor": window.getComputedStyle(element).backgroundColor,
+		color,
+		backgroundColor,
 	};
 };
 
