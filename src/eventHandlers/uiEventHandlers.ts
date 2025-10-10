@@ -7,14 +7,13 @@ import {
 	createDomElement,
 	findDomElement,
 	formatStyleBlock,
-	getColorBrightness,
 	getElementStyles,
 	getInstanceClassName,
 	scrollToHighlightedSuggestion,
 	showElement,
 	hideElement,
-	getHslFromRgbColor,
-	getStreetLineFormValue
+	getStreetLineFormValue,
+	getHslColorsFromElement
 } from "../utils/uiUtils.ts";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
@@ -150,6 +149,7 @@ export const formatAddressSuggestions:EventHandler = ({event, state:uiState}) =>
 };
 
 export const setCustomStyles:EventHandler = ({event, state, setState}) => {
+	// TODO: Recalculate these values whenever anything changes (e.g. screen size)
 	if (!state.customStylesElement) {
 		const newStylesElement = document.createElement("style");
 		const head  = document.getElementsByTagName('head')[0];
@@ -158,11 +158,10 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 	}
 
 	const stylesElement = state.customStylesElement;
-	const customStyles = getElementStyles(state.searchInputElement);
-	// TODO: Recalculate these values whenever anything changes (e.g. screen size)
 	const {left, bottom, width} = state.searchInputElement.getBoundingClientRect();
 
-	const {hue, saturation, lightness} = getHslFromRgbColor(customStyles.backgroundColor);
+	const inputStyles = getElementStyles(state.searchInputElement);
+	const {hue, saturation, lightness} = getHslColorsFromElement(state.searchInputElement).backgroundColor;
 	const isLightMode = lightness  > 50;
 	const useBlueLogo = lightness  > 75;
 
@@ -179,15 +178,15 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 
 	// TODO: Need to define all the missing vars here (see colors.css)
 	const dynamicColorStyles = {
-		"--smartyAddress__text-basePrimaryColor": customStyles.color,
-		"--smartyAddress__surfaceBasePrimaryColor": customStyles.backgroundColor,
+		"--smartyAddress__text-basePrimaryColor": inputStyles.color,
+		"--smartyAddress__surfaceBasePrimaryColor": inputStyles.backgroundColor,
 		"--smartyAddress__surfaceBaseSecondaryColor": highlightColor,
 		"--smartyAddress__surfaceBaseTertiaryColor": scrollbarColor,
 		"--smartyAddress__colorContrastLow1": colorContrastLow1,
 		"--smartyAddress__colorContrastMedium1": colorContrastMedium1,
 		"--smartyAddress__colorContrastHigh1": colorContrastHigh1,
 		"--smartyAddress__surfaceInverseExtremeColor": hoverMixColor,
-		"--smartyAddress__surfaceBasePrimaryInverseColor": customStyles.color,
+		"--smartyAddress__surfaceBasePrimaryInverseColor": inputStyles.color,
 		"--smartyAddress__logoDarkDisplay": useBlueLogo ? "block" : "none",
 		"--smartyAddress__logoLightDisplay": useBlueLogo ? "none" : "block",
 		"--smartyAddress__largeShadow1": "0 12px 24px 0 rgba(4, 34, 75, 0.10)",
