@@ -171,10 +171,10 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 	const isLightMode = l  > 50;
 	const useBlueLogo = l  > 75;
 
-	const highlightLightness = isLightMode ? l - 10 : l + 10;
-	const scrollbarLightness = isLightMode ? l - 20 : l + 20;
-	const highlightColor = `hsl(${h} ${s}% ${highlightLightness}%)`;
-	const scrollbarColor = `hsl(${h} ${s}% ${scrollbarLightness}%)`;
+	const secondaryLightness = isLightMode ? l - 10 : l + 10;
+	const tertiaryLightness = isLightMode ? l - 20 : l + 20;
+	const secondarySurfaceColor = `hsl(${h} ${s}% ${secondaryLightness}%)`;
+	const tertiarySurfaceColor = `hsl(${h} ${s}% ${tertiaryLightness}%)`;
 	const hoverMixColor = isLightMode ? "#000" : "#fff";
 
 	// TODO: I think we can remove these, but make sure they aren't being used (and won't be needed elsewhere).
@@ -186,8 +186,8 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 	const dynamicColorStyles = {
 		"--smartyAddress__textBasePrimaryColor": inputStyles.color,
 		"--smartyAddress__surfaceBasePrimaryColor": inputStyles.backgroundColor,
-		"--smartyAddress__surfaceBaseSecondaryColor": highlightColor,
-		"--smartyAddress__surfaceBaseTertiaryColor": scrollbarColor,
+		"--smartyAddress__surfaceBaseSecondaryColor": secondarySurfaceColor,
+		"--smartyAddress__surfaceBaseTertiaryColor": tertiarySurfaceColor,
 		"--smartyAddress__colorContrastLow1": colorContrastLow1,
 		"--smartyAddress__colorContrastMedium1": colorContrastMedium1,
 		"--smartyAddress__colorContrastHigh1": colorContrastHigh1,
