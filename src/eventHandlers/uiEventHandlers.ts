@@ -13,7 +13,8 @@ import {
 	showElement,
 	hideElement,
 	getStreetLineFormValue,
-	getHslColorsFromElement
+	getHslColorsFromElement,
+	getFirstParentWithStyles
 } from "../utils/uiUtils.ts";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
@@ -160,15 +161,18 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 	const stylesElement = state.customStylesElement;
 	const {left, bottom, width} = state.searchInputElement.getBoundingClientRect();
 
-	const inputStyles = getElementStyles(state.searchInputElement);
-	const {hue, saturation, lightness} = getHslColorsFromElement(state.searchInputElement).backgroundColor;
-	const isLightMode = lightness  > 50;
-	const useBlueLogo = lightness  > 75;
+	// TODO: Do we also want to inherit boundingBoxPositions from this element?
+	const elementToInheritStylesFrom = getFirstParentWithStyles(state.searchInputElement);
+	const inputStyles = getElementStyles(elementToInheritStylesFrom);
+	const {h, s, l} = getHslColorsFromElement(inputStyles.backgroundColor);
 
-	const highlightLightness = isLightMode ? lightness - 10 : lightness + 10;
-	const scrollbarLightness = isLightMode ? lightness - 20 : lightness + 20;
-	const highlightColor = `hsl(${hue} ${saturation}% ${highlightLightness}%)`;
-	const scrollbarColor = `hsl(${hue} ${saturation}% ${scrollbarLightness}%)`;
+	const isLightMode = l  > 50;
+	const useBlueLogo = l  > 75;
+
+	const highlightLightness = isLightMode ? l - 10 : l + 10;
+	const scrollbarLightness = isLightMode ? l - 20 : l + 20;
+	const highlightColor = `hsl(${h} ${s}% ${highlightLightness}%)`;
+	const scrollbarColor = `hsl(${h} ${s}% ${scrollbarLightness}%)`;
 	const hoverMixColor = isLightMode ? "#000" : "#fff";
 
 	// TODO: I think we can remove these, but make sure they aren't being used (and won't be needed elsewhere).
@@ -178,7 +182,7 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 
 	// TODO: Need to define all the missing vars here (see colors.css)
 	const dynamicColorStyles = {
-		"--smartyAddress__text-basePrimaryColor": inputStyles.color,
+		"--smartyAddress__textBasePrimaryColor": inputStyles.color,
 		"--smartyAddress__surfaceBasePrimaryColor": inputStyles.backgroundColor,
 		"--smartyAddress__surfaceBaseSecondaryColor": highlightColor,
 		"--smartyAddress__surfaceBaseTertiaryColor": scrollbarColor,
