@@ -160,6 +160,8 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 
 	const stylesElement = state.customStylesElement;
 	const {left, bottom, width} = state.searchInputElement.getBoundingClientRect();
+	const scrollY = window.scrollY;
+	const scrollX = window.scrollX;
 
 	// TODO: Do we also want to inherit boundingBoxPositions from this element?
 	const elementToInheritStylesFrom = getFirstParentWithStyles(state.searchInputElement);
@@ -198,8 +200,8 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 	};
 
 	const dynamicPositionStyles = {
-		"--smartyAddress__dropdownPositionTop": `${bottom}px`,
-		"--smartyAddress__dropdownPositionLeft": `${left}px`,
+		"--smartyAddress__dropdownPositionTop": `${bottom + scrollY}px`,
+		"--smartyAddress__dropdownPositionLeft": `${left + scrollX}px`,
 		"--smartyAddress__dropdownWidth": `${width}px`,
 	};
 
