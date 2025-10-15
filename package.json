@@ -39,6 +39,5 @@
     "vite": "^7.1.4"
   },
   "dependencies": {
-    "color": "^5.0.2"
   }
 }

@@ -1,5 +1,4 @@
-import {AddressSuggestion, BasicStateObject} from "../interfaces.ts";
-import Color from "color";
+import {AddressSuggestion, BasicStateObject, HslColor, RgbaColor} from "../interfaces.ts";
 
 export const findDomElement = (selector: string | undefined) => {
 	const element:HTMLElement|null = selector ? document.querySelector(selector) : null;
@@ -38,12 +37,10 @@ export const getInstanceClassName = (instanceId:number) => {
 	return `smartyAddress__instance_${instanceId}`;
 };
 
-export const getElementStyles = (element:HTMLElement):{color:string, backgroundColor:string} => {
-	const {color, backgroundColor} = window.getComputedStyle(element);
-	return {
-		color,
-		backgroundColor,
-	};
+export const getElementStyles = (element:HTMLElement, property:string):CSSStyleDeclaration => {
+	const styles:CSSStyleDeclaration = window.getComputedStyle(element);
+
+	return styles[property] ?? "rgba(0, 0, 0, 0)";
 };
 
 export const scrollToHighlightedSuggestion = (highlightedElement:HTMLElement, container:HTMLElement) => {
@@ -129,32 +126,32 @@ export const convertDecimalToPercentage = (decimal:number) => {
 	return +(decimal * 100);
 };
 
-export const getFirstParentWithStyles = (element:HTMLElement):HTMLElement => {
+export const getNearestStyledElement = (element:HTMLElement, colorProperty:string):HTMLElement => {
 	// TODO: What about background-images, gradients, styles defined in a sibling (instead of ancestor), and other edge cases?
-	const backgroundColor = getElementStyles(element).backgroundColor;
-	const {alpha} = getRGBAString(backgroundColor);
+	const colorValue = getElementStyles(element, colorProperty);
+	const {alpha} = getRgbaFromCssColor(colorValue);
 
-	return alpha < .1 && element.parentElement ? getFirstParentWithStyles(element.parentElement) : element;
+	return alpha < .1 && element.parentElement ? getNearestStyledElement(element.parentElement, colorProperty) : element;
 };
 
-function getRGBAString(colorValue:string) {
+function getRgbaFromCssColor(cssColor:CSSStyleDeclaration) {
 	const canvas = document.createElement("canvas");
 	canvas.width = 1; canvas.height = 1;
-	// TODO: review config options
+	// TODO: review "canvas.getContext()" config options
 	// TODO: Make sure this solution works cross-browser
 	const context = canvas.getContext("2d", { willReadFrequently: true });
 
 	context.globalCompositeOperation = "copy";
-	context.fillStyle = colorValue;
+	context.fillStyle = cssColor;
 	context.fillRect(0, 0, 1, 1);
 
-	const [r, g, b, aByte] = context.getImageData(0, 0, 1, 1).data;
+	const [red, green, blue, aByte] = context.getImageData(0, 0, 1, 1).data;
 	const alpha = Math.round((aByte / 255) * 1000) / 1000;
 
-	return {r, g, b, alpha};
+	return {red, green, blue, alpha};
 }
 
-export const getHslColorsFromElement = (colorString:string) => {
-	// TODO: Should we use the "rgbToHsl()" function instead of the "color" npm package?
-	return Color(getRGBAString(colorString)).hsl().object();
+export const getHslFromColorString = (colorString:CSSStyleDeclaration) => {
+	const rgbaColor = getRgbaFromCssColor(colorString);
+	return rgbToHsl(rgbaColor);
 };
