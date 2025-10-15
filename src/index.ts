@@ -9,7 +9,6 @@ import {getResourceUrl, loadStylesheet} from "./utils/appUtils.ts";
 // TODO: Update tsconfig.json (borrow from storefront-2)
 // TODO: Add ability to destroy an instance of SmartyAddress (and remove all associated elements from DOM)
 // TODO: Upload package to npm
-// TODO: Figure out what to name the plugin
 // TODO: Make styles dynamically configurable (e.g. what if I want to change the theme dynamically after the page has loaded?)
 // TODO: add `rel="preload" (or similar) to <link> tags (use a service worker?)
 // TODO: reference package.json from the SDK and borrow what makes sense
@@ -17,10 +16,10 @@ import {getResourceUrl, loadStylesheet} from "./utils/appUtils.ts";
 // TODO: Add error handling (what does the UI look like?)
 // TODO: Add testing
 // TODO: Build in accessibility (see https://smartystreets.slack.com/archives/D07C2G81HRD/p1758644912463549)
-// TODO: See how plugin performs with MUI inputs and other widely-used libraries
 // TODO: Update code to use international names for address fields, variable names, etc. (e.g. postal code instead of zipcode)
 // TODO: Add "backoff" for autocomplete results (add config option to make this customizable)
 // TODO: Add config option for "min characters" before api request is sent
+// TODO: Add ShadCdn to test site (see https://ui.shadcn.com/)
 
 const SMARTY_LOGO_DARK_URL = "/assets/img/smarty-logo-blue.svg";
 const SMARTY_LOGO_LIGHT_URL = "/assets/img/smarty-logo-white.svg";

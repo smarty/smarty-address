@@ -177,20 +177,12 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 	const tertiarySurfaceColor = `hsl(${h} ${s}% ${tertiaryLightness}%)`;
 	const hoverMixColor = isLightMode ? "#000" : "#fff";
 
-	// TODO: I think we can remove these, but make sure they aren't being used (and won't be needed elsewhere).
-	const colorContrastLow1 = isLightMode ? "92%" : "85%";
-	const colorContrastMedium1 = isLightMode ? "80%" : "65%";
-	const colorContrastHigh1 = isLightMode ? "70%" : "55%";
-
 	// TODO: Need to define all the missing vars here (see colors.css)
 	const dynamicColorStyles = {
 		"--smartyAddress__textBasePrimaryColor": inputStyles.color,
 		"--smartyAddress__surfaceBasePrimaryColor": inputStyles.backgroundColor,
 		"--smartyAddress__surfaceBaseSecondaryColor": secondarySurfaceColor,
 		"--smartyAddress__surfaceBaseTertiaryColor": tertiarySurfaceColor,
-		"--smartyAddress__colorContrastLow1": colorContrastLow1,
-		"--smartyAddress__colorContrastMedium1": colorContrastMedium1,
-		"--smartyAddress__colorContrastHigh1": colorContrastHigh1,
 		"--smartyAddress__surfaceInverseExtremeColor": hoverMixColor,
 		"--smartyAddress__surfaceBasePrimaryInverseColor": inputStyles.color,
 		"--smartyAddress__logoDarkDisplay": useBlueLogo ? "block" : "none",

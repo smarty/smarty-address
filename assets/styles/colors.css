@@ -13,10 +13,6 @@
     --smartyAddress__strokeBasePrimaryColor: #666;
     --smartyAddress__surfaceInverseExtremeColor: #fff;
 
-    --smartyAddress__colorContrastLow1: 85%;
-    --smartyAddress__colorContrastMedium1: 65%;
-    --smartyAddress__colorContrastHigh1: 55%;
-
     --smartyAddress__logoDarkDisplay: none;
     --smartyAddress__logoLightDisplay: block;
 
@@ -37,10 +33,6 @@
 
     --smartyAddress__strokeBasePrimaryColor: #ccc;
     --smartyAddress__surfaceInverseExtremeColor: #000;
-
-    --smartyAddress__colorContrastLow1: 92%;
-    --smartyAddress__colorContrastMedium1: 80%;
-    --smartyAddress__colorContrastHigh1: 70%;
 
     --smartyAddress__logoDarkDisplay: block;
     --smartyAddress__logoLightDisplay: none;
