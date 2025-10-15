@@ -90,7 +90,7 @@ export const getHslFromRgbColor = (rgbColor:string) => {
 		return Number(numString) / 255;
 	});
 
-const rgbToHsl = ([red, green, blue]:number[]) => {
+const rgbToHsl = ({red, green, blue, alpha}:RgbaColor):HslColor => {
 	red /= 255;
 	green /= 255;
 	blue /= 255;
@@ -116,17 +116,17 @@ const rgbToHsl = ([red, green, blue]:number[]) => {
 		hue = (red - green) / delta + 4;
 	}
 
-	hue = Math.round(hue * 60);
+	hue *= 60;
 
 	if (hue < 0) {
 		hue += 360;
 	}
 
-	return {hue, saturation, lightness};
+	return {hue, saturation, lightness, alpha};
 };
 
 export const convertDecimalToPercentage = (decimal:number) => {
-	return +(decimal * 100).toFixed(1);
+	return +(decimal * 100);
 };
 
 export const getFirstParentWithStyles = (element:HTMLElement):HTMLElement => {
