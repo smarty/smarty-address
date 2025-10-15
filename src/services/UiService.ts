@@ -8,7 +8,7 @@ import {
 	notifyDomInitIsComplete,
 	setThemeFromConfig,
 	updateTheme,
-	setCustomStyles,
+	setupDynamicStyling,
 	handleSelectDropdownItem,
 	handleAutocompleteError,
 } from "../eventHandlers/uiEventHandlers.ts";
@@ -46,7 +46,7 @@ export const uiService: ServiceDefinition = {
 		UiService_foundInputElements: [
 			buildDomElements,
 			watchSearchInputForChanges,
-			setCustomStyles,
+			setupDynamicStyling,
 		],
 		UiService_builtDomElements: [
 			notifyDomInitIsComplete,

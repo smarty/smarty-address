@@ -6,15 +6,12 @@ import {
 import {
 	createDomElement,
 	findDomElement,
-	formatStyleBlock,
-	getElementStyles,
 	getInstanceClassName,
 	scrollToHighlightedSuggestion,
 	showElement,
 	hideElement,
 	getStreetLineFormValue,
-	getHslFromColorString,
-	getNearestStyledElement
+	updateDynamicStyles
 } from "../utils/uiUtils.ts";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
@@ -41,7 +38,7 @@ export const findInputElements:EventHandler = ({event, state, setState}) => {
 
 export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 	const searchInputElement = state.searchInputElement;
-	// TODO: Add event listeners for other DOM elements
+	// TODO: Add event listeners for other DOM elements (v2)
 	searchInputElement.addEventListener("input", (inputEvent:Event) => {
 		handleSearchInputOnChange({event: inputEvent, state, setState});
 	});
@@ -53,6 +50,8 @@ export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 
 	searchInputElement.addEventListener("keydown", (inputEvent:Event) => {
 		handleAutocompleteKeydown({event: inputEvent, state, setState});
+		// TODO: Figure out how to prevent 1Password from triggering when arrowing down (or selecting an address via the "enter" key)
+		return false;
 	});
 };
 
@@ -149,8 +148,7 @@ export const formatAddressSuggestions:EventHandler = ({event, state:uiState}) =>
 	uiState.eventDispatcher.dispatch("UiService_formattedAddressSuggestions", {addressSuggestions});
 };
 
-export const setCustomStyles:EventHandler = ({event, state, setState}) => {
-	// TODO: Recalculate these values whenever anything changes (e.g. screen size)
+export const setupDynamicStyling:EventHandler = ({state, setState}) => {
 	if (!state.customStylesElement) {
 		const newStylesElement = document.createElement("style");
 		const head  = document.getElementsByTagName('head')[0];
@@ -158,51 +156,8 @@ export const setCustomStyles:EventHandler = ({event, state, setState}) => {
 		setState("customStylesElement", newStylesElement);
 	}
 
-	const stylesElement = state.customStylesElement;
-	const {left, bottom, width} = state.searchInputElement.getBoundingClientRect();
-	const scrollY = window.scrollY;
-	const scrollX = window.scrollX;
-
-	// TODO: Do we also want to inherit boundingBoxPositions from this element? Probably not because it's super risky, but maybe we allow the user to pass in "offset-x" and "offset-y" config values to handle edge cases
-	const backgroundColorElement = getNearestStyledElement(state.searchInputElement, "backgroundColor");
-	const colorElement = getNearestStyledElement(state.searchInputElement, "color");
-	const inputBackgroundColor = getElementStyles(backgroundColorElement, "backgroundColor");
-	const inputTextColor = getElementStyles(colorElement, "color");
-	const {hue, saturation, lightness} = getHslFromColorString(inputBackgroundColor);
-
-	const isLightMode = lightness  > 50;
-	const useBlueLogo = lightness  > 75;
-
-	const secondaryLightness = isLightMode ? lightness - 10 : lightness + 10;
-	const tertiaryLightness = isLightMode ? lightness - 20 : lightness + 20;
-	const secondarySurfaceColor = `hsl(${hue} ${saturation}% ${secondaryLightness}%)`;
-	const tertiarySurfaceColor = `hsl(${hue} ${saturation}% ${tertiaryLightness}%)`;
-	const hoverMixColor = isLightMode ? "#000" : "#fff";
-
-	// TODO: Need to define all the missing vars here (see colors.css)
-	const dynamicColorStyles = {
-		"--smartyAddress__textBasePrimaryColor": inputTextColor,
-		"--smartyAddress__surfaceBasePrimaryColor": inputBackgroundColor,
-		"--smartyAddress__surfaceBaseSecondaryColor": secondarySurfaceColor,
-		"--smartyAddress__surfaceBaseTertiaryColor": tertiarySurfaceColor,
-		"--smartyAddress__surfaceInverseExtremeColor": hoverMixColor,
-		"--smartyAddress__surfaceBasePrimaryInverseColor": inputTextColor,
-		"--smartyAddress__logoDarkDisplay": useBlueLogo ? "block" : "none",
-		"--smartyAddress__logoLightDisplay": useBlueLogo ? "none" : "block",
-		// TODO: What to do about shadows for sites in dark mode
-		"--smartyAddress__largeShadow1": "0 12px 24px 0 rgba(4, 34, 75, 0.10)",
-		"--smartyAddress__largeShadow2": "0 20px 40px 0 rgba(21, 27, 35, 0.06)",
-	};
-
-	const dynamicPositionStyles = {
-		"--smartyAddress__dropdownPositionTop": `${bottom + scrollY}px`,
-		"--smartyAddress__dropdownPositionLeft": `${left + scrollX}px`,
-		"--smartyAddress__dropdownWidth": `${width}px`,
-	};
-
-	const colorsStyleBlock = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(state.instanceId)}`, dynamicColorStyles)
-	const positionStyleBlock = formatStyleBlock(`.smartyAddress__position_dynamic.${getInstanceClassName(state.instanceId)}`, dynamicPositionStyles)
-	stylesElement.innerHTML = `${colorsStyleBlock} ${positionStyleBlock}`;
+	// TODO: Recalculate these values whenever anything changes (e.g. screen size)
+	updateDynamicStyles(state.customStylesElement, state.searchInputElement, state.instanceId);
 }
 
 // TODO: Does this really need its own event or can we just merge it with formatAddressSuggestions?

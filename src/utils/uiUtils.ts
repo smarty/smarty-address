@@ -137,3 +137,51 @@ export const getHslFromColorString = (colorString:CSSStyleDeclaration) => {
 	const rgbaColor = getRgbaFromCssColor(colorString);
 	return rgbToHsl(rgbaColor);
 };
+
+export const updateDynamicStyles = (stylesElement:HTMLStyleElement, searchInputElement:HTMLInputElement, instanceId:number) => {
+
+	const {left, bottom, width} = searchInputElement.getBoundingClientRect();
+	const scrollY = window.scrollY;
+	const scrollX = window.scrollX;
+
+	// TODO: Do we also want to inherit boundingBoxPositions from this element? Probably not because it's super risky, but maybe we allow the user to pass in "offset-x" and "offset-y" config values to handle edge cases
+	const backgroundColorElement = getNearestStyledElement(searchInputElement, "backgroundColor");
+	const colorElement = getNearestStyledElement(searchInputElement, "color");
+	const inputBackgroundColor = getElementStyles(backgroundColorElement, "backgroundColor");
+	const inputTextColor = getElementStyles(colorElement, "color");
+	const {hue, saturation, lightness} = getHslFromColorString(inputBackgroundColor);
+
+	const isLightMode = lightness  > 50;
+	const useBlueLogo = lightness  > 75;
+
+	const secondaryLightness = isLightMode ? lightness - 10 : lightness + 10;
+	const tertiaryLightness = isLightMode ? lightness - 20 : lightness + 20;
+	const secondarySurfaceColor = `hsl(${hue} ${saturation}% ${secondaryLightness}%)`;
+	const tertiarySurfaceColor = `hsl(${hue} ${saturation}% ${tertiaryLightness}%)`;
+	const hoverMixColor = isLightMode ? "#000" : "#fff";
+
+	// TODO: Need to define all the missing vars here (see colors.css)
+	const dynamicColorStyles = {
+		"--smartyAddress__textBasePrimaryColor": inputTextColor,
+		"--smartyAddress__surfaceBasePrimaryColor": inputBackgroundColor,
+		"--smartyAddress__surfaceBaseSecondaryColor": secondarySurfaceColor,
+		"--smartyAddress__surfaceBaseTertiaryColor": tertiarySurfaceColor,
+		"--smartyAddress__surfaceInverseExtremeColor": hoverMixColor,
+		"--smartyAddress__surfaceBasePrimaryInverseColor": inputTextColor,
+		"--smartyAddress__logoDarkDisplay": useBlueLogo ? "block" : "none",
+		"--smartyAddress__logoLightDisplay": useBlueLogo ? "none" : "block",
+		// TODO: What to do about shadows for sites in dark mode
+		"--smartyAddress__largeShadow1": "0 12px 24px 0 rgba(4, 34, 75, 0.10)",
+		"--smartyAddress__largeShadow2": "0 20px 40px 0 rgba(21, 27, 35, 0.06)",
+	};
+
+	const dynamicPositionStyles = {
+		"--smartyAddress__dropdownPositionTop": `${bottom + scrollY}px`,
+		"--smartyAddress__dropdownPositionLeft": `${left + scrollX}px`,
+		"--smartyAddress__dropdownWidth": `${width}px`,
+	};
+
+	const colorsStyleBlock = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(instanceId)}`, dynamicColorStyles)
+	const positionStyleBlock = formatStyleBlock(`.smartyAddress__position_dynamic.${getInstanceClassName(instanceId)}`, dynamicPositionStyles)
+	stylesElement.innerHTML = `${colorsStyleBlock} ${positionStyleBlock}`;
+};
