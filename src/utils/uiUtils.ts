@@ -81,12 +81,6 @@ export const hideElement = (element:HTMLElement) => {
 	element.classList.add("smartyAddress__hidden");
 };
 
-export const getHslFromRgbColor = (rgbColor:string) => {
-	const match = rgbColor.match(/\d+/g);
-	const [red, green, blue] = (match ?? [255, 255, 255]).map((numString) => {
-		return Number(numString) / 255;
-	});
-
 const rgbToHsl = ({red, green, blue, alpha}:RgbaColor):HslColor => {
 	red /= 255;
 	green /= 255;
