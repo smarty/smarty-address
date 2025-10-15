@@ -21,18 +21,6 @@ export const formatStyleBlock = (selector:string, styles:{}) => {
 	return `${selector} {\n${stylesString}\n}`;
 };
 
-export const getColorBrightness = (color:string) => {
-	const DEFAULT_BRIGHTNESS = 255;
-	const match = color.match(/\d+/g);
-	if (!match) return DEFAULT_BRIGHTNESS;
-
-	const [r, g, b] = match.map(Number);
-
-	const brightness = (0.299 * r + 0.587 * g + 0.114 * b);
-
-	return brightness;
-};
-
 export const getInstanceClassName = (instanceId:number) => {
 	return `smartyAddress__instance_${instanceId}`;
 };
