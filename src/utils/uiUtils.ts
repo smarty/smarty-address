@@ -91,6 +91,9 @@ export const getHslFromRgbColor = (rgbColor:string) => {
 	});
 
 const rgbToHsl = ([red, green, blue]:number[]) => {
+	red /= 255;
+	green /= 255;
+	blue /= 255;
 	const cmin = Math.min(red, green, blue);
 	const cmax = Math.max(red, green, blue);
 	const delta = cmax - cmin;
