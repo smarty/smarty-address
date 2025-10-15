@@ -79,3 +79,17 @@ export interface UiSuggestionItem {
 	address: AddressSuggestion,
 	suggestionElement: HTMLElement,
 }
+
+export interface RgbaColor {
+	red: number,
+	green: number,
+	blue: number,
+	alpha: number,
+}
+
+export interface HslColor {
+	hue: number,
+	saturation: number,
+	lightness: number,
+	alpha: number,
+}
