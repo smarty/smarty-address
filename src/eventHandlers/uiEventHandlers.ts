@@ -156,8 +156,17 @@ export const setupDynamicStyling:EventHandler = ({state, setState}) => {
 		setState("customStylesElement", newStylesElement);
 	}
 
-	// TODO: Recalculate these values whenever anything changes (e.g. screen size)
+	// TODO: Do we need to separate "color" and "position" functionality?
+	// TODO: Do we need to setup polling or a mutation observer so we can also recalculate these values when sizes/positions/colors change for other reasons besides scoll/resize?
 	updateDynamicStyles(state.customStylesElement, state.searchInputElement, state.instanceId);
+
+	window.addEventListener("scroll", () => {
+		updateDynamicStyles(state.customStylesElement, state.searchInputElement, state.instanceId);
+	});
+
+	window.addEventListener("resize", () => {
+		updateDynamicStyles(state.customStylesElement, state.searchInputElement, state.instanceId);
+	});
 }
 
 // TODO: Does this really need its own event or can we just merge it with formatAddressSuggestions?
