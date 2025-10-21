@@ -45,7 +45,7 @@ export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 
 	searchInputElement.addEventListener("focusout", () => {
 		// TODO: Re-enable this later
-		// closeDropdown(state.dropdownElement);
+		// hideElement(state.dropdownElement);
 	});
 
 	searchInputElement.addEventListener("keydown", (inputEvent:Event) => {
@@ -167,7 +167,7 @@ export const setupDynamicStyling:EventHandler = ({state, setState}) => {
 	window.addEventListener("resize", () => {
 		updateDynamicStyles(state.customStylesElement, state.searchInputElement, state.instanceId);
 	});
-}
+};
 
 // TODO: Does this really need its own event or can we just merge it with formatAddressSuggestions?
 export const updateDropdownSuggestions:EventHandler = ({event, state, setState}) => {
@@ -284,5 +284,5 @@ const handleDropdownOnBlur = (event) => {
 };
 
 export const handleAutocompleteError:EventHandler = ({event, state, setState}) => {
-	console.log("handleAutocompleteError", event.detail?.errorName);
+	hideElement(state.dropdownElement);
 };

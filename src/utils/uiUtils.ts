@@ -144,8 +144,8 @@ export const updateDynamicStyles = (stylesElement:HTMLStyleElement, searchInputE
 	const scrollY = window.scrollY;
 	const scrollX = window.scrollX;
 
-	// TODO: Do we also want to inherit boundingBoxPositions from this element? Probably not because it's super risky, but maybe we allow the user to pass in "offset-x" and "offset-y" config values to handle edge cases
 	const backgroundColorElement = getNearestStyledElement(searchInputElement, "backgroundColor");
+	// TODO: Do we also want to inherit boundingBoxPositions from this element? Probably not because it's super risky, but maybe we allow the user to pass in "offset-x" and "offset-y" config values to handle edge cases
 	const colorElement = getNearestStyledElement(searchInputElement, "color");
 	const inputBackgroundColor = getElementStyles(backgroundColorElement, "backgroundColor");
 	const inputTextColor = getElementStyles(colorElement, "color");
