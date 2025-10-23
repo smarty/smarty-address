@@ -42,7 +42,7 @@ export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 				} else {
 					state.eventDispatcher.dispatch(
 						"ApiService_retryNewAddressSuggestions",
-						{...event.detail, skipRetry: true},
+						event.detail,
 					);
 				}
 			} else {
