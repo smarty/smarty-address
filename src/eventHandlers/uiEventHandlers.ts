@@ -279,6 +279,6 @@ const handleDropdownOnBlur = (event) => {
 
 };
 
-export const handleAutocompleteError:EventHandler = ({event, state, setState}) => {
+export const handleAutocompleteError:EventHandler = ({state}) => {
 	hideElement(state.dropdownElement);
 };
