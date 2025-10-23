@@ -3,7 +3,6 @@ import {formatSelectedAddress, getApiError, unknownError} from "../utils/apiUtil
 
 // TODO: Dynamically update the version to match `package.json`
 const USER_AGENT = "name:smarty-address-plugin,version:0.1.0";
-const MAX_RETRY_AFTER_SECONDS = 1;
 
 export const setApiKey: EventHandler = ({event, setState}) => {
 	setState("apiKey", event.detail.embeddedKey);
