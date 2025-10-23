@@ -29,28 +29,12 @@ export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 		} else {
 			const errorResponse = await response.json() as { errors: ApiErrorResponse[] };
 			const error = getApiError(response.status, errorResponse);
-			const retryAfter = Number(response.headers.get("Retry-After"));
 			// TODO: Figure out if we want to add styling to the console messages
 			console.log(error.message);
 
-			if (retryAfter > 0) {
-				if (Number(retryAfter) > MAX_RETRY_AFTER_SECONDS) {
-					state.eventDispatcher.dispatch("ApiService_receivedApiErrorFetchingAddressSuggestions", {
-						errorName: error.name,
-						retryAfter,
-					});
-				} else {
-					state.eventDispatcher.dispatch(
-						"ApiService_retryNewAddressSuggestions",
-						event.detail,
-					);
-				}
-			} else {
-					state.eventDispatcher.dispatch("ApiService_receivedApiErrorFetchingAddressSuggestions", {
-						errorName: error.name,
-					});
-			}
-
+			state.eventDispatcher.dispatch("ApiService_receivedApiErrorFetchingAddressSuggestions", {
+				errorName: error.name,
+			});
 		}
 	} catch (error) {
 		console.log(unknownError.message);
