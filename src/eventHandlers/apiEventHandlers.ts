@@ -1,8 +1,9 @@
 import {AddressSuggestion, ApiErrorResponse, EventHandler} from "../interfaces.ts";
-import {formatSelectedAddress, getApiError} from "../utils/apiUtils.ts";
+import {formatSelectedAddress, getApiError, unknownError} from "../utils/apiUtils.ts";
 
 // TODO: Dynamically update the version to match `package.json`
 const USER_AGENT = "name:smarty-address-plugin,version:0.1.0";
+const MAX_RETRY_AFTER_SECONDS = 1;
 
 export const setApiKey: EventHandler = ({event, setState}) => {
 	setState("apiKey", event.detail.embeddedKey);
@@ -11,6 +12,7 @@ export const setApiKey: EventHandler = ({event, setState}) => {
 export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 	// TODO: Add support for additional input fields (e.g. max_results, include_only_zip_codes, etc.). These would likely be set as "config" values
 	try {
+		await testRateLimit(state.autocompleteBaseUrl, state.apiKey);
 		const selectedAddress = event.detail.selectedAddress;
 		const requestData = {
 			"auth-id": state.apiKey,
@@ -28,13 +30,80 @@ export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 		} else {
 			const errorResponse = await response.json() as { errors: ApiErrorResponse[] };
 			const error = getApiError(response.status, errorResponse);
+			const retryAfter = Number(response.headers.get("Retry-After"));
+			// TODO: Figure out if we want to add styling to the console messages
+			console.log(error.message);
 
+			if (retryAfter > 0) {
+				if (Number(retryAfter) > MAX_RETRY_AFTER_SECONDS) {
+					state.eventDispatcher.dispatch("ApiService_receivedApiErrorFetchingAddressSuggestions", {
+						errorName: error.name,
+						retryAfter,
+					});
+				} else {
+					state.eventDispatcher.dispatch(
+						"ApiService_retryNewAddressSuggestions",
+						{...event.detail, skipRetry: true},
+					);
+				}
+			} else {
+					state.eventDispatcher.dispatch("ApiService_receivedApiErrorFetchingAddressSuggestions", {
+						errorName: error.name,
+					});
+			}
 
-			state.eventDispatcher.dispatch("ApiService_receivedApiErrorFetchingAddressSuggestions", {errorName: error.name});
 		}
 	} catch (error) {
-		state.eventDispatcher.dispatch("ApiService_experiencedUnknownErrorFetchingAddressSuggestions");
+		console.log(unknownError.message);
+		state.eventDispatcher.dispatch("ApiService_receivedApiErrorFetchingAddressSuggestions", {errorName: unknownError.name});
 	}
+};
+
+const testRateLimit = async (autocompleteBaseUrl:string, apiKey:string) => {
+	const promiseArray = [];
+	for(let i = 0; i < 200; i++) {
+		try {
+			const requestData = {
+				"auth-id": apiKey,
+				search: "testing" + i,
+			};
+
+			const params = new URLSearchParams(requestData);
+			promiseArray.push(fetch(`${autocompleteBaseUrl}?${params}`));
+		} catch (error) {}
+	}
+	const outerPromise = new Promise((resolve,) => {
+		let counter = 0;
+
+		const intervalId = setInterval(() => {
+			if (counter < 600) {
+				counter++;
+				try {
+					const requestData = {
+						"auth-id": apiKey,
+						search: "testing" + counter,
+					};
+
+					const params = new URLSearchParams(requestData);
+					const promise = fetch(`${autocompleteBaseUrl}?${params}`);
+					promise.then((response) => {
+						if (!response.ok) {
+							setTimeout(() => {
+								clearInterval(intervalId);
+								resolve(true);
+							}, 50);
+						}
+					});
+				} catch (error) {}
+			}
+			else {
+				resolve(true);
+			}
+		}, 5);
+	});
+
+	promiseArray.push(outerPromise);
+	await Promise.all(promiseArray);
 };
 
 const verifyAddress = async (address: AddressSuggestion): Promise<AddressSuggestion> => {

@@ -245,10 +245,6 @@ const populateForm = () => {
 
 };
 
-const displayError = () => {
-
-};
-
 const displaySuccess = () => {
 
 };
