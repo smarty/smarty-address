@@ -1,9 +1,7 @@
 import {AddressSuggestion, BasicStateObject, HslColor, RgbaColor} from "../interfaces";
 
-export const findDomElement = (selector: string | undefined) => {
-	const element:HTMLElement|null = selector ? document.querySelector(selector) : null;
-
-	return element;
+export const findDomElement = (selector?: string): HTMLElement | null => {
+	return selector ? document.querySelector(selector) : null;
 };
 
 export const createDomElement = (tagName: string, classList?: string[] = [], children:HTMLElement[] = []) => {
