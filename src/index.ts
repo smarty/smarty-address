@@ -5,6 +5,7 @@ import {EventDispatcher} from "./utils/EventDispatcher";
 import {initService} from "./utils/serviceFactory";
 import {themes} from "./themes";
 import {getResourceUrl, loadStylesheet} from "./utils/appUtils";
+import {SMARTY_LOGO_DARK_URL, SMARTY_LOGO_LIGHT_URL, STYLESHEET_HREF} from "./constants";
 // TODO: Update readme
 // TODO: Update tsconfig.json (borrow from storefront-2)
 // TODO: Add ability to destroy an instance of SmartyAddress (and remove all associated elements from DOM)
@@ -20,10 +21,6 @@ import {getResourceUrl, loadStylesheet} from "./utils/appUtils";
 // TODO: Add "backoff" for autocomplete results (add config option to make this customizable)
 // TODO: Add config option for "min characters" before api request is sent
 // TODO: Add ShadCdn to test site (see https://ui.shadcn.com/)
-
-const SMARTY_LOGO_DARK_URL = "/assets/img/smarty-logo-blue.svg";
-const SMARTY_LOGO_LIGHT_URL = "/assets/img/smarty-logo-white.svg";
-const STYLESHEET_HREF = "/assets/styles/theme.css";
 
 export default class SmartyAddress {
 	static defaultServiceDefinitions:ServiceDefinitionMap = {
