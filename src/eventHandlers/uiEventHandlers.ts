@@ -212,7 +212,8 @@ export const buildDomElements:EventHandler = ({state, setState}) => {
 	setState("suggestionsElement", suggestionsElement);
 	setState("poweredBySmartyElement", poweredBySmartyElement);
 
-	state.eventDispatcher.dispatch("UiService_builtDomElements", {dropdownElement});
+
+	updateTheme(state.theme, [], state.dropdownWrapperElement);
 };
 
 export const notifyDomInitIsComplete:EventHandler = ({state}) => {
@@ -252,22 +253,20 @@ const displaySuccess = () => {
 // TODO: Handle config modifications generically instead of having specific handlers for each config element
 export const setThemeFromConfig:EventHandler = ({event, state, setState}) => {
 	const previousTheme = state.theme;
-	setState("theme", event.detail?.theme);
+	const newTheme = event.detail?.theme;
+	setState("theme", newTheme);
 	setState("smartyLogoDark", event.detail?.smartyLogoDark);
 	setState("smartyLogoLight", event.detail?.smartyLogoLight);
 
 	if (previousTheme !== state.theme) {
-		state.eventDispatcher.dispatch("UiService_receivedNewTheme", {previousTheme});
+		updateTheme(newTheme, previousTheme, state.dropdownWrapperElement);
 	}
 };
 
-export const updateTheme:EventHandler = ({event, state}) => {
-	const previousTheme = event.detail?.previousTheme ?? [];
-	const dropdownWrapperElement = state.dropdownWrapperElement;
-
+export const updateTheme = (newTheme:string[], previousTheme:string[] = [], dropdownWrapperElement:HTMLElement) => {
 	if (dropdownWrapperElement) {
 		dropdownWrapperElement.classList.remove(...previousTheme);
-		dropdownWrapperElement.classList.add(...state.theme);
+		dropdownWrapperElement.classList.add(...newTheme);
 	}
 };
 

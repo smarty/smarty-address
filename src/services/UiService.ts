@@ -7,7 +7,6 @@ import {
 	buildDomElements,
 	notifyDomInitIsComplete,
 	setThemeFromConfig,
-	updateTheme,
 	setupDynamicStyling,
 	handleSelectDropdownItem,
 	handleAutocompleteError,
@@ -50,10 +49,6 @@ export const uiService: ServiceDefinition = {
 		],
 		UiService_builtDomElements: [
 			notifyDomInitIsComplete,
-			updateTheme,
-		],
-		UiService_receivedNewTheme: [
-			updateTheme,
 		],
 		ApiService_receivedAddressSuggestions: [
 			formatAddressSuggestions,
