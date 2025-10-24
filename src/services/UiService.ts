@@ -2,7 +2,6 @@ import {ServiceDefinition} from "../interfaces";
 import {
 	findInputElements,
 	watchSearchInputForChanges,
-	updateDropdownSuggestions,
 	formatAddressSuggestions,
 	buildDomElements,
 	notifyDomInitIsComplete,
@@ -52,9 +51,6 @@ export const uiService: ServiceDefinition = {
 		],
 		ApiService_receivedAddressSuggestions: [
 			formatAddressSuggestions,
-		],
-		UiService_formattedAddressSuggestions: [
-			updateDropdownSuggestions,
 		],
 		UiService_addressSelected: [
 			handleSelectDropdownItem,

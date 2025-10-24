@@ -125,7 +125,7 @@ export const handleSelectDropdownItem:EventHandler = ({event, state:uiState, set
 	}
 };
 
-export const formatAddressSuggestions:EventHandler = ({event, state:uiState}) => {
+export const formatAddressSuggestions:EventHandler = ({event, state:uiState, setState}) => {
 	const addressSuggestions = event.detail.suggestions.map((suggestion, index):UiSuggestionItem => {
 		const {street_line, secondary = "", city, state, zipcode, entries = 0} = suggestion;
 		const suggestionString = `${street_line} ${secondary}, ${city}, ${state} ${zipcode}`;
@@ -145,7 +145,17 @@ export const formatAddressSuggestions:EventHandler = ({event, state:uiState}) =>
 			suggestionElement,
 		};
 	});
-	uiState.eventDispatcher.dispatch("UiService_formattedAddressSuggestions", {addressSuggestions});
+
+	const suggestionItems = addressSuggestions ?? [];
+	const suggestionElements = suggestionItems.map(({suggestionElement}) => suggestionElement);
+	setState("addressSuggestionResults", suggestionItems);
+	uiState.suggestionsElement.replaceChildren(...suggestionElements);
+
+	if(suggestionItems.length) {
+		highlightNewAddress(suggestionItems, 0, uiState, setState, 0);
+	}
+
+	showElement(uiState.dropdownElement);
 };
 
 export const setupDynamicStyling:EventHandler = ({state, setState}) => {
@@ -169,20 +179,6 @@ export const setupDynamicStyling:EventHandler = ({state, setState}) => {
 	});
 };
 
-// TODO: Does this really need its own event or can we just merge it with formatAddressSuggestions?
-export const updateDropdownSuggestions:EventHandler = ({event, state, setState}) => {
-	const addressSuggestions = event.detail.addressSuggestions;
-	const suggestionItems = addressSuggestions ?? [];
-	const suggestionElements = suggestionItems.map(({suggestionElement}) => suggestionElement);
-	setState("addressSuggestionResults", suggestionItems);
-	state.suggestionsElement.replaceChildren(...suggestionElements);
-
-	if(suggestionItems.length) {
-		highlightNewAddress(suggestionItems, 0, state, setState, 0);
-	}
-
-	showElement(state.dropdownElement);
-};
 
 // TODO: Compare with the AI-generated plugin to see what we can leverage from it
 const handleSearchInputOnChange:BrowserEventHandler = ({event, state}) => {
