@@ -1,10 +1,10 @@
-import {DefaultSmartyAddressConfig, ServiceDefinitionMap, SmartyAddressConfig} from "./interfaces.ts";
-import {uiService} from "./services/UiService.ts";
-import {apiService} from "./services/ApiService.ts";
-import {EventDispatcher} from "./utils/EventDispatcher.ts";
-import {initService} from "./utils/serviceFactory.ts";
-import {themes} from "./themes.ts";
-import {getResourceUrl, loadStylesheet} from "./utils/appUtils.ts";
+import {DefaultSmartyAddressConfig, ServiceDefinitionMap, SmartyAddressConfig} from "./interfaces";
+import {uiService} from "./services/UiService";
+import {apiService} from "./services/ApiService";
+import {EventDispatcher} from "./utils/EventDispatcher";
+import {initService} from "./utils/serviceFactory";
+import {themes} from "./themes";
+import {getResourceUrl, loadStylesheet} from "./utils/appUtils";
 // TODO: Update readme
 // TODO: Update tsconfig.json (borrow from storefront-2)
 // TODO: Add ability to destroy an instance of SmartyAddress (and remove all associated elements from DOM)

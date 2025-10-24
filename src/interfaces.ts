@@ -1,4 +1,4 @@
-import {EventDispatcher} from "./utils/EventDispatcher.ts";
+import {EventDispatcher} from "./utils/EventDispatcher";
 
 export interface DefaultSmartyAddressConfig {
 	services?:ServiceDefinitionMap,

@@ -1,5 +1,5 @@
-import {AddressSuggestion, ApiErrorResponse, EventHandler} from "../interfaces.ts";
-import {formatSelectedAddress, getApiError, unknownError} from "../utils/apiUtils.ts";
+import {AddressSuggestion, ApiErrorResponse, EventHandler} from "../interfaces";
+import {formatSelectedAddress, getApiError, unknownError} from "../utils/apiUtils";
 
 // TODO: Dynamically update the version to match `package.json`
 const USER_AGENT = "name:smarty-address-plugin,version:0.1.0";

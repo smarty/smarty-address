@@ -1,5 +1,5 @@
-import {ServiceDefinition} from "../interfaces.ts";
-import {setApiKey, fetchAddressSuggestions} from "../eventHandlers/apiEventHandlers.ts";
+import {ServiceDefinition} from "../interfaces";
+import {setApiKey, fetchAddressSuggestions} from "../eventHandlers/apiEventHandlers";
 
 export const apiService: ServiceDefinition = {
 	initialState: {

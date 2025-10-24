@@ -1,4 +1,4 @@
-import {ServiceDefinition} from "../interfaces.ts";
+import {ServiceDefinition} from "../interfaces";
 import {
 	findInputElements,
 	watchSearchInputForChanges,
@@ -11,8 +11,8 @@ import {
 	setupDynamicStyling,
 	handleSelectDropdownItem,
 	handleAutocompleteError,
-} from "../eventHandlers/uiEventHandlers.ts";
-import {themes} from "../themes.ts";
+} from "../eventHandlers/uiEventHandlers";
+import {themes} from "../themes";
 
 export const uiService: ServiceDefinition = {
 	initialState: {

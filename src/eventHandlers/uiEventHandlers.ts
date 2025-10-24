@@ -2,7 +2,7 @@ import {
 	BrowserEventHandler,
 	EventHandler,
 	UiSuggestionItem
-} from "../interfaces.ts";
+} from "../interfaces";
 import {
 	createDomElement,
 	findDomElement,
@@ -12,7 +12,7 @@ import {
 	hideElement,
 	getStreetLineFormValue,
 	updateDynamicStyles
-} from "../utils/uiUtils.ts";
+} from "../utils/uiUtils";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
 export const findInputElements:EventHandler = ({event, state, setState}) => {

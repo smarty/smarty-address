@@ -1,4 +1,4 @@
-import {AddressSuggestion, BasicStateObject, HslColor, RgbaColor} from "../interfaces.ts";
+import {AddressSuggestion, BasicStateObject, HslColor, RgbaColor} from "../interfaces";
 
 export const findDomElement = (selector: string | undefined) => {
 	const element:HTMLElement|null = selector ? document.querySelector(selector) : null;

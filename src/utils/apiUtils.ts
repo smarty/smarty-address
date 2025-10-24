@@ -1,4 +1,4 @@
-import {AddressSuggestion, ApiErrorResponse} from "../interfaces.ts";
+import {AddressSuggestion, ApiErrorResponse} from "../interfaces";
 
 export const formatSelectedAddress = ({street_line, secondary = "", city, state, zipcode, entries}:AddressSuggestion) => {
 	return `${street_line} ${secondary} (${entries}) ${city} ${state} ${zipcode}`;

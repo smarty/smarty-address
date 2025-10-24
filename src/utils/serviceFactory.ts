@@ -1,5 +1,5 @@
-import {EventHandler, ServiceDefinition} from "../interfaces.ts";
-import {EventDispatcher} from "./EventDispatcher.ts";
+import {EventHandler, ServiceDefinition} from "../interfaces";
+import {EventDispatcher} from "./EventDispatcher";
 
 export const initService = (
 	{eventHandlersMap, initialState = {}}:ServiceDefinition,
