@@ -1,14 +1,11 @@
 import {ServiceDefinition} from "../interfaces";
 import {
-	watchSearchInputForChanges,
 	formatAddressSuggestions,
-	buildDomElements,
 	notifyDomInitIsComplete,
-	setupDynamicStyling,
 	handleSelectDropdownItem,
 	handleAutocompleteError,
 	updateConfig,
-	findInputElements,
+	findInputElements, setupDom,
 } from "../eventHandlers/uiEventHandlers";
 import {themes} from "../themes";
 
@@ -50,9 +47,7 @@ export const uiService: ServiceDefinition = {
 			findInputElements,
 		],
 		UiService_foundInputElements: [
-			buildDomElements,
-			watchSearchInputForChanges,
-			setupDynamicStyling,
+			setupDom,
 		],
 		UiService_builtDomElements: [
 			notifyDomInitIsComplete,

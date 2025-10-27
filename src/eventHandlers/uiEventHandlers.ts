@@ -1,4 +1,5 @@
 import {
+	BasicStateObject,
 	BrowserEventHandler,
 	EventHandler,
 	UiSuggestionItem
@@ -24,8 +25,8 @@ export const findInputElements:EventHandler = ({state, setState}) => {
 		stateSelector,
 		zipcodeSelector,
 	} = state;
-	// TODO: default "searchInputSelector" to "streetSelector" (or vice versa)
 
+	// TODO: Consider finding the DOM elements each time they're needed (instead of caching them)
 	setState("streetLineInputElement", findDomElement(streetSelector));
 	setState("secondaryInputElement", findDomElement(secondarySelector));
 	setState("cityInputElement", findDomElement(citySelector));
@@ -158,7 +159,7 @@ export const formatAddressSuggestions:EventHandler = ({event, state:uiState, set
 	showElement(uiState.dropdownElement);
 };
 
-export const setupDynamicStyling:EventHandler = ({state, setState}) => {
+export const configureDynamicStyling:EventHandler = ({state, setState}) => {
 	if (!state.customStylesElement) {
 		const newStylesElement = document.createElement("style");
 		const head  = document.getElementsByTagName('head')[0];
@@ -187,29 +188,41 @@ const handleSearchInputOnChange:BrowserEventHandler = ({event, state}) => {
 	state.eventDispatcher.dispatch(eventName, {searchString: searchInputValue});
 };
 
-// TODO: Split this out into smaller functions
-export const buildDomElements:EventHandler = ({state, setState}) => {
-	const instanceClass = getInstanceClassName(state.instanceId);
+export const setupDom:EventHandler = ({state, setState}) => {
+	const instanceClassname = getInstanceClassName(state.instanceId);
+	const elements = buildDomElements(instanceClassname, state.smartyLogoDark, state.smartyLogoLight);
+
+	document.body.appendChild(elements.dropdownWrapperElement);
+
+	Object.keys(elements).forEach((elementKey) => {
+		setState(elementKey, elements[elementKey]);
+	});
+
+	updateTheme(state.theme, [], state.dropdownWrapperElement);
+
+	watchSearchInputForChanges({state, setState});
+	configureDynamicStyling({state, setState});
+};
+
+export const buildDomElements = (instanceClassname:string, smartyLogoDark:string, smartyLogoLight:string):Record<string, HTMLElement> => {
 	const smartyLogoDarkElement = createDomElement("img", ["smartyAddress__smartyLogoDark"]);
 	const smartyLogoLightElement = createDomElement("img", ["smartyAddress__smartyLogoLight"]);
 	const poweredByText = document.createTextNode("Powered by");
 	const suggestionsElement = createDomElement("ul", ["smartyAddress__suggestionsElement"]);
 	const poweredBySmartyElement = createDomElement("div", ["smartyAddress__poweredBy"], [poweredByText, smartyLogoDarkElement, smartyLogoLightElement]);
 	const dropdownElement = createDomElement("div", ["smartyAddress__dropdownElement", "smartyAddress__hidden"], [suggestionsElement, poweredBySmartyElement]);
-	const dropdownWrapperElement = createDomElement("div", ["smartyAddress__suggestionsWrapperElement", instanceClass], [dropdownElement]);
+	const dropdownWrapperElement = createDomElement("div", ["smartyAddress__suggestionsWrapperElement", instanceClassname], [dropdownElement]);
 
 	dropdownElement.setAttribute("role", "listbox");
-	smartyLogoDarkElement.setAttribute("src", state.smartyLogoDark);
-	smartyLogoLightElement.setAttribute("src", state.smartyLogoLight);
-	document.body.appendChild(dropdownWrapperElement);
+	smartyLogoDarkElement.setAttribute("src", smartyLogoDark);
+	smartyLogoLightElement.setAttribute("src", smartyLogoLight);
 
-	setState("dropdownWrapperElement", dropdownWrapperElement);
-	setState("dropdownElement", dropdownElement);
-	setState("suggestionsElement", suggestionsElement);
-	setState("poweredBySmartyElement", poweredBySmartyElement);
-
-
-	updateTheme(state.theme, [], state.dropdownWrapperElement);
+	return {
+		dropdownWrapperElement,
+		dropdownElement,
+		suggestionsElement,
+		poweredBySmartyElement,
+	};
 };
 
 export const notifyDomInitIsComplete:EventHandler = ({state}) => {
