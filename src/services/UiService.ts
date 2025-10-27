@@ -6,13 +6,22 @@ import {
 	notifyDomInitIsComplete,
 	setupDynamicStyling,
 	handleSelectDropdownItem,
-	handleAutocompleteError, setupConfig,
+	handleAutocompleteError,
+	updateConfig,
+	findInputElements,
 } from "../eventHandlers/uiEventHandlers";
 import {themes} from "../themes";
 
 export const uiService: ServiceDefinition = {
 	initialState: {
 		theme: themes.default,
+
+		searchInputSelector: null,
+		streetSelector: null,
+		secondarySelector: null,
+		citySelector: null,
+		stateSelector: null,
+		zipcodeSelector: null,
 
 		searchInputElement: null,
 		streetLineInputElement: null,
@@ -35,7 +44,10 @@ export const uiService: ServiceDefinition = {
 	eventHandlersMap: {
 		// TODO: Refactor this to have a 1:1 mapping of events to handlers (for easier "pluginableness" for users)
 		SmartyAddress_receivedSmartyAddressConfig: [
-			setupConfig,
+			updateConfig,
+		],
+		SmartyAddress_updatedConfig: [
+			findInputElements,
 		],
 		UiService_foundInputElements: [
 			buildDomElements,
