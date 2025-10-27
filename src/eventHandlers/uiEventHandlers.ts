@@ -207,10 +207,6 @@ export const notifyDomInitIsComplete:EventHandler = ({state}) => {
 	state.eventDispatcher.dispatch("UiService_domReadyForAutocomplete");
 };
 
-const updateDropdown = () => {
-
-};
-
 // TODO: Figure out how to simplify the params in this function (e.g. merge indexes, eliminate state/setState params)
 // TODO: After this gets cleaned up, it should also be moved into uiUtils.ts
 const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:number, state, setState, indexChange:number) => {
