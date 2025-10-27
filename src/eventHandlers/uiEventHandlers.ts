@@ -220,19 +220,6 @@ const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:number, stat
 	scrollToHighlightedSuggestion(items[newIndex].suggestionElement, state.suggestionsElement);
 };
 
-// e.g. for secondaries
-const expandDropdown = () => {
-
-};
-
-const populateForm = () => {
-
-};
-
-const displaySuccess = () => {
-
-};
-
 export const updateConfig:EventHandler = ({event, state, setState}) => {
 	const previousTheme = state.theme;
 	const newTheme = event.detail?.theme;
