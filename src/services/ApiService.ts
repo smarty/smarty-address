@@ -1,9 +1,10 @@
 import {ServiceDefinition} from "../interfaces";
 import {setApiKey, fetchAddressSuggestions} from "../eventHandlers/apiEventHandlers";
+import {AUTOCOMPLETE_BASE_API_URL} from "../constants.ts";
 
 export const apiService: ServiceDefinition = {
 	initialState: {
-		autocompleteBaseUrl: "https://us-autocomplete-pro.api.smarty.com/lookup",
+		autocompleteBaseUrl: AUTOCOMPLETE_BASE_API_URL,
 		apiKey: "",
 	},
 	eventHandlersMap: {
