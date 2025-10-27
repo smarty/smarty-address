@@ -11,7 +11,8 @@ import {
 	showElement,
 	hideElement,
 	getStreetLineFormValue,
-	updateDynamicStyles, buildDomElements
+	updateDynamicStyles,
+	buildDomElements
 } from "../utils/uiUtils";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
@@ -158,14 +159,7 @@ export const formatAddressSuggestions:EventHandler = ({event, state:uiState, set
 	showElement(uiState.dropdownElement);
 };
 
-export const configureDynamicStyling:EventHandler = ({state, setState}) => {
-	if (!state.customStylesElement) {
-		const newStylesElement = document.createElement("style");
-		const head  = document.getElementsByTagName('head')[0];
-		head.appendChild(newStylesElement);
-		setState("customStylesElement", newStylesElement);
-	}
-
+export const configureDynamicStyling:EventHandler = ({state}) => {
 	// TODO: Do we need to separate "color" and "position" functionality?
 	// TODO: Do we need to setup polling or a mutation observer so we can also recalculate these values when sizes/positions/colors change for other reasons besides scoll/resize?
 	updateDynamicStyles(state.customStylesElement, state.searchInputElement, state.instanceId);
@@ -192,6 +186,7 @@ export const setupDom:EventHandler = ({state, setState}) => {
 	const elements = buildDomElements(instanceClassname, state.smartyLogoDark, state.smartyLogoLight);
 
 	document.body.appendChild(elements.dropdownWrapperElement);
+	document.getElementsByTagName('head')[0].appendChild(elements.customStylesElement);
 
 	Object.keys(elements).forEach((elementKey) => {
 		setState(elementKey, elements[elementKey]);

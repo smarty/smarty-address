@@ -185,6 +185,8 @@ export const updateDynamicStyles = (stylesElement:HTMLStyleElement, searchInputE
 };
 
 export const buildDomElements = (instanceClassname:string, smartyLogoDark:string, smartyLogoLight:string):Record<string, HTMLElement> => {
+	const customStylesElement = createDomElement("style");
+
 	const smartyLogoDarkElement = createDomElement("img", ["smartyAddress__smartyLogoDark"]);
 	const smartyLogoLightElement = createDomElement("img", ["smartyAddress__smartyLogoLight"]);
 	const poweredByText = document.createTextNode("Powered by");
@@ -198,6 +200,7 @@ export const buildDomElements = (instanceClassname:string, smartyLogoDark:string
 	smartyLogoLightElement.setAttribute("src", smartyLogoLight);
 
 	return {
+		customStylesElement,
 		dropdownWrapperElement,
 		dropdownElement,
 		suggestionsElement,
