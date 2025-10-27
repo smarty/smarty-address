@@ -246,6 +246,11 @@ const displaySuccess = () => {
 
 };
 
+export const setupConfig:EventHandler = ({event, state, setState}) => {
+	setThemeFromConfig({event, state, setState});
+	findInputElements({event, state, setState});
+};
+
 // TODO: Handle config modifications generically instead of having specific handlers for each config element
 export const setThemeFromConfig:EventHandler = ({event, state, setState}) => {
 	const previousTheme = state.theme;

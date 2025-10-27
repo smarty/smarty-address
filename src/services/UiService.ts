@@ -1,14 +1,12 @@
 import {ServiceDefinition} from "../interfaces";
 import {
-	findInputElements,
 	watchSearchInputForChanges,
 	formatAddressSuggestions,
 	buildDomElements,
 	notifyDomInitIsComplete,
-	setThemeFromConfig,
 	setupDynamicStyling,
 	handleSelectDropdownItem,
-	handleAutocompleteError,
+	handleAutocompleteError, setupConfig,
 } from "../eventHandlers/uiEventHandlers";
 import {themes} from "../themes";
 
@@ -37,9 +35,7 @@ export const uiService: ServiceDefinition = {
 	eventHandlersMap: {
 		// TODO: Refactor this to have a 1:1 mapping of events to handlers (for easier "pluginableness" for users)
 		SmartyAddress_receivedSmartyAddressConfig: [
-			// TODO: This is a race condition. Logos don't load if the events don't fire in this order. Need to fix
-			setThemeFromConfig,
-			findInputElements,
+			setupConfig,
 		],
 		UiService_foundInputElements: [
 			buildDomElements,
