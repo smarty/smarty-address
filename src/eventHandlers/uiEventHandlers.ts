@@ -15,7 +15,7 @@ import {
 } from "../utils/uiUtils";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
-export const findInputElements:EventHandler = ({event, state, setState}) => {
+export const findInputElements:EventHandler = ({state, setState}) => {
 	const {
 		searchInputSelector,
 		streetSelector,
@@ -23,7 +23,7 @@ export const findInputElements:EventHandler = ({event, state, setState}) => {
 		citySelector,
 		stateSelector,
 		zipcodeSelector,
-	} = event.detail;
+	} = state;
 	// TODO: default "searchInputSelector" to "streetSelector" (or vice versa)
 
 	setState("streetLineInputElement", findDomElement(streetSelector));
@@ -246,22 +246,24 @@ const displaySuccess = () => {
 
 };
 
-export const setupConfig:EventHandler = ({event, state, setState}) => {
-	setThemeFromConfig({event, state, setState});
-	findInputElements({event, state, setState});
-};
-
-// TODO: Handle config modifications generically instead of having specific handlers for each config element
-export const setThemeFromConfig:EventHandler = ({event, state, setState}) => {
+export const updateConfig:EventHandler = ({event, state, setState}) => {
 	const previousTheme = state.theme;
 	const newTheme = event.detail?.theme;
 	setState("theme", newTheme);
 	setState("smartyLogoDark", event.detail?.smartyLogoDark);
 	setState("smartyLogoLight", event.detail?.smartyLogoLight);
+	setState("searchInputSelector", event.detail?.searchInputSelector);
+	setState("streetSelector", event.detail?.streetSelector);
+	setState("secondarySelector", event.detail?.secondarySelector);
+	setState("citySelector", event.detail?.citySelector);
+	setState("stateSelector", event.detail?.stateSelector);
+	setState("zipcodeSelector", event.detail?.zipcodeSelector);
 
 	if (previousTheme !== state.theme) {
 		updateTheme(newTheme, previousTheme, state.dropdownWrapperElement);
 	}
+
+	state.eventDispatcher.dispatch("SmartyAddress_updatedConfig");
 };
 
 export const updateTheme = (newTheme:string[], previousTheme:string[] = [], dropdownWrapperElement:HTMLElement) => {
