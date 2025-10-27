@@ -159,20 +159,14 @@ export const formatAddressSuggestions:EventHandler = ({event, state:uiState, set
 	showElement(uiState.dropdownElement);
 };
 
-export const configureDynamicStyling:EventHandler = ({state}) => {
+export const configureDynamicStyling = (dynamicStylingHandler:Function) => {
 	// TODO: Do we need to separate "color" and "position" functionality?
 	// TODO: Do we need to setup polling or a mutation observer so we can also recalculate these values when sizes/positions/colors change for other reasons besides scoll/resize?
-	updateDynamicStyles(state.customStylesElement, state.searchInputElement, state.instanceId);
 
-	window.addEventListener("scroll", () => {
-		updateDynamicStyles(state.customStylesElement, state.searchInputElement, state.instanceId);
-	});
-
-	window.addEventListener("resize", () => {
-		updateDynamicStyles(state.customStylesElement, state.searchInputElement, state.instanceId);
-	});
+	dynamicStylingHandler();
+	window.addEventListener("scroll", () => dynamicStylingHandler);
+	window.addEventListener("resize", () => dynamicStylingHandler);
 };
-
 
 // TODO: Compare with the AI-generated plugin to see what we can leverage from it
 const handleSearchInputOnChange:BrowserEventHandler = ({event, state}) => {
@@ -195,7 +189,12 @@ export const setupDom:EventHandler = ({state, setState}) => {
 	updateTheme(state.theme, [], state.dropdownWrapperElement);
 
 	watchSearchInputForChanges({state, setState});
-	configureDynamicStyling({state, setState});
+
+	const dynamicStylingHandler = () => {
+		updateDynamicStyles(state.customStylesElement, state.searchInputElement, state.instanceId);
+	};
+
+	configureDynamicStyling(dynamicStylingHandler);
 };
 
 export const notifyDomInitIsComplete:EventHandler = ({state}) => {
