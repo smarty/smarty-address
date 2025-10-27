@@ -207,3 +207,12 @@ export const buildDomElements = (instanceClassname:string, smartyLogoDark:string
 		poweredBySmartyElement,
 	};
 };
+
+export const configureDynamicStyling = (dynamicStylingHandler:Function) => {
+	// TODO: Do we need to separate "color" and "position" functionality?
+	// TODO: Do we need to setup polling or a mutation observer so we can also recalculate these values when sizes/positions/colors change for other reasons besides scoll/resize?
+
+	dynamicStylingHandler();
+	window.addEventListener("scroll", () => dynamicStylingHandler);
+	window.addEventListener("resize", () => dynamicStylingHandler);
+};

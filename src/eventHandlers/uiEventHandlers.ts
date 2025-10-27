@@ -12,7 +12,7 @@ import {
 	hideElement,
 	getStreetLineFormValue,
 	updateDynamicStyles,
-	buildDomElements
+	buildDomElements, configureDynamicStyling
 } from "../utils/uiUtils";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
@@ -159,15 +159,6 @@ export const formatAddressSuggestions:EventHandler = ({event, state:uiState, set
 	showElement(uiState.dropdownElement);
 };
 
-export const configureDynamicStyling = (dynamicStylingHandler:Function) => {
-	// TODO: Do we need to separate "color" and "position" functionality?
-	// TODO: Do we need to setup polling or a mutation observer so we can also recalculate these values when sizes/positions/colors change for other reasons besides scoll/resize?
-
-	dynamicStylingHandler();
-	window.addEventListener("scroll", () => dynamicStylingHandler);
-	window.addEventListener("resize", () => dynamicStylingHandler);
-};
-
 // TODO: Compare with the AI-generated plugin to see what we can leverage from it
 const handleSearchInputOnChange:BrowserEventHandler = ({event, state}) => {
 	const searchInputValue = event.target?.value;
@@ -178,21 +169,19 @@ const handleSearchInputOnChange:BrowserEventHandler = ({event, state}) => {
 export const setupDom:EventHandler = ({state, setState}) => {
 	const instanceClassname = getInstanceClassName(state.instanceId);
 	const elements = buildDomElements(instanceClassname, state.smartyLogoDark, state.smartyLogoLight);
+	const customStylesElement = elements.customStylesElement;
 
 	document.body.appendChild(elements.dropdownWrapperElement);
-	document.getElementsByTagName('head')[0].appendChild(elements.customStylesElement);
+	document.getElementsByTagName('head')[0].appendChild(customStylesElement);
 
 	Object.keys(elements).forEach((elementKey) => {
 		setState(elementKey, elements[elementKey]);
 	});
 
 	updateTheme(state.theme, [], state.dropdownWrapperElement);
-
 	watchSearchInputForChanges({state, setState});
 
-	const dynamicStylingHandler = () => {
-		updateDynamicStyles(state.customStylesElement, state.searchInputElement, state.instanceId);
-	};
+	const dynamicStylingHandler = () => updateDynamicStyles(customStylesElement, state.searchInputElement, state.instanceId);
 
 	configureDynamicStyling(dynamicStylingHandler);
 };
