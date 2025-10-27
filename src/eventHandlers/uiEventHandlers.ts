@@ -1,5 +1,4 @@
 import {
-	BasicStateObject,
 	BrowserEventHandler,
 	EventHandler,
 	UiSuggestionItem
@@ -12,7 +11,7 @@ import {
 	showElement,
 	hideElement,
 	getStreetLineFormValue,
-	updateDynamicStyles
+	updateDynamicStyles, buildDomElements
 } from "../utils/uiUtils";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
@@ -202,27 +201,6 @@ export const setupDom:EventHandler = ({state, setState}) => {
 
 	watchSearchInputForChanges({state, setState});
 	configureDynamicStyling({state, setState});
-};
-
-export const buildDomElements = (instanceClassname:string, smartyLogoDark:string, smartyLogoLight:string):Record<string, HTMLElement> => {
-	const smartyLogoDarkElement = createDomElement("img", ["smartyAddress__smartyLogoDark"]);
-	const smartyLogoLightElement = createDomElement("img", ["smartyAddress__smartyLogoLight"]);
-	const poweredByText = document.createTextNode("Powered by");
-	const suggestionsElement = createDomElement("ul", ["smartyAddress__suggestionsElement"]);
-	const poweredBySmartyElement = createDomElement("div", ["smartyAddress__poweredBy"], [poweredByText, smartyLogoDarkElement, smartyLogoLightElement]);
-	const dropdownElement = createDomElement("div", ["smartyAddress__dropdownElement", "smartyAddress__hidden"], [suggestionsElement, poweredBySmartyElement]);
-	const dropdownWrapperElement = createDomElement("div", ["smartyAddress__suggestionsWrapperElement", instanceClassname], [dropdownElement]);
-
-	dropdownElement.setAttribute("role", "listbox");
-	smartyLogoDarkElement.setAttribute("src", smartyLogoDark);
-	smartyLogoLightElement.setAttribute("src", smartyLogoLight);
-
-	return {
-		dropdownWrapperElement,
-		dropdownElement,
-		suggestionsElement,
-		poweredBySmartyElement,
-	};
 };
 
 export const notifyDomInitIsComplete:EventHandler = ({state}) => {

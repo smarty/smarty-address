@@ -1,4 +1,4 @@
-import {AddressSuggestion, BasicStateObject, HslColor, RgbaColor} from "../interfaces";
+import {AddressSuggestion, BasicStateObject, EventHandler, HslColor, RgbaColor, UiSuggestionItem} from "../interfaces";
 
 export const findDomElement = (selector?: string): HTMLElement | null => {
 	return selector ? document.querySelector(selector) : null;
@@ -182,4 +182,25 @@ export const updateDynamicStyles = (stylesElement:HTMLStyleElement, searchInputE
 	const colorsStyleBlock = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(instanceId)}`, dynamicColorStyles)
 	const positionStyleBlock = formatStyleBlock(`.smartyAddress__position_dynamic.${getInstanceClassName(instanceId)}`, dynamicPositionStyles)
 	stylesElement.innerHTML = `${colorsStyleBlock} ${positionStyleBlock}`;
+};
+
+export const buildDomElements = (instanceClassname:string, smartyLogoDark:string, smartyLogoLight:string):Record<string, HTMLElement> => {
+	const smartyLogoDarkElement = createDomElement("img", ["smartyAddress__smartyLogoDark"]);
+	const smartyLogoLightElement = createDomElement("img", ["smartyAddress__smartyLogoLight"]);
+	const poweredByText = document.createTextNode("Powered by");
+	const suggestionsElement = createDomElement("ul", ["smartyAddress__suggestionsElement"]);
+	const poweredBySmartyElement = createDomElement("div", ["smartyAddress__poweredBy"], [poweredByText, smartyLogoDarkElement, smartyLogoLightElement]);
+	const dropdownElement = createDomElement("div", ["smartyAddress__dropdownElement", "smartyAddress__hidden"], [suggestionsElement, poweredBySmartyElement]);
+	const dropdownWrapperElement = createDomElement("div", ["smartyAddress__suggestionsWrapperElement", instanceClassname], [dropdownElement]);
+
+	dropdownElement.setAttribute("role", "listbox");
+	smartyLogoDarkElement.setAttribute("src", smartyLogoDark);
+	smartyLogoLightElement.setAttribute("src", smartyLogoLight);
+
+	return {
+		dropdownWrapperElement,
+		dropdownElement,
+		suggestionsElement,
+		poweredBySmartyElement,
+	};
 };
