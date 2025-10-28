@@ -39,7 +39,6 @@ export const uiService: ServiceDefinition = {
 		smartyLogoLight: "null",
 	},
 	eventHandlersMap: {
-		// TODO: Refactor this to have a 1:1 mapping of events to handlers (for easier "pluginableness" for users)
 		SmartyAddress_receivedSmartyAddressConfig: updateConfig,
 		SmartyAddress_updatedConfig: findInputElements,
 		UiService_foundInputElements: setupDom,
