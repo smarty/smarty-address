@@ -1,4 +1,5 @@
 import {
+	AbstractStateObject,
 	BrowserEventHandler,
 	EventHandler,
 	UiSuggestionItem
@@ -40,8 +41,8 @@ export const findInputElements:EventHandler = ({state, setState}) => {
 export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 	const searchInputElement = state.searchInputElement;
 	// TODO: Add event listeners for other DOM elements (v2)
-	searchInputElement.addEventListener("input", (inputEvent:Event) => {
-		handleSearchInputOnChange({event: inputEvent, state, setState});
+	searchInputElement.addEventListener("input", (event:Event) => {
+		handleSearchInputOnChange({event, state, setState});
 	});
 
 	searchInputElement.addEventListener("focusout", () => {
@@ -49,14 +50,13 @@ export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 		// hideElement(state.dropdownElement);
 	});
 
-	searchInputElement.addEventListener("keydown", (inputEvent:Event) => {
-		handleAutocompleteKeydown({event: inputEvent, state, setState});
-		// TODO: Figure out how to prevent 1Password from triggering when arrowing down (or selecting an address via the "enter" key)
-		return false;
+	searchInputElement.addEventListener("keydown", (event:KeyboardEvent) => {
+		handleAutocompleteKeydown(event, state, setState);
+		// TODO: Figure out how to prevent 1Password from triggering when arrowing down (or selecting an address via the "enter" key). The way to do this is to update the attributes of the input element (e.g. `autocomplete="off"`). See the "test-site" repo for an example.
 	});
 };
 
-export const handleAutocompleteKeydown:EventHandler = ({event, state, setState}) => {
+export const handleAutocompleteKeydown = (event:KeyboardEvent, state:AbstractStateObject, setState:Function) => {
 	const items = state.addressSuggestionResults ?? [];
 	const currentIndex = state.highlightedSuggestionIndex;
 
