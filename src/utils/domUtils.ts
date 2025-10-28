@@ -1,4 +1,4 @@
-import {AddressSuggestion, BasicStateObject} from "../interfaces.ts";
+import {AddressSuggestion, BasicStateObject, UiSuggestionItem} from "../interfaces.ts";
 import {formatStyleBlock, getHslFromColorString, getInstanceClassName} from "./uiUtils.ts";
 
 export const findDomElement = (selector?: string): HTMLElement | null => {
@@ -163,4 +163,24 @@ export const configureDynamicStyling = (dynamicStylingHandler:Function) => {
 	dynamicStylingHandler();
 	window.addEventListener("scroll", () => dynamicStylingHandler);
 	window.addEventListener("resize", () => dynamicStylingHandler);
+};
+
+// TODO: Figure out how to simplify this function
+export const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:number, suggestionsElement:HTMLElement, indexChange:number) => {
+	const newIndex = (currentIndex + indexChange + items.length) % items.length;
+
+	items.forEach((item, i) => {
+		item.suggestionElement.setAttribute("aria-selected", i === newIndex ? "true" : "false");
+	});
+
+	scrollToHighlightedSuggestion(items[newIndex].suggestionElement, suggestionsElement);
+
+	return newIndex;
+};
+
+export const updateTheme = (newTheme:string[], previousTheme:string[] = [], dropdownWrapperElement:HTMLElement) => {
+	if (dropdownWrapperElement) {
+		dropdownWrapperElement.classList.remove(...previousTheme);
+		dropdownWrapperElement.classList.add(...newTheme);
+	}
 };

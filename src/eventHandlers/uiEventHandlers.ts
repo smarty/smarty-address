@@ -8,13 +8,12 @@ import {getInstanceClassName} from "../utils/uiUtils";
 import {
 	createDomElement,
 	findDomElement,
-	scrollToHighlightedSuggestion,
 	showElement,
 	hideElement,
 	getStreetLineFormValue,
 	updateDynamicStyles,
 	buildDomElements,
-	configureDynamicStyling
+	configureDynamicStyling, highlightNewAddress, updateTheme
 } from "../utils/domUtils";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
@@ -52,12 +51,12 @@ export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 	});
 
 	searchInputElement.addEventListener("keydown", (event:KeyboardEvent) => {
-		handleAutocompleteKeydown(event, state, setState);
+		handleAutocompleteKeydown(event.key, state, setState);
 		// TODO: Figure out how to prevent 1Password from triggering when arrowing down (or selecting an address via the "enter" key). The way to do this is to update the attributes of the input element (e.g. `autocomplete="off"`). See the "test-site" repo for an example.
 	});
 };
 
-export const handleAutocompleteKeydown = (event:KeyboardEvent, state:AbstractStateObject, setState:Function) => {
+export const handleAutocompleteKeydown = (pressedKey:string, state:AbstractStateObject, setState:Function) => {
 	const items = state.addressSuggestionResults ?? [];
 	const currentIndex = state.highlightedSuggestionIndex;
 	const handleHighlightChange = (indexChange:number) => {
@@ -66,24 +65,20 @@ export const handleAutocompleteKeydown = (event:KeyboardEvent, state:AbstractSta
 	};
 
 	// TODO: Only run these actions if the dropdown is open
-	switch (event.key) {
-		case 'ArrowDown':
-			event.preventDefault();
+	switch (pressedKey) {
+		case "ArrowDown":
 			handleHighlightChange(1);
 			break;
-		case 'ArrowUp':
-			event.preventDefault();
+		case "ArrowUp":
 			handleHighlightChange(-1);
 			break;
-		case 'Enter':
-			event.preventDefault();
+		case "Enter":
 			const selectedAddress = items[state.highlightedSuggestionIndex];
 			if (selectedAddress) {
 				state.eventDispatcher.dispatch("UiService_addressSelected", {selectedAddress});
 			}
 			break;
-		case 'Escape':
-			event.preventDefault();
+		case "Escape":
 			hideElement(state.dropdownElement);
 			break;
 	}
@@ -195,20 +190,6 @@ export const notifyDomInitIsComplete:EventHandler = ({state}) => {
 	state.eventDispatcher.dispatch("UiService_domReadyForAutocomplete");
 };
 
-// TODO: Figure out how to simplify the params in this function (e.g. merge indexes, eliminate state/setState params)
-// TODO: After this gets cleaned up, it should also be moved into uiUtils.ts
-const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:number, suggestionsElement:HTMLElement, indexChange:number) => {
-	const newIndex = (currentIndex + indexChange + items.length) % items.length;
-
-	items.forEach((item, i) => {
-		item.suggestionElement.setAttribute("aria-selected", i === newIndex ? "true" : "false");
-	});
-
-	scrollToHighlightedSuggestion(items[newIndex].suggestionElement, suggestionsElement);
-
-	return newIndex;
-};
-
 export const updateConfig:EventHandler = ({event, state, setState}) => {
 	const previousTheme = state.theme;
 	const newTheme = event.detail?.theme;
@@ -227,13 +208,6 @@ export const updateConfig:EventHandler = ({event, state, setState}) => {
 	}
 
 	state.eventDispatcher.dispatch("SmartyAddress_updatedConfig");
-};
-
-export const updateTheme = (newTheme:string[], previousTheme:string[] = [], dropdownWrapperElement:HTMLElement) => {
-	if (dropdownWrapperElement) {
-		dropdownWrapperElement.classList.remove(...previousTheme);
-		dropdownWrapperElement.classList.add(...newTheme);
-	}
 };
 
 const handleAddressOnSelect = (event) => {
