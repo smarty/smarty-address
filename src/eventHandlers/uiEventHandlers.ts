@@ -60,16 +60,20 @@ export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 export const handleAutocompleteKeydown = (event:KeyboardEvent, state:AbstractStateObject, setState:Function) => {
 	const items = state.addressSuggestionResults ?? [];
 	const currentIndex = state.highlightedSuggestionIndex;
+	const handleHighlightChange = (indexChange:number) => {
+		const newHighlightIndex = highlightNewAddress(items, currentIndex, state.suggestionsElement, indexChange);
+		setState("highlightedSuggestionIndex", newHighlightIndex);
+	};
 
 	// TODO: Only run these actions if the dropdown is open
 	switch (event.key) {
 		case 'ArrowDown':
 			event.preventDefault();
-			highlightNewAddress(items, currentIndex, state, setState, 1);
+			handleHighlightChange(1);
 			break;
 		case 'ArrowUp':
 			event.preventDefault();
-			highlightNewAddress(items, currentIndex, state, setState, -1);
+			handleHighlightChange(-1);
 			break;
 		case 'Enter':
 			event.preventDefault();
@@ -154,7 +158,7 @@ export const formatAddressSuggestions:EventHandler = ({event, state:uiState, set
 	uiState.suggestionsElement.replaceChildren(...suggestionElements);
 
 	if(suggestionItems.length) {
-		highlightNewAddress(suggestionItems, 0, uiState, setState, 0);
+		setState("highlightedSuggestionIndex", highlightNewAddress(suggestionItems, 0, uiState.suggestionsElement, 0));
 	}
 
 	showElement(uiState.dropdownElement);
@@ -193,15 +197,16 @@ export const notifyDomInitIsComplete:EventHandler = ({state}) => {
 
 // TODO: Figure out how to simplify the params in this function (e.g. merge indexes, eliminate state/setState params)
 // TODO: After this gets cleaned up, it should also be moved into uiUtils.ts
-const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:number, state, setState, indexChange:number) => {
+const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:number, suggestionsElement:HTMLElement, indexChange:number) => {
 	const newIndex = (currentIndex + indexChange + items.length) % items.length;
-	setState("highlightedSuggestionIndex", newIndex);
 
 	items.forEach((item, i) => {
 		item.suggestionElement.setAttribute("aria-selected", i === newIndex ? "true" : "false");
 	});
 
-	scrollToHighlightedSuggestion(items[newIndex].suggestionElement, state.suggestionsElement);
+	scrollToHighlightedSuggestion(items[newIndex].suggestionElement, suggestionsElement);
+
+	return newIndex;
 };
 
 export const updateConfig:EventHandler = ({event, state, setState}) => {
