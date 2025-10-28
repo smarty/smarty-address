@@ -4,17 +4,18 @@ import {
 	EventHandler,
 	UiSuggestionItem
 } from "../interfaces";
+import {getInstanceClassName} from "../utils/uiUtils";
 import {
 	createDomElement,
 	findDomElement,
-	getInstanceClassName,
 	scrollToHighlightedSuggestion,
 	showElement,
 	hideElement,
 	getStreetLineFormValue,
 	updateDynamicStyles,
-	buildDomElements, configureDynamicStyling
-} from "../utils/uiUtils";
+	buildDomElements,
+	configureDynamicStyling
+} from "../utils/domUtils";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
 export const findInputElements:EventHandler = ({state, setState}) => {
