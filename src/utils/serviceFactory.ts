@@ -22,10 +22,8 @@ export const initService = (
 
 	};
 
-	Object.entries(eventHandlersMap).forEach(([eventName, eventHandlers]) => {
-		eventHandlers.forEach((eventHandler) => {
-			state.eventDispatcher.addEventListener(eventName, eventHandlerWrapper(eventHandler));
-		});
+	Object.entries(eventHandlersMap).forEach(([eventName, eventHandler]) => {
+		state.eventDispatcher.addEventListener(eventName, eventHandlerWrapper(eventHandler));
 	});
 };
  

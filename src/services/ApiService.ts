@@ -8,7 +8,7 @@ export const apiService: ServiceDefinition = {
 		apiKey: "",
 	},
 	eventHandlersMap: {
-		SmartyAddress_receivedSmartyAddressConfig: [setApiKey],
-		UiService_requestedNewAddressSuggestions: [fetchAddressSuggestions],
+		SmartyAddress_receivedSmartyAddressConfig: setApiKey,
+		UiService_requestedNewAddressSuggestions: fetchAddressSuggestions,
 	},
 };
