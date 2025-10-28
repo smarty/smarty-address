@@ -25,19 +25,13 @@
   "author": "Smarty Integrations Team <support@smarty.com> (https://www.smarty.com)",
   "license": "Apache-2.0",
   "type": "module",
-  "scripts": {
-    "dev": "vite --port 5173",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
+  "scripts": {},
   "exports": {
     ".": "./src/index.ts",
     "./assets/*": "./assets/*"
   },
   "devDependencies": {
-    "typescript": "^5.2.2",
-    "vite": "^7.1.4"
+    "typescript": "^5.2.2"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
