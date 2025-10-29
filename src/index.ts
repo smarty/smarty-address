@@ -4,13 +4,14 @@ import {
 	ServiceDefinitionMap,
 	SmartyAddressConfig
 } from "./interfaces";
-import {uiService} from "./services/UiService";
 import {apiService} from "./services/ApiService";
 import {EventDispatcher} from "./utils/EventDispatcher";
 import {initService} from "./utils/serviceFactory";
 import {themes} from "./themes";
 import {getResourceUrl, loadStylesheet} from "./utils/appUtils";
 import {AUTOCOMPLETE_API_URL, SMARTY_LOGO_DARK_URL, SMARTY_LOGO_LIGHT_URL, STYLESHEET_HREF} from "./constants";
+import {autocompleteUiService} from "./services/AutocompleteUiService.ts";
+import {addressFormUiService} from "./services/AddressFormUiService.ts";
 // TODO: Update readme
 // TODO: Update tsconfig.json (borrow from storefront-2)
 // TODO: Add ability to destroy an instance of SmartyAddress (and remove all associated elements from DOM)
@@ -26,12 +27,14 @@ import {AUTOCOMPLETE_API_URL, SMARTY_LOGO_DARK_URL, SMARTY_LOGO_LIGHT_URL, STYLE
 // TODO: Add "backoff" for autocomplete results (add config option to make this customizable)
 // TODO: Add config option for "min characters" before api request is sent
 // TODO: Add ShadCdn to test site (see https://ui.shadcn.com/)
+// TODO: Handle populating select lists (e.g. for "state")
 
 export default class SmartyAddress {
 	static defaultConfig:DefaultSmartyAddressConfig = {
 		theme: themes.default,
 		services: {
-			uiService,
+			autocompleteUiService,
+			addressFormUiService,
 			apiService,
 		},
 		autocompleteApiUrl: AUTOCOMPLETE_API_URL,

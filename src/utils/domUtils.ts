@@ -132,7 +132,7 @@ export const updateDynamicStyles = (stylesElement:HTMLStyleElement, searchInputE
 	stylesElement.innerHTML = `${colorsStyleBlock} ${positionStyleBlock}`;
 };
 
-export const buildDomElements = (instanceClassname:string, smartyLogoDark:string, smartyLogoLight:string):Record<string, HTMLElement> => {
+export const buildAutocompleteDomElements = (instanceClassname:string, smartyLogoDark:string, smartyLogoLight:string):Record<string, HTMLElement> => {
 	const customStylesElement = createDomElement("style");
 
 	const smartyLogoDarkElement = createDomElement("img", ["smartyAddress__smartyLogoDark"]);

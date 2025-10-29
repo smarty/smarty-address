@@ -1,42 +1,12 @@
+import {AbstractStateObject, BrowserEventHandler, EventHandler, UiSuggestionItem} from "../interfaces.ts";
 import {
-	AbstractStateObject,
-	BrowserEventHandler,
-	EventHandler,
-	UiSuggestionItem
-} from "../interfaces";
-import {getInstanceClassName} from "../utils/uiUtils";
-import {
+	buildAutocompleteDomElements, configureDynamicStyling,
 	createDomElement,
-	findDomElement,
-	showElement,
 	hideElement,
-	getStreetLineFormValue,
-	updateDynamicStyles,
-	buildDomElements,
-	configureDynamicStyling, highlightNewAddress, updateTheme
-} from "../utils/domUtils";
-// TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
-
-export const findInputElements:EventHandler = ({state, setState}) => {
-	const {
-		searchInputSelector,
-		streetSelector,
-		secondarySelector,
-		citySelector,
-		stateSelector,
-		zipcodeSelector,
-	} = state;
-
-	// TODO: Consider finding the DOM elements each time they're needed (instead of caching them)
-	setState("streetLineInputElement", findDomElement(streetSelector));
-	setState("secondaryInputElement", findDomElement(secondarySelector));
-	setState("cityInputElement", findDomElement(citySelector));
-	setState("stateInputElement", findDomElement(stateSelector));
-	setState("zipcodeInputElement", findDomElement(zipcodeSelector));
-	setState("searchInputElement", findDomElement(searchInputSelector) ?? state.streetLineInputElement);
-
-	state.eventDispatcher.dispatch("UiService_foundInputElements");
-};
+	highlightNewAddress,
+	showElement, updateDynamicStyles, updateTheme
+} from "../utils/domUtils.ts";
+import {getInstanceClassName} from "../utils/uiUtils.ts";
 
 export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 	const searchInputElement = state.searchInputElement;
@@ -84,9 +54,9 @@ export const handleAutocompleteKeydown = (pressedKey:string, state:AbstractState
 	}
 };
 
-export const handleSelectDropdownItem:EventHandler = ({event, state:uiState, setState}) => {
+export const handleSelectDropdownItem:EventHandler = ({event, state:uiState}) => {
 	const selectedAddress = event.detail.selectedAddress;
-	const {street_line, secondary = "", city, state:addressState, zipcode, entries = 0} = selectedAddress.address;
+	const {street_line, secondary = "", entries = 0} = selectedAddress.address;
 	const searchInputElement = uiState.searchInputElement;
 
 	if (entries > 1) {
@@ -103,25 +73,7 @@ export const handleSelectDropdownItem:EventHandler = ({event, state:uiState, set
 			}
 		);
 	} else {
-		setState("selectedAddress", selectedAddress);
-
-		// TODO: If elements aren't inputs, specify innerHtml instead of value
-		uiState.streetLineInputElement.value = getStreetLineFormValue(uiState, selectedAddress.address);
-
-		if (uiState.secondaryInputElement) {
-			uiState.secondaryInputElement.value = secondary;
-		}
-		if (uiState.cityInputElement) {
-			uiState.cityInputElement.value = city;
-		}
-		if (uiState.stateInputElement) {
-			uiState.stateInputElement.value = addressState;
-		}
-		if (uiState.zipcodeInputElement) {
-			uiState.zipcodeInputElement.value = zipcode;
-		}
-
-		// TODO: Add verification so we can get the full zip code
+		uiState.eventDispatcher.dispatch("AutocompleteUiService_receivedNewAddressForForm", {selectedAddress: selectedAddress.address});
 		hideElement(uiState.dropdownElement);
 	}
 };
@@ -137,6 +89,7 @@ export const formatAddressSuggestions:EventHandler = ({event, state:uiState, set
 		const entriesElement = createDomElement("div", ["smartyAddress__suggestionEntries"], [entriesTextNode]);
 		const suggestionElement = createDomElement("li", ["smartyAddress__suggestion"], [addressElement, entriesElement]);
 		suggestionElement.setAttribute("data-address", JSON.stringify(suggestion));
+		// TODO: Find a better way to accomplish this
 		suggestionElement.addEventListener("click", () => {
 			uiState.eventDispatcher.dispatch("UiService_addressSelected", {selectedAddress: uiState.addressSuggestionResults[index]});
 		});
@@ -166,9 +119,10 @@ const handleSearchInputOnChange:BrowserEventHandler = ({event, state}) => {
 	state.eventDispatcher.dispatch(eventName, {searchString: searchInputValue});
 };
 
-export const setupDom:EventHandler = ({state, setState}) => {
+export const setupDom:EventHandler = ({event, state, setState}) => {
 	const instanceClassname = getInstanceClassName(state.instanceId);
-	const elements = buildDomElements(instanceClassname, state.smartyLogoDark, state.smartyLogoLight);
+	setState("searchInputElement", event.detail.searchInputElement);
+	const elements = buildAutocompleteDomElements(instanceClassname, state.smartyLogoDark, state.smartyLogoLight);
 	const customStylesElement = elements.customStylesElement;
 
 	document.body.appendChild(elements.dropdownWrapperElement);
@@ -179,15 +133,12 @@ export const setupDom:EventHandler = ({state, setState}) => {
 	});
 
 	updateTheme(state.theme, [], state.dropdownWrapperElement);
+	// TODO: See if we can do this without needing to pass state/setState (or if we must, then trigger an event)
 	watchSearchInputForChanges({state, setState});
 
 	const dynamicStylingHandler = () => updateDynamicStyles(customStylesElement, state.searchInputElement, state.instanceId);
 
 	configureDynamicStyling(dynamicStylingHandler);
-};
-
-export const notifyDomInitIsComplete:EventHandler = ({state}) => {
-	state.eventDispatcher.dispatch("UiService_domReadyForAutocomplete");
 };
 
 export const updateConfig:EventHandler = ({event, state, setState}) => {
@@ -196,26 +147,12 @@ export const updateConfig:EventHandler = ({event, state, setState}) => {
 	setState("theme", newTheme);
 	setState("smartyLogoDark", event.detail?.smartyLogoDark);
 	setState("smartyLogoLight", event.detail?.smartyLogoLight);
-	setState("searchInputSelector", event.detail?.searchInputSelector);
-	setState("streetSelector", event.detail?.streetSelector);
-	setState("secondarySelector", event.detail?.secondarySelector);
-	setState("citySelector", event.detail?.citySelector);
-	setState("stateSelector", event.detail?.stateSelector);
-	setState("zipcodeSelector", event.detail?.zipcodeSelector);
 
 	if (previousTheme !== state.theme) {
 		updateTheme(newTheme, previousTheme, state.dropdownWrapperElement);
 	}
 
-	state.eventDispatcher.dispatch("SmartyAddress_updatedConfig");
-};
-
-const handleAddressOnSelect = (event) => {
-
-};
-
-const handleDropdownOnBlur = (event) => {
-
+	state.eventDispatcher.dispatch("AutocompleteUiService_updatedConfig");
 };
 
 export const handleAutocompleteError:EventHandler = ({state}) => {
