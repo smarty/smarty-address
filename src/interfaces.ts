@@ -1,13 +1,16 @@
 import {EventDispatcher} from "./utils/EventDispatcher";
 
 export interface DefaultSmartyAddressConfig {
-	services?:ServiceDefinitionMap,
-	theme?:string[],
-	smartyLogoDark?:string,
-	smartyLogoLight?:string,
+	services:ServiceDefinitionMap,
+	theme:string[],
 }
 
-export interface SmartyAddressConfig extends DefaultSmartyAddressConfig{
+export interface PrivateSmartyAddressConfig {
+	smartyLogoDark:string,
+	smartyLogoLight:string,
+}
+
+export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 	// TODO: Talk to Jeffrey and Adam about correct naming of fields/properties
 	embeddedKey:string,
 	searchInputSelector:string,

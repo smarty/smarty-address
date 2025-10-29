@@ -1,4 +1,9 @@
-import {DefaultSmartyAddressConfig, ServiceDefinitionMap, SmartyAddressConfig} from "./interfaces";
+import {
+	DefaultSmartyAddressConfig,
+	PrivateSmartyAddressConfig,
+	ServiceDefinitionMap,
+	SmartyAddressConfig
+} from "./interfaces";
 import {uiService} from "./services/UiService";
 import {apiService} from "./services/ApiService";
 import {EventDispatcher} from "./utils/EventDispatcher";
@@ -31,7 +36,7 @@ export default class SmartyAddress {
 		}
 	};
 
-	private static privateConfig = {
+	private static privateConfig:PrivateSmartyAddressConfig = {
 		// TODO: Why aren't these actual URLs? (the contents of the file are just directly embedded)
 		smartyLogoDark: getResourceUrl(SMARTY_LOGO_DARK_URL).href,
 		smartyLogoLight: getResourceUrl(SMARTY_LOGO_LIGHT_URL).href,
@@ -53,7 +58,11 @@ export default class SmartyAddress {
 	}
 
 	init = async (config: SmartyAddressConfig) => {
-		config = {...SmartyAddress.defaultConfig, ...config, ...SmartyAddress.privateConfig};
+		config = {
+			...SmartyAddress.defaultConfig,
+			...config,
+			...SmartyAddress.privateConfig
+		};
 		this.setupServices(config.services);
 		await SmartyAddress.stylesheetPromise;
 		this.eventDispatcher.dispatch("SmartyAddress_receivedSmartyAddressConfig", config);
