@@ -25,13 +25,16 @@ import {SMARTY_LOGO_DARK_URL, SMARTY_LOGO_LIGHT_URL, STYLESHEET_HREF} from "./co
 export default class SmartyAddress {
 	static defaultConfig:DefaultSmartyAddressConfig = {
 		theme: themes.default,
-		// TODO: Why aren't these actual URLs? (the contents of the file are just directly embedded)
-		smartyLogoDark: getResourceUrl(SMARTY_LOGO_DARK_URL).href,
-		smartyLogoLight: getResourceUrl(SMARTY_LOGO_LIGHT_URL).href,
 		services: {
 			uiService,
 			apiService,
 		}
+	};
+
+	private static privateConfig = {
+		// TODO: Why aren't these actual URLs? (the contents of the file are just directly embedded)
+		smartyLogoDark: getResourceUrl(SMARTY_LOGO_DARK_URL).href,
+		smartyLogoLight: getResourceUrl(SMARTY_LOGO_LIGHT_URL).href,
 	};
 
 	static themes = themes;
@@ -50,7 +53,7 @@ export default class SmartyAddress {
 	}
 
 	init = async (config: SmartyAddressConfig) => {
-		config = {...SmartyAddress.defaultConfig, ...config};
+		config = {...SmartyAddress.defaultConfig, ...config, ...SmartyAddress.privateConfig};
 		this.setupServices(config.services);
 		await SmartyAddress.stylesheetPromise;
 		this.eventDispatcher.dispatch("SmartyAddress_receivedSmartyAddressConfig", config);
