@@ -3,6 +3,7 @@ import {EventDispatcher} from "./utils/EventDispatcher";
 export interface DefaultSmartyAddressConfig {
 	services:ServiceDefinitionMap,
 	theme:string[],
+	autocompleteApiUrl:string,
 }
 
 export interface PrivateSmartyAddressConfig {
@@ -74,7 +75,7 @@ export interface BrowserEventHandlerProps {
 
 export interface ServiceDefinition {
 	initialState: AbstractStateObject,
-	eventHandlersMap: {[eventName: string]: EventHandler[]}
+	eventHandlersMap: {[eventName: string]: EventHandler}
 }
 
 export interface ServiceDefinitionMap {[eventName: string]:ServiceDefinition}

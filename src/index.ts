@@ -10,7 +10,7 @@ import {EventDispatcher} from "./utils/EventDispatcher";
 import {initService} from "./utils/serviceFactory";
 import {themes} from "./themes";
 import {getResourceUrl, loadStylesheet} from "./utils/appUtils";
-import {SMARTY_LOGO_DARK_URL, SMARTY_LOGO_LIGHT_URL, STYLESHEET_HREF} from "./constants";
+import {AUTOCOMPLETE_API_URL, SMARTY_LOGO_DARK_URL, SMARTY_LOGO_LIGHT_URL, STYLESHEET_HREF} from "./constants";
 // TODO: Update readme
 // TODO: Update tsconfig.json (borrow from storefront-2)
 // TODO: Add ability to destroy an instance of SmartyAddress (and remove all associated elements from DOM)
@@ -33,7 +33,8 @@ export default class SmartyAddress {
 		services: {
 			uiService,
 			apiService,
-		}
+		},
+		autocompleteApiUrl: AUTOCOMPLETE_API_URL,
 	};
 
 	private static privateConfig:PrivateSmartyAddressConfig = {

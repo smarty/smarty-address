@@ -4,8 +4,9 @@ import {formatSelectedAddress, getApiError, unknownError} from "../utils/apiUtil
 // TODO: Dynamically update the version to match `package.json`
 const USER_AGENT = "name:smarty-address-plugin,version:0.1.0";
 
-export const setApiKey: EventHandler = ({event, setState}) => {
+export const setConfig: EventHandler = ({event, setState}) => {
 	setState("apiKey", event.detail.embeddedKey);
+	setState("autocompleteApiUrl", event.detail.autocompleteApiUrl);
 };
 
 export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
@@ -20,7 +21,7 @@ export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 		};
 
 		const params = new URLSearchParams(requestData);
-		const response = await fetch(`${state.autocompleteBaseUrl}?${params}`);
+		const response = await fetch(`${state.autocompleteApiUrl}?${params}`);
 
 		if (response.ok) {
 			const {suggestions} = await response.json() as { suggestions: AddressSuggestion[] };
@@ -29,14 +30,14 @@ export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 			const errorResponse = await response.json() as { errors: ApiErrorResponse[] };
 			const error = getApiError(response.status, errorResponse);
 			// TODO: Figure out if we want to add styling to the console messages
-			console.log(error.message);
+			console.error(error.message);
 
 			state.eventDispatcher.dispatch("ApiService_receivedApiErrorFetchingAddressSuggestions", {
 				errorName: error.name,
 			});
 		}
 	} catch (error) {
-		console.log(unknownError.message);
+		console.error(unknownError.message);
 		state.eventDispatcher.dispatch("ApiService_receivedApiErrorFetchingAddressSuggestions", {errorName: unknownError.name});
 	}
 };

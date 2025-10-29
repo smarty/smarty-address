@@ -1,14 +1,13 @@
 import {ServiceDefinition} from "../interfaces";
-import {setApiKey, fetchAddressSuggestions} from "../eventHandlers/apiEventHandlers";
-import {AUTOCOMPLETE_BASE_API_URL} from "../constants.ts";
+import {setConfig, fetchAddressSuggestions} from "../eventHandlers/apiEventHandlers";
 
 export const apiService: ServiceDefinition = {
 	initialState: {
-		autocompleteBaseUrl: AUTOCOMPLETE_BASE_API_URL,
+		autocompleteApiUrl: "",
 		apiKey: "",
 	},
 	eventHandlersMap: {
-		SmartyAddress_receivedSmartyAddressConfig: setApiKey,
+		SmartyAddress_receivedSmartyAddressConfig: setConfig,
 		UiService_requestedNewAddressSuggestions: fetchAddressSuggestions,
 	},
 };
