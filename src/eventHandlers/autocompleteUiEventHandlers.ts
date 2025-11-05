@@ -4,7 +4,7 @@ import {
 	createDomElement,
 	hideElement,
 	highlightNewAddress,
-	showElement, updateDynamicStyles, updateTheme
+	showElement, updateDynamicStyles, updateThemeClass
 } from "../utils/domUtils.ts";
 import {getInstanceClassName} from "../utils/uiUtils.ts";
 
@@ -132,7 +132,7 @@ export const setupDom:EventHandler = ({event, state, setState}) => {
 		setState(elementKey, elements[elementKey]);
 	});
 
-	updateTheme(state.theme, [], state.dropdownWrapperElement);
+	updateThemeClass(state.theme, [], state.dropdownWrapperElement);
 	// TODO: See if we can do this without needing to pass state/setState (or if we must, then trigger an event)
 	watchSearchInputForChanges({state, setState});
 
@@ -149,7 +149,7 @@ export const updateConfig:EventHandler = ({event, state, setState}) => {
 	setState("smartyLogoLight", event.detail?.smartyLogoLight);
 
 	if (previousTheme !== state.theme) {
-		updateTheme(newTheme, previousTheme, state.dropdownWrapperElement);
+		updateThemeClass(newTheme, previousTheme, state.dropdownWrapperElement);
 	}
 
 	state.eventDispatcher.dispatch("AutocompleteUiService_updatedConfig");

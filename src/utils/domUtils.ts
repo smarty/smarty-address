@@ -158,7 +158,7 @@ export const buildAutocompleteDomElements = (instanceClassname:string, smartyLog
 
 export const configureDynamicStyling = (dynamicStylingHandler:Function) => {
 	// TODO: Do we need to separate "color" and "position" functionality?
-	// TODO: Do we need to setup polling or a mutation observer so we can also recalculate these values when sizes/positions/colors change for other reasons besides scoll/resize?
+	// TODO: Do we need to setup polling or a mutation observer so we can also recalculate these values when sizes/positions/colors change for other reasons besides scroll/resize?
 
 	dynamicStylingHandler();
 	window.addEventListener("scroll", () => dynamicStylingHandler);
@@ -178,7 +178,7 @@ export const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:numbe
 	return newIndex;
 };
 
-export const updateTheme = (newTheme:string[], previousTheme:string[] = [], dropdownWrapperElement:HTMLElement) => {
+export const updateThemeClass = (newTheme:string[], previousTheme:string[] = [], dropdownWrapperElement:HTMLElement) => {
 	if (dropdownWrapperElement) {
 		dropdownWrapperElement.classList.remove(...previousTheme);
 		dropdownWrapperElement.classList.add(...newTheme);

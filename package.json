@@ -1,6 +1,5 @@
 {
-  "name": "smarty-address",
-  "private": true,
+  "name": "@smarty-integrations-sandbox/smarty-address",
   "version": "0.1.0",
   "description": "Quick and easy Smarty address autocomplete and validation.",
   "keywords": [
