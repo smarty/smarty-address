@@ -3,7 +3,7 @@ import {
 	findInputElements,
 	populateFormWithNewAddress,
 	updateConfig
-} from "../eventHandlers/addressFormUiEventHandlers.ts";
+} from "../eventHandlers/addressFormUiEventHandlers";
 
 export const addressFormUiService: ServiceDefinition = {
 	initialState: {

@@ -2,7 +2,7 @@ import {
 	HslColor,
 	RgbaColor,
 } from "../interfaces";
-import {getRgbaFromCssColor} from "./domUtils.ts";
+import {getRgbaFromCssColor} from "./domUtils";
 
 export const formatStyleBlock = (selector:string, styles:{}) => {
 	const stylesString = Object.entries(styles).map(([property, value]) => `${property}: ${value};`).join("\n");

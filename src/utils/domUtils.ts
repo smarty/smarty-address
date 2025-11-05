@@ -1,5 +1,5 @@
-import {AddressSuggestion, BasicStateObject, UiSuggestionItem} from "../interfaces.ts";
-import {formatStyleBlock, getHslFromColorString, getInstanceClassName} from "./uiUtils.ts";
+import {AddressSuggestion, BasicStateObject, UiSuggestionItem} from "../interfaces";
+import {formatStyleBlock, getHslFromColorString, getInstanceClassName} from "./uiUtils";
 
 export const findDomElement = (selector?: string): HTMLElement | null => {
 	return selector ? document.querySelector(selector) : null;

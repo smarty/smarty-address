@@ -1,12 +1,12 @@
-import {AbstractStateObject, BrowserEventHandler, EventHandler, UiSuggestionItem} from "../interfaces.ts";
+import {AbstractStateObject, BrowserEventHandler, EventHandler, UiSuggestionItem} from "../interfaces";
 import {
 	buildAutocompleteDomElements, configureDynamicStyling,
 	createDomElement,
 	hideElement,
 	highlightNewAddress,
 	showElement, updateDynamicStyles, updateThemeClass
-} from "../utils/domUtils.ts";
-import {getInstanceClassName} from "../utils/uiUtils.ts";
+} from "../utils/domUtils";
+import {getInstanceClassName} from "../utils/uiUtils";
 
 export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 	const searchInputElement = state.searchInputElement;

@@ -10,8 +10,8 @@ import {initService} from "./utils/serviceFactory";
 import {themes} from "./themes";
 import {getResourceUrl, loadStylesheet} from "./utils/appUtils";
 import {AUTOCOMPLETE_API_URL, SMARTY_LOGO_DARK_URL, SMARTY_LOGO_LIGHT_URL, STYLESHEET_HREF} from "./constants";
-import {autocompleteUiService} from "./services/AutocompleteUiService.ts";
-import {addressFormUiService} from "./services/AddressFormUiService.ts";
+import {autocompleteUiService} from "./services/AutocompleteUiService";
+import {addressFormUiService} from "./services/AddressFormUiService";
 // TODO: Update readme
 // TODO: Update tsconfig.json (borrow from storefront-2)
 // TODO: Add ability to destroy an instance of SmartyAddress (and remove all associated elements from DOM)

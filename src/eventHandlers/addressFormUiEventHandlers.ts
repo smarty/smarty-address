@@ -1,5 +1,5 @@
-import {EventHandler} from "../interfaces.ts";
-import {findDomElement, getStreetLineFormValue} from "../utils/domUtils.ts";
+import {EventHandler} from "../interfaces";
+import {findDomElement, getStreetLineFormValue} from "../utils/domUtils";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
 export const updateConfig:EventHandler = ({event, state, setState}) => {
