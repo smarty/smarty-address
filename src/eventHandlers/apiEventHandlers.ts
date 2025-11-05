@@ -42,9 +42,3 @@ export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 	}
 };
 
-const verifyAddress = async (address: AddressSuggestion): Promise<AddressSuggestion> => {
-	// TODO: Implement address verification
-	// This would call the US Street Address API endpoint
-	// Also need to handle international addresses
-	return address;
-};

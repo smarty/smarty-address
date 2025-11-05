@@ -114,7 +114,7 @@ export const formatAddressSuggestions:EventHandler = ({event, state:uiState, set
 
 // TODO: Compare with the AI-generated plugin to see what we can leverage from it
 const handleSearchInputOnChange:BrowserEventHandler = ({event, state}) => {
-	const searchInputValue = event.target?.value;
+	const searchInputValue = (event.target as HTMLInputElement)?.value;
 	const eventName = searchInputValue.length ? "UiService_requestedNewAddressSuggestions" : "UiService_searchInputCleared";
 	state.eventDispatcher.dispatch(eventName, {searchString: searchInputValue});
 };
@@ -134,9 +134,9 @@ export const setupDom:EventHandler = ({event, state, setState}) => {
 
 	updateThemeClass(state.theme, [], state.dropdownWrapperElement);
 	// TODO: See if we can do this without needing to pass state/setState (or if we must, then trigger an event)
-	watchSearchInputForChanges({state, setState});
+	watchSearchInputForChanges({state, setState, event});
 
-	const dynamicStylingHandler = () => updateDynamicStyles(customStylesElement, state.searchInputElement, state.instanceId);
+	const dynamicStylingHandler = () => updateDynamicStyles(customStylesElement as HTMLStyleElement, state.searchInputElement, state.instanceId);
 
 	configureDynamicStyling(dynamicStylingHandler);
 };

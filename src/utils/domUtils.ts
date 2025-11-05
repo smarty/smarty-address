@@ -5,7 +5,7 @@ export const findDomElement = (selector?: string): HTMLElement | null => {
 	return selector ? document.querySelector(selector) : null;
 };
 
-export const createDomElement = (tagName: string, classList?: string[] = [], children:HTMLElement[] = []) => {
+export const createDomElement = (tagName: string, classList: string[] = [], children: (HTMLElement | Text)[] = []) => {
 	const element = document.createElement(tagName);
 	element.classList.add(...classList);
 	children.forEach((child) => {
@@ -75,7 +75,7 @@ export const getRgbaFromCssColor = (cssColor:CSSStyleDeclaration) => {
 	const context = canvas.getContext("2d", { willReadFrequently: true });
 
 	context.globalCompositeOperation = "copy";
-	context.fillStyle = cssColor;
+	context.fillStyle = cssColor as any;
 	context.fillRect(0, 0, 1, 1);
 
 	const [red, green, blue, aByte] = context.getImageData(0, 0, 1, 1).data;
