@@ -20,14 +20,23 @@
     "international",
     "http"
   ],
-  "main": "src/index.ts",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "author": "Smarty Integrations Team <support@smarty.com> (https://www.smarty.com)",
   "license": "Apache-2.0",
   "type": "module",
-  "scripts": {},
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && cp -r assets dist/"
+  },
   "exports": {
-    ".": "./src/index.ts",
-    "./assets/*": "./assets/*"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./assets/*": "./dist/assets/*"
   },
   "devDependencies": {
     "typescript": "^5.2.2"
