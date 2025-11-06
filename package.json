@@ -1,6 +1,6 @@
 {
   "name": "@smarty-integrations-sandbox/smarty-address",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Quick and easy Smarty address autocomplete and validation.",
   "keywords": [
     "smarty",
@@ -36,7 +36,8 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./assets/*": "./dist/assets/*"
+    "./assets/img/smarty-logo-blue.svg": "./dist/assets/img/smarty-logo-blue.svg",
+    "./assets/img/smarty-logo-white.svg": "./dist/assets/img/smarty-logo-white.svg"
   },
   "devDependencies": {
     "typescript": "^5.2.2"
