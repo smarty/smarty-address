@@ -36,6 +36,7 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./dist/assets/styles/theme.css": "./dist/assets/styles/theme.css",
     "./dist/assets/img/smarty-logo-blue.svg": "./dist/assets/img/smarty-logo-blue.svg",
     "./dist/assets/img/smarty-logo-white.svg": "./dist/assets/img/smarty-logo-white.svg"
   },
