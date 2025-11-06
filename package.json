@@ -36,8 +36,8 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./assets/img/smarty-logo-blue.svg": "./dist/assets/img/smarty-logo-blue.svg",
-    "./assets/img/smarty-logo-white.svg": "./dist/assets/img/smarty-logo-white.svg"
+    "./dist/assets/img/smarty-logo-blue.svg": "./dist/assets/img/smarty-logo-blue.svg",
+    "./dist/assets/img/smarty-logo-white.svg": "./dist/assets/img/smarty-logo-white.svg"
   },
   "devDependencies": {
     "typescript": "^5.2.2"
