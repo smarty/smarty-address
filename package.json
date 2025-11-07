@@ -1,6 +1,6 @@
 {
   "name": "@smarty-integrations-sandbox/smarty-address",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Quick and easy Smarty address autocomplete and validation.",
   "keywords": [
     "smarty",
@@ -29,7 +29,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && cp -r assets dist/"
+    "build": "tsc && cp -r assets dist/",
+    "dev": "vite --port 5176"
   },
   "exports": {
     ".": {
@@ -41,7 +42,8 @@
     "./dist/assets/img/smarty-logo-white.svg": "./dist/assets/img/smarty-logo-white.svg"
   },
   "devDependencies": {
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vite": "^2.7.13"
   },
   "dependencies": {}
 }

@@ -9,7 +9,7 @@ import {EventDispatcher} from "./utils/EventDispatcher";
 import {initService} from "./utils/serviceFactory";
 import {themes} from "./themes";
 import {getResourceUrl, loadStylesheet} from "./utils/appUtils";
-import {AUTOCOMPLETE_API_URL, SMARTY_LOGO_DARK_URL, SMARTY_LOGO_LIGHT_URL, STYLESHEET_HREF} from "./constants";
+import {AUTOCOMPLETE_API_URL, SMARTY_LOGO_DARK_URL, SMARTY_LOGO_LIGHT_URL} from "./constants";
 import {autocompleteUiService} from "./services/AutocompleteUiService";
 import {addressFormUiService} from "./services/AddressFormUiService";
 // TODO: Update readme
@@ -48,7 +48,7 @@ export default class SmartyAddress {
 
 	static themes = themes;
 	private static instances:SmartyAddress[] = [];
-	private static stylesheetPromise:undefined | Promise<Event> = loadStylesheet(getResourceUrl(STYLESHEET_HREF).href);
+	private static stylesheetPromise:undefined | Promise<void> = loadStylesheet();
 
 	private eventDispatcher = new EventDispatcher();
 	private instanceId;

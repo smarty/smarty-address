@@ -1,8 +1,9 @@
 import {AddressSuggestion, ApiErrorResponse, EventHandler} from "../interfaces";
 import {formatSelectedAddress, getApiError, unknownError} from "../utils/apiUtils";
+import {APP_VERSION} from "../constants";
 
 // TODO: Dynamically update the version to match `package.json`
-const USER_AGENT = "name:smarty-address-plugin,version:0.1.4";
+const USER_AGENT = `name:smarty-address-plugin,version:${APP_VERSION}`;
 
 export const setConfig: EventHandler = ({event, setState}) => {
 	setState("apiKey", event.detail.embeddedKey);
