@@ -1,3 +1,4 @@
+export const baseStyles = `
 .smartyAddress__base_default {
     --smartyAddress__wrapperPosition: absolute;
     --smartyAddress__hiddenDisplay: none;
@@ -19,4 +20,5 @@
     --smartyAddress__suggestionOverflow: ellipsis;
     --smartyAddress__suggestionOverflowX: hidden;
 }
+`;
 

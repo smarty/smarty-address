@@ -1,8 +1,4 @@
-@import "base.css";
-@import "colors.css";
-@import "spacing.css";
-@import "misc.css";
-
+export const themeStyles = `
 .smartyAddress__suggestionsWrapperElement {
     top: var(--smartyAddress__dropdownPositionTop);
     left: var(--smartyAddress__dropdownPositionLeft);
@@ -86,3 +82,4 @@
 .smartyAddress__smartyLogoLight {
     display: var(--smartyAddress__logoLightDisplay);
 }
+`;

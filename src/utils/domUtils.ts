@@ -106,7 +106,7 @@ export const updateDynamicStyles = (stylesElement:HTMLStyleElement, searchInputE
 	const tertiarySurfaceColor = `hsl(${hue} ${saturation}% ${tertiaryLightness}%)`;
 	const hoverMixColor = isLightMode ? "#000" : "#fff";
 
-	// TODO: Need to define all the missing vars here (see colors.css)
+	// TODO: Need to define all the missing vars here (see colors.ts)
 	const dynamicColorStyles = {
 		"--smartyAddress__textBasePrimaryColor": inputTextColor,
 		"--smartyAddress__surfaceBasePrimaryColor": inputBackgroundColor,

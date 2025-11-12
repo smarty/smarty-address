@@ -1,4 +1,4 @@
-
+export const miscStyles = `
 .smartyAddress__typography_default {
     --smartyAddress__fontSizeSmall1: .65em;
 }
@@ -8,3 +8,4 @@
     --smartyAddress__dropdownPositionTop: 0;
     --smartyAddress__dropdownPositionLeft: 0;
 }
+`;

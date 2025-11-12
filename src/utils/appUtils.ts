@@ -1,4 +1,8 @@
-import themeStyles from '../../assets/styles/theme.css';
+import {themeStyles} from '../../assets/styles/theme';
+import {baseStyles} from '../../assets/styles/base';
+import {colorStyles} from '../../assets/styles/colors';
+import {miscStyles} from '../../assets/styles/misc';
+import {spacingStyles} from '../../assets/styles/spacing';
 
 export const getResourceUrl = (pathFromRoot:string) => {
 	const relativePath = `../..${pathFromRoot}`;
@@ -7,6 +11,10 @@ export const getResourceUrl = (pathFromRoot:string) => {
 
 export const loadStylesheet = ():Promise<void> => {
 	return new Promise((resolve) => {
+		addStylesheetToDom(baseStyles);
+		addStylesheetToDom(colorStyles);
+		addStylesheetToDom(miscStyles);
+		addStylesheetToDom(spacingStyles);
 		addStylesheetToDom(themeStyles);
 		resolve();
 	});

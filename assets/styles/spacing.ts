@@ -1,3 +1,4 @@
+export const spacingStyles = `
 
 .smartyAddress__spacing_medium {
     --smartyAddress__spacingNone: 0px;
@@ -14,3 +15,4 @@
     --smartyAddress__heightLarge1: 500px;
     --smartyAddress__scrollbarWidth: thin;
 }
+`;
