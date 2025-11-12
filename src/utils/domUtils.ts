@@ -1,5 +1,6 @@
 import {AddressSuggestion, BasicStateObject, UiSuggestionItem} from "../interfaces";
 import {formatStyleBlock, getHslFromColorString, getInstanceClassName} from "./uiUtils";
+import {getSmartyLogo} from "./getSmartyLogo";
 
 export const findDomElement = (selector?: string): HTMLElement | null => {
 	return selector ? document.querySelector(selector) : null;
@@ -132,11 +133,12 @@ export const updateDynamicStyles = (stylesElement:HTMLStyleElement, searchInputE
 	stylesElement.innerHTML = `${colorsStyleBlock} ${positionStyleBlock}`;
 };
 
-export const buildAutocompleteDomElements = (instanceClassname:string, smartyLogoDark:string, smartyLogoLight:string):Record<string, HTMLElement> => {
+export const buildAutocompleteDomElements = (instanceClassname:string):Record<string, HTMLElement> => {
 	const customStylesElement = createDomElement("style");
 
-	const smartyLogoDarkElement = createDomElement("img", ["smartyAddress__smartyLogoDark"]);
-	const smartyLogoLightElement = createDomElement("img", ["smartyAddress__smartyLogoLight"]);
+	// TODO: Fix logo sizing
+	const smartyLogoDarkElement = createDomElement("div", ["smartyAddress__smartyLogoDark"]);
+	const smartyLogoLightElement = createDomElement("div", ["smartyAddress__smartyLogoLight"]);
 	const poweredByText = document.createTextNode("Powered by");
 	const suggestionsElement = createDomElement("ul", ["smartyAddress__suggestionsElement"]);
 	const poweredBySmartyElement = createDomElement("div", ["smartyAddress__poweredBy"], [poweredByText, smartyLogoDarkElement, smartyLogoLightElement]);
@@ -144,8 +146,8 @@ export const buildAutocompleteDomElements = (instanceClassname:string, smartyLog
 	const dropdownWrapperElement = createDomElement("div", ["smartyAddress__suggestionsWrapperElement", instanceClassname], [dropdownElement]);
 
 	dropdownElement.setAttribute("role", "listbox");
-	smartyLogoDarkElement.setAttribute("src", smartyLogoDark);
-	smartyLogoLightElement.setAttribute("src", smartyLogoLight);
+	smartyLogoDarkElement.innerHTML = getSmartyLogo("#0066FF");
+	smartyLogoLightElement.innerHTML = getSmartyLogo("#FFFFFF");
 
 	return {
 		customStylesElement,

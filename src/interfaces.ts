@@ -6,11 +6,6 @@ export interface DefaultSmartyAddressConfig {
 	autocompleteApiUrl:string,
 }
 
-export interface PrivateSmartyAddressConfig {
-	smartyLogoDark:string,
-	smartyLogoLight:string,
-}
-
 export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 	// TODO: Talk to Jeffrey and Adam about correct naming of fields/properties
 	embeddedKey:string,

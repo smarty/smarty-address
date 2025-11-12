@@ -1,6 +1,5 @@
 import {
 	DefaultSmartyAddressConfig,
-	PrivateSmartyAddressConfig,
 	ServiceDefinitionMap,
 	SmartyAddressConfig
 } from "./interfaces";
@@ -8,8 +7,8 @@ import {apiService} from "./services/ApiService";
 import {EventDispatcher} from "./utils/EventDispatcher";
 import {initService} from "./utils/serviceFactory";
 import {themes} from "./themes";
-import {getResourceUrl, loadStylesheet} from "./utils/appUtils";
-import {AUTOCOMPLETE_API_URL, SMARTY_LOGO_DARK_URL, SMARTY_LOGO_LIGHT_URL} from "./constants";
+import {loadStylesheet} from "./utils/appUtils";
+import {AUTOCOMPLETE_API_URL} from "./constants";
 import {autocompleteUiService} from "./services/AutocompleteUiService";
 import {addressFormUiService} from "./services/AddressFormUiService";
 // TODO: Update readme
@@ -40,13 +39,6 @@ export default class SmartyAddress {
 		autocompleteApiUrl: AUTOCOMPLETE_API_URL,
 	};
 
-	private static privateConfig:PrivateSmartyAddressConfig = {
-		// TODO: Why aren't these actual URLs? (the contents of the file are just directly embedded)
-		smartyLogoDark: getResourceUrl(SMARTY_LOGO_DARK_URL).href,
-		smartyLogoLight: getResourceUrl(SMARTY_LOGO_LIGHT_URL).href,
-	};
-
-	static themes = themes;
 	private static instances:SmartyAddress[] = [];
 	private static stylesheetPromise:undefined | Promise<void> = loadStylesheet();
 
@@ -65,7 +57,6 @@ export default class SmartyAddress {
 		config = {
 			...SmartyAddress.defaultConfig,
 			...config,
-			...SmartyAddress.privateConfig
 		};
 		this.setupServices(config.services);
 		await SmartyAddress.stylesheetPromise;

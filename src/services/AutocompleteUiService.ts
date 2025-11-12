@@ -19,8 +19,6 @@ export const autocompleteUiService: ServiceDefinition = {
 		highlightedSuggestionIndex: 0,
 		addressSuggestionResults: [],
 		customStylesElement: null,
-		smartyLogoDark: "",
-		smartyLogoLight: "",
 	},
 	eventHandlersMap: {
 		SmartyAddress_receivedSmartyAddressConfig: updateConfig,

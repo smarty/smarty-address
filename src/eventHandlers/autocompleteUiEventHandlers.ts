@@ -122,7 +122,7 @@ const handleSearchInputOnChange:BrowserEventHandler = ({event, state}) => {
 export const setupDom:EventHandler = ({event, state, setState}) => {
 	const instanceClassname = getInstanceClassName(state.instanceId);
 	setState("searchInputElement", event.detail.searchInputElement);
-	const elements = buildAutocompleteDomElements(instanceClassname, state.smartyLogoDark, state.smartyLogoLight);
+	const elements = buildAutocompleteDomElements(instanceClassname);
 	const customStylesElement = elements.customStylesElement;
 
 	document.body.appendChild(elements.dropdownWrapperElement);
@@ -145,8 +145,6 @@ export const updateConfig:EventHandler = ({event, state, setState}) => {
 	const previousTheme = state.theme;
 	const newTheme = event.detail?.theme;
 	setState("theme", newTheme);
-	setState("smartyLogoDark", event.detail?.smartyLogoDark);
-	setState("smartyLogoLight", event.detail?.smartyLogoLight);
 
 	if (previousTheme !== state.theme) {
 		updateThemeClass(newTheme, previousTheme, state.dropdownWrapperElement);

@@ -4,11 +4,6 @@ import {colorStyles} from '../../assets/styles/colors';
 import {miscStyles} from '../../assets/styles/misc';
 import {spacingStyles} from '../../assets/styles/spacing';
 
-export const getResourceUrl = (pathFromRoot:string) => {
-	const relativePath = `../..${pathFromRoot}`;
-	return new URL(relativePath, import.meta.url);
-};
-
 export const loadStylesheet = ():Promise<void> => {
 	return new Promise((resolve) => {
 		addStylesheetToDom(baseStyles);
