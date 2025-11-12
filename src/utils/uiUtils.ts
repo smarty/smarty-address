@@ -56,3 +56,15 @@ export const getHslFromColorString = (colorString:CSSStyleDeclaration) => {
 	const rgbaColor = getRgbaFromCssColor(colorString);
 	return rgbToHsl(rgbaColor);
 };
+
+export const convertStylesObjectToCssBlock = (stylesObject) => {
+	const selectorsBlock = Object.entries(stylesObject).map(([selector, selectorStyles]) => {
+		const stylesBlock = Object.entries(selectorStyles).map(([key, value]) => {
+			return `${key}: ${value};`;
+		}).join("\n\t");
+
+		return `\n${selector} {\n\t${stylesBlock}\n}`;
+	});
+
+	return selectorsBlock.join("");
+};

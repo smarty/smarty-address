@@ -3,14 +3,15 @@ import {baseStyles} from '../../assets/styles/base';
 import {colorStyles} from '../../assets/styles/colors';
 import {miscStyles} from '../../assets/styles/misc';
 import {spacingStyles} from '../../assets/styles/spacing';
+import {convertStylesObjectToCssBlock} from "./uiUtils";
 
 export const loadStylesheet = ():Promise<void> => {
 	return new Promise((resolve) => {
-		addStylesheetToDom(baseStyles);
-		addStylesheetToDom(colorStyles);
-		addStylesheetToDom(miscStyles);
-		addStylesheetToDom(spacingStyles);
-		addStylesheetToDom(themeStyles);
+		addStylesheetToDom(convertStylesObjectToCssBlock(baseStyles));
+		addStylesheetToDom(convertStylesObjectToCssBlock(colorStyles));
+		addStylesheetToDom(convertStylesObjectToCssBlock(miscStyles));
+		addStylesheetToDom(convertStylesObjectToCssBlock(spacingStyles));
+		addStylesheetToDom(convertStylesObjectToCssBlock(themeStyles));
 		resolve();
 	});
 };
