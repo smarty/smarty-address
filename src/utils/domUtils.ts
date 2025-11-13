@@ -137,8 +137,8 @@ export const buildAutocompleteDomElements = (instanceClassname:string):Record<st
 	const customStylesElement = createDomElement("style");
 
 	// TODO: Fix logo sizing
-	const smartyLogoDarkElement = createDomElement("div", ["smartyAddress__smartyLogoDark"]);
-	const smartyLogoLightElement = createDomElement("div", ["smartyAddress__smartyLogoLight"]);
+	const smartyLogoDarkElement = createDomElement("img", ["smartyAddress__smartyLogoDark"]);
+	const smartyLogoLightElement = createDomElement("img", ["smartyAddress__smartyLogoLight"]);
 	const poweredByText = document.createTextNode("Powered by");
 	const suggestionsElement = createDomElement("ul", ["smartyAddress__suggestionsElement"]);
 	const poweredBySmartyElement = createDomElement("div", ["smartyAddress__poweredBy"], [poweredByText, smartyLogoDarkElement, smartyLogoLightElement]);
@@ -146,8 +146,8 @@ export const buildAutocompleteDomElements = (instanceClassname:string):Record<st
 	const dropdownWrapperElement = createDomElement("div", ["smartyAddress__suggestionsWrapperElement", instanceClassname], [dropdownElement]);
 
 	dropdownElement.setAttribute("role", "listbox");
-	smartyLogoDarkElement.innerHTML = getSmartyLogo("#0066FF");
-	smartyLogoLightElement.innerHTML = getSmartyLogo("#FFFFFF");
+	smartyLogoDarkElement.setAttribute("src", `data:image/svg+xml,${getSmartyLogo("#0066FF")}`);
+	smartyLogoLightElement.setAttribute("src", `data:image/svg+xml,${getSmartyLogo("#FFFFFF")}`);
 
 	return {
 		customStylesElement,
