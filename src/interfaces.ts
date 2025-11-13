@@ -29,6 +29,12 @@ export interface AddressSuggestion {
 	metadata?: Record<string, any>;
 }
 
+export interface StylesObject {
+	[selector: string]: {
+		[cssVar: string]: string;
+	};
+}
+
 export interface ApiErrorResponse {
 	id: number;
 	message: string;

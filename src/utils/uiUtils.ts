@@ -1,6 +1,7 @@
 import {
 	HslColor,
 	RgbaColor,
+	StylesObject,
 } from "../interfaces";
 import {getRgbaFromCssColor} from "./domUtils";
 
@@ -57,7 +58,7 @@ export const getHslFromColorString = (colorString:CSSStyleDeclaration) => {
 	return rgbToHsl(rgbaColor);
 };
 
-export const convertStylesObjectToCssBlock = (stylesObject) => {
+export const convertStylesObjectToCssBlock = (stylesObject:StylesObject) => {
 	const selectorsBlock = Object.entries(stylesObject).map(([selector, selectorStyles]) => {
 		const stylesBlock = Object.entries(selectorStyles).map(([key, value]) => {
 			return `${key}: ${value};`;

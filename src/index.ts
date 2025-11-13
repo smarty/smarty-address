@@ -7,7 +7,7 @@ import {apiService} from "./services/ApiService";
 import {EventDispatcher} from "./utils/EventDispatcher";
 import {initService} from "./utils/serviceFactory";
 import {themes} from "./themes";
-import {loadStylesheet} from "./utils/appUtils";
+import {defineStyles} from "./utils/appUtils";
 import {AUTOCOMPLETE_API_URL} from "./constants";
 import {autocompleteUiService} from "./services/AutocompleteUiService";
 import {addressFormUiService} from "./services/AddressFormUiService";
@@ -38,9 +38,11 @@ export default class SmartyAddress {
 		},
 		autocompleteApiUrl: AUTOCOMPLETE_API_URL,
 	};
+	static {
+		defineStyles();
+	}
 
 	private static instances:SmartyAddress[] = [];
-	private static stylesheetPromise:undefined | Promise<void> = loadStylesheet();
 
 	private eventDispatcher = new EventDispatcher();
 	private instanceId;
@@ -59,7 +61,6 @@ export default class SmartyAddress {
 			...config,
 		};
 		this.setupServices(config.services);
-		await SmartyAddress.stylesheetPromise;
 		this.eventDispatcher.dispatch("SmartyAddress_receivedSmartyAddressConfig", config);
 	}
 

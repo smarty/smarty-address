@@ -5,15 +5,16 @@ import {miscStyles} from '../../assets/styles/misc';
 import {spacingStyles} from '../../assets/styles/spacing';
 import {convertStylesObjectToCssBlock} from "./uiUtils";
 
-export const loadStylesheet = ():Promise<void> => {
-	return new Promise((resolve) => {
-		addStylesheetToDom(convertStylesObjectToCssBlock(baseStyles));
-		addStylesheetToDom(convertStylesObjectToCssBlock(colorStyles));
-		addStylesheetToDom(convertStylesObjectToCssBlock(miscStyles));
-		addStylesheetToDom(convertStylesObjectToCssBlock(spacingStyles));
-		addStylesheetToDom(convertStylesObjectToCssBlock(themeStyles));
-		resolve();
-	});
+export const defineStyles = () => {
+	const allStyles = {
+		...baseStyles,
+		...colorStyles,
+		...miscStyles,
+		...spacingStyles,
+		...themeStyles,
+	};
+	const cssStylesBlock = convertStylesObjectToCssBlock(allStyles);
+	return addStylesheetToDom(cssStylesBlock);
 };
 
 const addStylesheetToDom = (stylesString:string) => {
@@ -29,4 +30,6 @@ const addStylesheetToDom = (stylesString:string) => {
 	}
 
 	styleElement.appendChild(document.createTextNode(stylesString));
+
+	return styleElement;
 };
