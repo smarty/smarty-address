@@ -14,7 +14,6 @@ import {addressFormUiService} from "./services/AddressFormUiService";
 // TODO: Update readme
 // TODO: Update tsconfig.json (borrow from storefront-2)
 // TODO: Add ability to destroy an instance of SmartyAddress (and remove all associated elements from DOM)
-// TODO: Upload package to npm
 // TODO: Make styles dynamically configurable (e.g. what if I want to change the theme dynamically after the page has loaded?)
 // TODO: add `rel="preload" (or similar) to <link> tags (use a service worker?)
 // TODO: reference package.json from the SDK and borrow what makes sense

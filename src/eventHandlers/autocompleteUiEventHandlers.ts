@@ -6,7 +6,7 @@ import {
 	highlightNewAddress,
 	showElement, updateDynamicStyles, updateThemeClass
 } from "../utils/domUtils";
-import {getInstanceClassName} from "../utils/uiUtils";
+import {createSuggestionElement, getFormattedAddressSuggestion, getInstanceClassName} from "../utils/uiUtils";
 
 export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 	const searchInputElement = state.searchInputElement;
@@ -78,38 +78,32 @@ export const handleSelectDropdownItem:EventHandler = ({event, state:uiState}) =>
 	}
 };
 
-export const formatAddressSuggestions:EventHandler = ({event, state:uiState, setState}) => {
-	const addressSuggestions = event.detail.suggestions.map((suggestion, index):UiSuggestionItem => {
-		const {street_line, secondary = "", city, state, zipcode, entries = 0} = suggestion;
-		const suggestionString = `${street_line} ${secondary}, ${city}, ${state} ${zipcode}`;
-		const entriesString = entries > 1 ? `${entries} entries` : "";
-		const suggestionTextNode = document.createTextNode(suggestionString);
-		const entriesTextNode = document.createTextNode(entriesString);
-		const addressElement = createDomElement("div", ["smartyAddress__autocompleteAddress"], [suggestionTextNode]);
-		const entriesElement = createDomElement("div", ["smartyAddress__suggestionEntries"], [entriesTextNode]);
-		const suggestionElement = createDomElement("li", ["smartyAddress__suggestion"], [addressElement, entriesElement]);
-		suggestionElement.setAttribute("data-address", JSON.stringify(suggestion));
-		// TODO: Find a better way to accomplish this
-		suggestionElement.addEventListener("click", () => {
-			uiState.eventDispatcher.dispatch("UiService_addressSelected", {selectedAddress: uiState.addressSuggestionResults[index]});
-		});
+export const formatAddressSuggestions:EventHandler = ({event, state, setState}) => {
+	const {suggestions} = event.detail;
+	const suggestionItems = suggestions.map((address, index):UiSuggestionItem => {
+		const suggestionOnClickHandler = () => {
+			state.eventDispatcher.dispatch("UiService_addressSelected", {
+				selectedAddress: state.addressSuggestionResults[index]
+			});
+		};
+
+		const suggestionElement = createSuggestionElement(address);
+		suggestionElement.addEventListener("click", suggestionOnClickHandler);
 
 		return {
-			address: suggestion,
+			address,
 			suggestionElement,
 		};
 	});
 
-	const suggestionItems = addressSuggestions ?? [];
-	const suggestionElements = suggestionItems.map(({suggestionElement}) => suggestionElement);
 	setState("addressSuggestionResults", suggestionItems);
-	uiState.suggestionsElement.replaceChildren(...suggestionElements);
+	state.suggestionsElement.replaceChildren(...suggestionItems.map(item => item.suggestionElement));
 
-	if(suggestionItems.length) {
-		setState("highlightedSuggestionIndex", highlightNewAddress(suggestionItems, 0, uiState.suggestionsElement, 0));
+	if (suggestionItems.length) {
+		setState("highlightedSuggestionIndex", highlightNewAddress(suggestionItems, 0, state.suggestionsElement, 0));
 	}
 
-	showElement(uiState.dropdownElement);
+	showElement(state.dropdownElement);
 };
 
 // TODO: Compare with the AI-generated plugin to see what we can leverage from it
