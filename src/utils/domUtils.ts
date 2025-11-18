@@ -1,5 +1,5 @@
 import {AddressSuggestion, BasicStateObject, UiSuggestionItem} from "../interfaces";
-import {formatStyleBlock, getHslFromColorString, getInstanceClassName} from "./uiUtils";
+import {formatStyleBlock, getFormattedAddressSuggestion, getHslFromColorString, getInstanceClassName} from "./uiUtils";
 import {getSmartyLogo} from "./getSmartyLogo";
 
 export const findDomElement = (selector?: string): HTMLElement | null => {
@@ -14,6 +14,26 @@ export const createDomElement = (tagName: string, classList: string[] = [], chil
 	});
 
 	return element;
+};
+
+export const createSuggestionElement = (suggestion) => {
+	const {entries = 0} = suggestion;
+	const addressElementClasses = ["smartyAddress__autocompleteAddress"];
+	const entriesElementClasses = ["smartyAddress__suggestionEntries"];
+	const suggestionElementClasses = ["smartyAddress__suggestion"];
+
+	const entriesChildren = entries > 1 ? [{text: `${entries} entries`}] : undefined;
+
+	const elementsMap = [
+		{name: "suggestionElement", elementType: "ul", className: suggestionElementClasses, attributes: {"data-address": JSON.stringify(suggestion)}, children: [
+			{name: "addressElement", elementType: "div", className: addressElementClasses, children: [{text: getFormattedAddressSuggestion(suggestion)}]},
+			{name: "entriesElement", elementType: "div", className: entriesElementClasses, children: entriesChildren}
+		]},
+	];
+
+	const elements = buildElementsFromMap(elementsMap);
+
+	return elements["suggestionElement"];
 };
 
 export const getElementStyles = (element:HTMLElement, property:string):CSSStyleDeclaration => {
@@ -133,29 +153,49 @@ export const updateDynamicStyles = (stylesElement:HTMLStyleElement, searchInputE
 	stylesElement.innerHTML = `${colorsStyleBlock} ${positionStyleBlock}`;
 };
 
-export const buildAutocompleteDomElements = (instanceClassname:string):Record<string, HTMLElement> => {
-	const customStylesElement = createDomElement("style");
+// TODO: Fill in the types here
+const buildElementsFromMap = (fullElementsMap) => {
+	const elements = {};
 
-	// TODO: Fix logo sizing
-	const smartyLogoDarkElement = createDomElement("img", ["smartyAddress__smartyLogoDark"]);
-	const smartyLogoLightElement = createDomElement("img", ["smartyAddress__smartyLogoLight"]);
-	const poweredByText = document.createTextNode("Powered by");
-	const suggestionsElement = createDomElement("ul", ["smartyAddress__suggestionsElement"]);
-	const poweredBySmartyElement = createDomElement("div", ["smartyAddress__poweredBy"], [poweredByText, smartyLogoDarkElement, smartyLogoLightElement]);
-	const dropdownElement = createDomElement("div", ["smartyAddress__dropdownElement", "smartyAddress__hidden"], [suggestionsElement, poweredBySmartyElement]);
-	const dropdownWrapperElement = createDomElement("div", ["smartyAddress__suggestionsWrapperElement", instanceClassname], [dropdownElement]);
+	const buildElement = ({name, text, elementType, className = [], attributes = {}, children = []}) => {
+		const element = text ? document.createTextNode(text) : createDomElement(elementType, className, children.map(buildElement));
+		Object.entries(attributes).forEach(([attr, value]) => {
+			element.setAttribute(attr, value);
+		});
 
-	dropdownElement.setAttribute("role", "listbox");
-	smartyLogoDarkElement.setAttribute("src", `data:image/svg+xml,${getSmartyLogo("#0066FF")}`);
-	smartyLogoLightElement.setAttribute("src", `data:image/svg+xml,${getSmartyLogo("#FFFFFF")}`);
+		if (name) {elements[name] = element}
 
-	return {
-		customStylesElement,
-		dropdownWrapperElement,
-		dropdownElement,
-		suggestionsElement,
-		poweredBySmartyElement,
+		return element;
 	};
+
+	fullElementsMap.map(buildElement);
+
+	return elements;
+};
+
+export const buildAutocompleteDomElements = (instanceClassname:string):Record<string, HTMLElement> => {
+	const darkLogoElementClasses = ["smartyAddress__smartyLogoDark"];
+	const lightLogoElementClasses = ["smartyAddress__smartyLogoLight"];
+	const suggestionsElementClasses = ["smartyAddress__suggestionsElement"];
+	const poweredByElementClasses = ["smartyAddress__poweredBy"];
+	const dropdownElementInitialClasses = ["smartyAddress__dropdownElement", "smartyAddress__hidden"];
+	const dropdownWrapperElementClasses = ["smartyAddress__suggestionsWrapperElement", instanceClassname];
+
+	const elementsMap = [
+		{name: "customStylesElement", elementType: "style"},
+		{name: "dropdownWrapperElement", elementType: "div", className: dropdownWrapperElementClasses, children: [
+			{name: "dropdownElement", elementType: "div", className: dropdownElementInitialClasses, attributes: {role: "listbox"}, children: [
+				{name: "suggestionsElement", elementType: "ul", className: suggestionsElementClasses},
+				{name: "poweredBySmartyElement", elementType: "div", className: poweredByElementClasses, children: [
+						{text: "Powered by"},
+						{elementType: "img", className: darkLogoElementClasses, attributes: {src: getSmartyLogo("#0066FF")}},
+						{elementType: "img", className: lightLogoElementClasses, attributes: {src: getSmartyLogo("#FFFFFF")}},
+				]},
+			]},
+		]},
+	];
+
+	return  buildElementsFromMap(elementsMap);
 };
 
 export const configureDynamicStyling = (dynamicStylingHandler:Function) => {

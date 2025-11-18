@@ -4,35 +4,12 @@ import {
 	RgbaColor,
 	StylesObject,
 } from "../interfaces";
-import {createDomElement, getRgbaFromCssColor} from "./domUtils";
+import {getRgbaFromCssColor} from "./domUtils";
 
 export const getFormattedAddressSuggestion = (suggestion:AddressSuggestion) => {
 	const {street_line, secondary = "", city, state, zipcode} = suggestion;
 
 	return `${street_line} ${secondary}, ${city}, ${state} ${zipcode}`;
-};
-
-export const createSuggestionElement = (suggestion) => {
-	const {entries = 0} = suggestion;
-	const addressElementClasses = ["smartyAddress__autocompleteAddress"];
-	const entriesElementClasses = ["smartyAddress__suggestionEntries"];
-	const suggestionElementClasses = ["smartyAddress__suggestion"];
-
-	const addressElement = createDomElement("div", addressElementClasses);
-	const entriesElement = createDomElement("div", entriesElementClasses);
-	const suggestionElement = createDomElement("li", suggestionElementClasses, [
-		addressElement,
-		entriesElement,
-	]);
-
-	addressElement.textContent = getFormattedAddressSuggestion(suggestion);
-	suggestionElement.setAttribute("data-address", JSON.stringify(suggestion));
-
-	if (entries > 1) {
-		entriesElement.textContent = `${entries} entries`;
-	}
-
-	return suggestionElement;
 };
 
 export const formatStyleBlock = (selector:string, styles:{}) => {

@@ -44,7 +44,7 @@ export const findInputElements:EventHandler = ({state, setState}) => {
 export const populateFormWithNewAddress:EventHandler = ({event, state}) => {
 	const {selectedAddress} = event.detail;
 
-	// TODO: If elements aren't inputs, specify innerHtml instead of value
+	// TODO: If elements aren't inputs, specify textContent instead of value
 	// TODO: Handle if elements (e.g. state input) are <select> elements
 	state.streetLineInputElement.value = getStreetLineFormValue(state, selectedAddress);
 

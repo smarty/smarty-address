@@ -1,12 +1,12 @@
 import {AbstractStateObject, BrowserEventHandler, EventHandler, UiSuggestionItem} from "../interfaces";
 import {
 	buildAutocompleteDomElements, configureDynamicStyling,
-	createDomElement,
 	hideElement,
 	highlightNewAddress,
-	showElement, updateDynamicStyles, updateThemeClass
+	showElement, updateDynamicStyles, updateThemeClass,
+	createSuggestionElement
 } from "../utils/domUtils";
-import {createSuggestionElement, getFormattedAddressSuggestion, getInstanceClassName} from "../utils/uiUtils";
+import {getInstanceClassName} from "../utils/uiUtils";
 
 export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 	const searchInputElement = state.searchInputElement;
@@ -117,16 +117,16 @@ export const setupDom:EventHandler = ({event, state, setState}) => {
 	const instanceClassname = getInstanceClassName(state.instanceId);
 	setState("searchInputElement", event.detail.searchInputElement);
 	const elements = buildAutocompleteDomElements(instanceClassname);
-	const customStylesElement = elements.customStylesElement;
+	const {customStylesElement, dropdownWrapperElement} = elements;
 
-	document.body.appendChild(elements.dropdownWrapperElement);
+	document.body.appendChild(dropdownWrapperElement);
 	document.getElementsByTagName('head')[0].appendChild(customStylesElement);
 
 	Object.keys(elements).forEach((elementKey) => {
 		setState(elementKey, elements[elementKey]);
 	});
 
-	updateThemeClass(state.theme, [], state.dropdownWrapperElement);
+	updateThemeClass(state.theme, [], dropdownWrapperElement);
 	// TODO: See if we can do this without needing to pass state/setState (or if we must, then trigger an event)
 	watchSearchInputForChanges({state, setState, event});
 
