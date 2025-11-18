@@ -66,7 +66,7 @@ export const handleSelectDropdownItem:EventHandler = ({event, state:uiState}) =>
 
 		searchInputElement.value = newSearchTerm;
 		uiState.eventDispatcher.dispatch(
-			"UiService_requestedNewAddressSuggestions",
+			"UiService_requestedSecondaryAddressSuggestions",
 			{
 				searchString: newSearchTerm,
 				selectedAddress: selectedAddress.address,
@@ -150,3 +150,9 @@ export const updateConfig:EventHandler = ({event, state, setState}) => {
 export const handleAutocompleteError:EventHandler = ({state}) => {
 	hideElement(state.dropdownElement);
 };
+
+export const handleAutocompleteSecondaryError:EventHandler = ({state}) => {
+	// TODO: Implement better error handling here
+	hideElement(state.dropdownElement);
+};
+

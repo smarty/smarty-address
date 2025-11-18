@@ -1,5 +1,5 @@
 import {ServiceDefinition} from "../interfaces";
-import {setConfig, fetchAddressSuggestions} from "../eventHandlers/apiEventHandlers";
+import {setConfig, fetchAddressSuggestions, fetchSecondaryAddressSuggestions} from "../eventHandlers/apiEventHandlers";
 
 export const apiService: ServiceDefinition = {
 	initialState: {
@@ -9,5 +9,6 @@ export const apiService: ServiceDefinition = {
 	eventHandlersMap: {
 		SmartyAddress_receivedSmartyAddressConfig: setConfig,
 		UiService_requestedNewAddressSuggestions: fetchAddressSuggestions,
+		UiService_requestedSecondaryAddressSuggestions: fetchSecondaryAddressSuggestions,
 	},
 };

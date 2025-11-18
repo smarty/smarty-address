@@ -3,7 +3,9 @@ import {
 	handleSelectDropdownItem,
 	updateConfig,
 	formatAddressSuggestions,
-	handleAutocompleteError, setupDom
+	handleAutocompleteError,
+	setupDom,
+	handleAutocompleteSecondaryError
 } from "../eventHandlers/autocompleteUiEventHandlers";
 
 export const autocompleteUiService: ServiceDefinition = {
@@ -26,5 +28,6 @@ export const autocompleteUiService: ServiceDefinition = {
 		ApiService_receivedAddressSuggestions: formatAddressSuggestions,
 		UiService_addressSelected: handleSelectDropdownItem,
 		ApiService_receivedApiErrorFetchingAddressSuggestions: handleAutocompleteError,
+		ApiService_receivedApiErrorFetchingSecondaryAddressSuggestions: handleAutocompleteSecondaryError,
 	},
 };

@@ -1,7 +1,40 @@
 import {AddressSuggestion, ApiErrorResponse} from "../interfaces";
+import {APP_VERSION} from "../constants";
+
+// TODO: Dynamically update the version to match `package.json`
+const USER_AGENT = `name:smarty-address-plugin,version:${APP_VERSION}`;
 
 export const formatSelectedAddress = ({street_line, secondary = "", city, state, zipcode, entries}:AddressSuggestion) => {
 	return `${street_line} ${secondary} (${entries}) ${city} ${state} ${zipcode}`;
+};
+
+export const getAutocompleteApiResults = async(searchString:string, apiKey:string, autocompleteApiUrl:string, selectedAddress:AddressSuggestion = null) => {
+	// TODO: Add support for additional input fields (e.g. max_results, include_only_zip_codes, etc.). These would likely be set as "config" values
+	try {
+		const requestData = {
+			"auth-id": apiKey,
+			"user-agent": USER_AGENT,
+			search: searchString,
+			selected: selectedAddress ? formatSelectedAddress(selectedAddress) : "",
+		};
+
+		const params = new URLSearchParams(requestData);
+		const response = await fetch(`${autocompleteApiUrl}?${params}`);
+
+		if (response.ok) {
+			const {suggestions} = await response.json() as { suggestions: AddressSuggestion[] };
+			return suggestions;
+		} else {
+			const errorResponse = await response.json() as { errors: ApiErrorResponse[] };
+			const error = getApiError(response.status, errorResponse);
+			console.error(error.message);
+
+			throw new Error(error.name);
+		}
+	} catch (error) {
+		console.error(unknownError.message);
+		throw new Error(unknownError.name);
+	}
 };
 
 export const getApiError = (statusCode:number, errorsResponse:{ errors: ApiErrorResponse[] }) => {
