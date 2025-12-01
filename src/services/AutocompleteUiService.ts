@@ -3,9 +3,10 @@ import {
 	handleSelectDropdownItem,
 	updateConfig,
 	formatAddressSuggestions,
+	formatSecondaryAddressSuggestions,
 	handleAutocompleteError,
 	setupDom,
-	handleAutocompleteSecondaryError
+	handleAutocompleteSecondaryError,
 } from "../eventHandlers/autocompleteUiEventHandlers";
 
 export const autocompleteUiService: ServiceDefinition = {
@@ -19,13 +20,16 @@ export const autocompleteUiService: ServiceDefinition = {
 		poweredBySmartyElement: null,
 
 		highlightedSuggestionIndex: 0,
+		selectedSuggestionIndex: null,
 		addressSuggestionResults: [],
+		secondaryAddressSuggestionResults: [],
 		customStylesElement: null,
 	},
 	eventHandlersMap: {
 		SmartyAddress_receivedSmartyAddressConfig: updateConfig,
 		AddressFormUiService_foundInputElements: setupDom,
 		ApiService_receivedAddressSuggestions: formatAddressSuggestions,
+		ApiService_receivedSecondaryAddressSuggestions: formatSecondaryAddressSuggestions,
 		UiService_addressSelected: handleSelectDropdownItem,
 		ApiService_receivedApiErrorFetchingAddressSuggestions: handleAutocompleteError,
 		ApiService_receivedApiErrorFetchingSecondaryAddressSuggestions: handleAutocompleteSecondaryError,

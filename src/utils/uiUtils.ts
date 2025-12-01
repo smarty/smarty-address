@@ -6,10 +6,11 @@ import {
 } from "../interfaces";
 import {getRgbaFromCssColor} from "./domUtils";
 
-export const getFormattedAddressSuggestion = (suggestion:AddressSuggestion) => {
+export const getFormattedAddressSuggestion = (suggestion:AddressSuggestion, isSecondary:boolean = false) => {
 	const {street_line, secondary = "", city, state, zipcode} = suggestion;
+	const streetText = isSecondary ? "…" : street_line;
 
-	return `${street_line} ${secondary}, ${city}, ${state} ${zipcode}`;
+	return `${streetText} ${secondary}, ${city}, ${state} ${zipcode}`;
 };
 
 export const formatStyleBlock = (selector:string, styles:{}) => {

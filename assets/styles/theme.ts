@@ -37,11 +37,22 @@ export const themeStyles = {
     "padding": "var(--smartyAddress__spacingMedium3)",
     "color": "var(--smartyAddress__textBasePrimaryColor)",
     "background-color": "var(--smartyAddress__surfaceBasePrimaryColor)",
+},
+
+".smartyAddress__secondarySuggestion": {
+	"cursor": "var(--smartyAddress__cursorStyle)",
+	"padding": "var(--smartyAddress__spacingMedium3)",
+	"padding-left": "var(--smartyAddress__spacingLarge3)",
+	"color": "var(--smartyAddress__textBasePrimaryColor)",
+	"background-color": "var(--smartyAddress__surfaceBasePrimaryColor)",
+},
+
+".smartyAddress__addressWrapper": {
     "display": "var(--smartyAddress__suggestionDisplay)",
     "justify-content": "var(--smartyAddress__suggestionJustifyContent)",
 },
 
-".smartyAddress__suggestion:hover, .smartyAddress__suggestion[aria-selected='true']": {
+".smartyAddress__suggestion:hover, .smartyAddress__suggestion[aria-selected='true'], .smartyAddress__secondarySuggestion:hover, .smartyAddress__secondarySuggestion[aria-selected='true']": {
     "background-color": "var(--smartyAddress__surfaceBaseSecondaryColor)",
 },
 

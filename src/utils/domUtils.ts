@@ -19,21 +19,42 @@ export const createDomElement = (tagName: string, classList: string[] = [], chil
 export const createSuggestionElement = (suggestion) => {
 	const {entries = 0} = suggestion;
 	const addressElementClasses = ["smartyAddress__autocompleteAddress"];
+	const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
 	const entriesElementClasses = ["smartyAddress__suggestionEntries"];
 	const suggestionElementClasses = ["smartyAddress__suggestion"];
 
 	const entriesChildren = entries > 1 ? [{text: `${entries} entries`}] : undefined;
 
 	const elementsMap = [
-		{name: "suggestionElement", elementType: "ul", className: suggestionElementClasses, attributes: {"data-address": JSON.stringify(suggestion)}, children: [
-			{name: "addressElement", elementType: "div", className: addressElementClasses, children: [{text: getFormattedAddressSuggestion(suggestion)}]},
-			{name: "entriesElement", elementType: "div", className: entriesElementClasses, children: entriesChildren}
-		]},
+		{name: "suggestionElement", elementType: "li", className: suggestionElementClasses, attributes: {"data-address": JSON.stringify(suggestion)}, children: [
+				{elementType: "div", className: addressWrapperElementClasses, children: [
+						{name: "addressElement", elementType: "div", className: addressElementClasses, children: [{text: getFormattedAddressSuggestion(suggestion)}]},
+						{name: "entriesElement", elementType: "div", className: entriesElementClasses, children: entriesChildren},
+					]},
+			]},
 	];
 
-	const elements = buildElementsFromMap(elementsMap);
+	return buildElementsFromMap(elementsMap);
+};
 
-	return elements["suggestionElement"];
+export const createSecondarySuggestionElement = (suggestion) => {
+	const addressElementClasses = ["smartyAddress__autocompleteAddress"];
+	const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
+	const secondarySuggestionElementClasses = ["smartyAddress__secondarySuggestion"];
+
+	const elementsMap = [
+		{name: "secondarySuggestionElement", elementType: "li", className: secondarySuggestionElementClasses, attributes: {"data-address": JSON.stringify(suggestion)}, children: [
+				{elementType: "div", className: addressWrapperElementClasses, children: [
+						{name: "addressElement", elementType: "div", className: addressElementClasses, children: [{text: getFormattedAddressSuggestion(suggestion, true)}]}
+					]}
+			]},
+	];
+
+	return buildElementsFromMap(elementsMap);
+};
+
+export const updateDropdownContents = (addressSuggestionResults:UiSuggestionItem[], suggestionsElement:HTMLElement) => {
+	suggestionsElement.replaceChildren(...addressSuggestionResults.map(item => item.suggestionElement));
 };
 
 export const getElementStyles = (element:HTMLElement, property:string):CSSStyleDeclaration => {

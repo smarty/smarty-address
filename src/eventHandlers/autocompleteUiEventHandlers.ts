@@ -4,7 +4,7 @@ import {
 	hideElement,
 	highlightNewAddress,
 	showElement, updateDynamicStyles, updateThemeClass,
-	createSuggestionElement
+	createSuggestionElement, createSecondarySuggestionElement, updateDropdownContents
 } from "../utils/domUtils";
 import {getInstanceClassName} from "../utils/uiUtils";
 
@@ -54,10 +54,12 @@ export const handleAutocompleteKeydown = (pressedKey:string, state:AbstractState
 	}
 };
 
-export const handleSelectDropdownItem:EventHandler = ({event, state:uiState}) => {
-	const selectedAddress = event.detail.selectedAddress;
+export const handleSelectDropdownItem:EventHandler = ({event, state, setState}) => {
+	const addressIndex = event.detail.addressIndex;
+	const selectedAddress = state.addressSuggestionResults[addressIndex];
 	const {street_line, secondary = "", entries = 0} = selectedAddress.address;
-	const searchInputElement = uiState.searchInputElement;
+	const searchInputElement = state.searchInputElement;
+	setState("selectedSuggestionIndex", addressIndex);
 
 	if (entries > 1) {
 		const newSearchTerm = `${street_line} ${secondary}`;
@@ -65,7 +67,7 @@ export const handleSelectDropdownItem:EventHandler = ({event, state:uiState}) =>
 		// TODO: How do users "back out" of the secondary address search?
 
 		searchInputElement.value = newSearchTerm;
-		uiState.eventDispatcher.dispatch(
+		state.eventDispatcher.dispatch(
 			"UiService_requestedSecondaryAddressSuggestions",
 			{
 				searchString: newSearchTerm,
@@ -73,21 +75,20 @@ export const handleSelectDropdownItem:EventHandler = ({event, state:uiState}) =>
 			}
 		);
 	} else {
-		uiState.eventDispatcher.dispatch("AutocompleteUiService_receivedNewAddressForForm", {selectedAddress: selectedAddress.address});
-		hideElement(uiState.dropdownElement);
+		state.eventDispatcher.dispatch("AutocompleteUiService_receivedNewAddressForForm", {selectedAddress: selectedAddress.address});
+		hideElement(state.dropdownElement);
 	}
 };
 
 export const formatAddressSuggestions:EventHandler = ({event, state, setState}) => {
 	const {suggestions} = event.detail;
-	const suggestionItems = suggestions.map((address, index):UiSuggestionItem => {
+	const suggestionItems = suggestions.map((address, addressIndex):UiSuggestionItem => {
 		const suggestionOnClickHandler = () => {
-			state.eventDispatcher.dispatch("UiService_addressSelected", {
-				selectedAddress: state.addressSuggestionResults[index]
-			});
+			state.eventDispatcher.dispatch("UiService_addressSelected", {addressIndex});
 		};
 
-		const suggestionElement = createSuggestionElement(address);
+		const suggestionListElements = createSuggestionElement(address);
+		const suggestionElement = suggestionListElements["suggestionElement"];
 		suggestionElement.addEventListener("click", suggestionOnClickHandler);
 
 		return {
@@ -101,6 +102,40 @@ export const formatAddressSuggestions:EventHandler = ({event, state, setState}) 
 
 	if (suggestionItems.length) {
 		setState("highlightedSuggestionIndex", highlightNewAddress(suggestionItems, 0, state.suggestionsElement, 0));
+	}
+
+	showElement(state.dropdownElement);
+};
+
+export const formatSecondaryAddressSuggestions:EventHandler = ({event, state, setState}) => {
+	const {suggestions} = event.detail;
+
+	const suggestionItems = suggestions.map((address, index):UiSuggestionItem => {
+		const suggestionOnClickHandler = () => {
+			state.eventDispatcher.dispatch("UiService_addressSelected", {
+				selectedAddress: state.addressSuggestionResults[index]
+			});
+		};
+
+		const suggestionListElements = createSecondarySuggestionElement(address);
+		const suggestionElement = suggestionListElements["secondarySuggestionElement"];
+		suggestionElement.addEventListener("click", suggestionOnClickHandler);
+
+		return {
+			address,
+			suggestionElement,
+		};
+	});
+
+	setState("secondaryAddressSuggestionResults", suggestionItems);
+
+	const {addressSuggestionResults, secondaryAddressSuggestionResults} = state;
+
+	const combinedSuggestionList = addressSuggestionResults.toSpliced(state.selectedSuggestionIndex + 1, 0, ...secondaryAddressSuggestionResults);
+	updateDropdownContents(combinedSuggestionList, state.suggestionsElement);
+
+	if (suggestionItems.length) {
+		setState("highlightedSuggestionIndex", highlightNewAddress(combinedSuggestionList, -1, state.suggestionsElement, 0));
 	}
 
 	showElement(state.dropdownElement);
