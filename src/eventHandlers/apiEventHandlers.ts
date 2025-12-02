@@ -18,8 +18,8 @@ export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
 
 export const fetchSecondaryAddressSuggestions: EventHandler = async ({event, state}) => {
 	try {
-		const {selectedAddress} = event.detail;
-		const suggestions = await getAutocompleteApiResults(event.detail.searchString, state.apiKey, state.autocompleteApiUrl, selectedAddress);
+		const {selectedAddress, searchString} = event.detail;
+		const suggestions = await getAutocompleteApiResults(searchString, state.apiKey, state.autocompleteApiUrl, selectedAddress);
 		state.eventDispatcher.dispatch("ApiService_receivedSecondaryAddressSuggestions", {suggestions, selectedAddress});
 	} catch (error) {
 		state.eventDispatcher.dispatch("ApiService_receivedApiErrorFetchingSecondaryAddressSuggestions", {errorName: error.message});

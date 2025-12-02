@@ -20,7 +20,7 @@ export const autocompleteUiService: ServiceDefinition = {
 		poweredBySmartyElement: null,
 
 		highlightedSuggestionIndex: 0,
-		selectedSuggestionIndex: null,
+		selectedSuggestionIndex: -1,
 		addressSuggestionResults: [],
 		secondaryAddressSuggestionResults: [],
 		customStylesElement: null,

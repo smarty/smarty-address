@@ -6,7 +6,7 @@ import {
 	showElement, updateDynamicStyles, updateThemeClass,
 	createSuggestionElement, createSecondarySuggestionElement, updateDropdownContents
 } from "../utils/domUtils";
-import {getInstanceClassName} from "../utils/uiUtils";
+import {getInstanceClassName, getMergedAddressSuggestions} from "../utils/uiUtils";
 
 export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 	const searchInputElement = state.searchInputElement;
@@ -27,7 +27,7 @@ export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 };
 
 export const handleAutocompleteKeydown = (pressedKey:string, state:AbstractStateObject, setState:Function) => {
-	const items = state.addressSuggestionResults ?? [];
+	const items = getMergedAddressSuggestions(state);
 	const currentIndex = state.highlightedSuggestionIndex;
 	const handleHighlightChange = (indexChange:number) => {
 		const newHighlightIndex = highlightNewAddress(items, currentIndex, state.suggestionsElement, indexChange);
@@ -56,7 +56,8 @@ export const handleAutocompleteKeydown = (pressedKey:string, state:AbstractState
 
 export const handleSelectDropdownItem:EventHandler = ({event, state, setState}) => {
 	const addressIndex = event.detail.addressIndex;
-	const selectedAddress = state.addressSuggestionResults[addressIndex];
+	const mergedAddressSuggestions = getMergedAddressSuggestions(state);
+	const selectedAddress = mergedAddressSuggestions[addressIndex];
 	const {street_line, secondary = "", entries = 0} = selectedAddress.address;
 	const searchInputElement = state.searchInputElement;
 	setState("selectedSuggestionIndex", addressIndex);
@@ -84,7 +85,7 @@ export const formatAddressSuggestions:EventHandler = ({event, state, setState}) 
 	const {suggestions} = event.detail;
 	const suggestionItems = suggestions.map((address, addressIndex):UiSuggestionItem => {
 		const suggestionOnClickHandler = () => {
-			state.eventDispatcher.dispatch("UiService_addressSelected", {addressIndex});
+			state.eventDispatcher.dispatch("UiService_addressSelected", {addressIndex: addressIndex + state.selectedSuggestionIndex + 1});
 		};
 
 		const suggestionListElements = createSuggestionElement(address);
@@ -98,7 +99,8 @@ export const formatAddressSuggestions:EventHandler = ({event, state, setState}) 
 	});
 
 	setState("addressSuggestionResults", suggestionItems);
-	state.suggestionsElement.replaceChildren(...suggestionItems.map(item => item.suggestionElement));
+	setState("secondaryAddressSuggestionResults", []);
+	updateDropdownContents(suggestionItems, state.suggestionsElement);
 
 	if (suggestionItems.length) {
 		setState("highlightedSuggestionIndex", highlightNewAddress(suggestionItems, 0, state.suggestionsElement, 0));
@@ -110,11 +112,9 @@ export const formatAddressSuggestions:EventHandler = ({event, state, setState}) 
 export const formatSecondaryAddressSuggestions:EventHandler = ({event, state, setState}) => {
 	const {suggestions} = event.detail;
 
-	const suggestionItems = suggestions.map((address, index):UiSuggestionItem => {
+	const suggestionItems = suggestions.map((address, addressIndex):UiSuggestionItem => {
 		const suggestionOnClickHandler = () => {
-			state.eventDispatcher.dispatch("UiService_addressSelected", {
-				selectedAddress: state.addressSuggestionResults[index]
-			});
+			state.eventDispatcher.dispatch("UiService_addressSelected", {addressIndex: addressIndex + state.selectedSuggestionIndex + 1});
 		};
 
 		const suggestionListElements = createSecondarySuggestionElement(address);
@@ -129,9 +129,7 @@ export const formatSecondaryAddressSuggestions:EventHandler = ({event, state, se
 
 	setState("secondaryAddressSuggestionResults", suggestionItems);
 
-	const {addressSuggestionResults, secondaryAddressSuggestionResults} = state;
-
-	const combinedSuggestionList = addressSuggestionResults.toSpliced(state.selectedSuggestionIndex + 1, 0, ...secondaryAddressSuggestionResults);
+	const combinedSuggestionList = getMergedAddressSuggestions(state);
 	updateDropdownContents(combinedSuggestionList, state.suggestionsElement);
 
 	if (suggestionItems.length) {

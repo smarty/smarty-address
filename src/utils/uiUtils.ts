@@ -1,4 +1,5 @@
 import {
+	AbstractStateObject,
 	AddressSuggestion,
 	HslColor,
 	RgbaColor,
@@ -76,4 +77,15 @@ export const convertStylesObjectToCssBlock = (stylesObject:StylesObject) => {
 	});
 
 	return selectorsBlock.join("");
+};
+
+export const getMergedAddressSuggestions = (state:AbstractStateObject) => {
+	const {
+		addressSuggestionResults,
+		secondaryAddressSuggestionResults,
+		selectedSuggestionIndex
+	} = state;
+
+
+	return addressSuggestionResults.toSpliced(selectedSuggestionIndex + 1, 0, ...secondaryAddressSuggestionResults);
 };
