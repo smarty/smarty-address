@@ -65,7 +65,7 @@ export const handleSelectDropdownItem:EventHandler = ({event, state, setState}) 
 	if (entries > 1) {
 		const newSearchTerm = `${street_line} ${secondary}`;
 		// TODO: Set selectedAddress to state so subsequent typing by the user doesn't "revert" back out to a broader search
-		// TODO: How do users "back out" of the secondary address search?
+		// TODO: How do users "back out" of the secondary address search? Right now it persists the "selectedAddress" value until the page is refreshed
 
 		searchInputElement.value = newSearchTerm;
 		state.eventDispatcher.dispatch(

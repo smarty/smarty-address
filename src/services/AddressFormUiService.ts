@@ -21,7 +21,7 @@ export const addressFormUiService: ServiceDefinition = {
 		stateInputElement: null,
 		zipcodeInputElement: null,
 	},
-	eventHandlersMap: {
+	eventHandlers: {
 		SmartyAddress_receivedSmartyAddressConfig: updateConfig,
 		AddressFormUiService_updatedConfig: findInputElements,
 		AutocompleteUiService_receivedNewAddressForForm: populateFormWithNewAddress,

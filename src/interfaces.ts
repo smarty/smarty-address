@@ -59,11 +59,19 @@ export interface UiStateObject extends BasicStateObject {
 }
 
 export interface EventHandler {(props:EventHandlerProps):void}
+export interface ServiceMethod {(props:ServiceMethodProps, customProps:any):void}
+export interface WrappedServiceMethod {(customProps:any):void}
 
-export interface EventHandlerProps {
-	event:CustomEvent,
+export interface ServiceMethodProps {
 	state:BasicStateObject,
 	setState: {(name:string, newState:unknown):void},
+	services: {[name: string]: WrappedServiceMethod},
+	serviceMethods: {[name: string]: WrappedServiceMethod},
+	utils: {[name: string]: (props?:any)=>any},
+}
+
+export interface EventHandlerProps extends ServiceMethodProps {
+	event:CustomEvent,
 }
 
 export interface BrowserEventHandler {(props:BrowserEventHandlerProps):void}
@@ -75,8 +83,11 @@ export interface BrowserEventHandlerProps {
 }
 
 export interface ServiceDefinition {
+	name: string,
 	initialState: AbstractStateObject,
-	eventHandlersMap: {[eventName: string]: EventHandler}
+	eventHandlers: {[eventName: string]: EventHandler},
+	serviceMethods: {[eventName: string]: ServiceMethod},
+	utils: {[eventName: string]: EventHandler},
 }
 
 export interface ServiceDefinitionMap {[eventName: string]:ServiceDefinition}

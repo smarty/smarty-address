@@ -25,7 +25,7 @@ export const autocompleteUiService: ServiceDefinition = {
 		secondaryAddressSuggestionResults: [],
 		customStylesElement: null,
 	},
-	eventHandlersMap: {
+	eventHandlers: {
 		SmartyAddress_receivedSmartyAddressConfig: updateConfig,
 		AddressFormUiService_foundInputElements: setupDom,
 		ApiService_receivedAddressSuggestions: formatAddressSuggestions,
