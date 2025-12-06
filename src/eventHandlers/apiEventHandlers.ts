@@ -1,10 +1,10 @@
-import {EventHandler} from "../interfaces";
+import {EventHandler, ServiceMethod} from "../interfaces";
 import {getAutocompleteApiResults} from "../utils/apiUtils";
 // TODO: Add support for additional input fields (e.g. max_results, include_only_zip_codes, etc.). These would likely be set as "config" values
 
-export const setConfig: EventHandler = ({event, setState}) => {
-	setState("apiKey", event.detail.embeddedKey);
-	setState("autocompleteApiUrl", event.detail.autocompleteApiUrl);
+export const init:ServiceMethod = async ({setState}, config) => {
+	setState("apiKey", config.embeddedKey);
+	setState("autocompleteApiUrl", config.autocompleteApiUrl);
 };
 
 export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {

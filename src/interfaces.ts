@@ -58,15 +58,15 @@ export interface UiStateObject extends BasicStateObject {
 	zipcodeInputElement: HTMLInputElement | null,
 }
 
+export interface ServicesObject {[name: string]: WrappedServiceMethod}
 export interface EventHandler {(props:EventHandlerProps):void}
-export interface ServiceMethod {(props:ServiceMethodProps, customProps:any):void}
-export interface WrappedServiceMethod {(customProps:any):void}
+export interface ServiceMethod {(props:ServiceMethodProps, customProps?:any):void}
+export interface WrappedServiceMethod {(customProps?:any):void}
 
 export interface ServiceMethodProps {
 	state:BasicStateObject,
 	setState: {(name:string, newState:unknown):void},
-	services: {[name: string]: WrappedServiceMethod},
-	serviceMethods: {[name: string]: WrappedServiceMethod},
+	services: {[name: string]: ServicesObject},
 	utils: {[name: string]: (props?:any)=>any},
 }
 

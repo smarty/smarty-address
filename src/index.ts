@@ -1,6 +1,5 @@
 import {
 	DefaultSmartyAddressConfig,
-	ServiceDefinitionMap,
 	SmartyAddressConfig
 } from "./interfaces";
 import {apiService} from "./services/ApiService";
@@ -59,13 +58,16 @@ export default class SmartyAddress {
 			...SmartyAddress.defaultConfig,
 			...config,
 		};
-		this.setupServices(config.services);
+		this.setupServices(config);
 		this.eventDispatcher.dispatch("SmartyAddress_receivedSmartyAddressConfig", config);
 	}
 
-	setupServices = (services:ServiceDefinitionMap = {}) => {
-		Object.entries(services).forEach(([, serviceDefinition]) => {
-			initService(serviceDefinition, this.eventDispatcher, this.instanceId);
+	setupServices = (config:SmartyAddressConfig) => {
+		Object.entries(config.services).forEach(([, serviceDefinition]) => {
+			const serviceMethods = initService(serviceDefinition, this.eventDispatcher, this.instanceId);
+			if (serviceMethods.init) {
+				serviceMethods.init(config);
+			}
 		});
 	}
 }
