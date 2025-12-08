@@ -67,7 +67,7 @@ export interface ServiceMethodProps {
 	state:BasicStateObject,
 	setState: {(name:string, newState:unknown):void},
 	services: {[name: string]: ServicesObject},
-	utils: {[name: string]: (props?:any)=>any},
+	utils: {[name: string]: (...props:unknown[])=>unknown},
 }
 
 export interface EventHandlerProps extends ServiceMethodProps {
@@ -85,9 +85,9 @@ export interface BrowserEventHandlerProps {
 export interface ServiceDefinition {
 	name: string,
 	initialState: AbstractStateObject,
-	eventHandlers: {[eventName: string]: EventHandler},
+	eventHandlers?: {[eventName: string]: EventHandler},
 	serviceMethods: {[eventName: string]: ServiceMethod},
-	utils: {[eventName: string]: EventHandler},
+	utils?: {[eventName: string]: (...args:unknown[])=>unknown},
 }
 
 export interface ServiceDefinitionMap {[eventName: string]:ServiceDefinition}

@@ -1,7 +1,7 @@
 import {ServiceDefinition} from "../interfaces";
 import {
 	handleSelectDropdownItem,
-	updateConfig,
+	init,
 	formatAddressSuggestions,
 	formatSecondaryAddressSuggestions,
 	handleAutocompleteError,
@@ -9,7 +9,10 @@ import {
 	handleAutocompleteSecondaryError,
 } from "../eventHandlers/autocompleteUiEventHandlers";
 
+import {updateThemeClass} from "../utils/domUtils";
+
 export const autocompleteUiService: ServiceDefinition = {
+	name: "autocompleteUiService",
 	initialState: {
 		theme: null,
 		searchInputElement: null,
@@ -26,12 +29,17 @@ export const autocompleteUiService: ServiceDefinition = {
 		customStylesElement: null,
 	},
 	eventHandlers: {
-		SmartyAddress_receivedSmartyAddressConfig: updateConfig,
 		AddressFormUiService_foundInputElements: setupDom,
 		ApiService_receivedAddressSuggestions: formatAddressSuggestions,
 		ApiService_receivedSecondaryAddressSuggestions: formatSecondaryAddressSuggestions,
 		UiService_addressSelected: handleSelectDropdownItem,
 		ApiService_receivedApiErrorFetchingAddressSuggestions: handleAutocompleteError,
 		ApiService_receivedApiErrorFetchingSecondaryAddressSuggestions: handleAutocompleteSecondaryError,
+	},
+	serviceMethods: {
+		init,
+	},
+	utils: {
+		updateThemeClass,
 	},
 };

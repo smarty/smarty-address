@@ -2,10 +2,11 @@ import {ServiceDefinition} from "../interfaces";
 import {
 	findInputElements,
 	populateFormWithNewAddress,
-	updateConfig
+	init
 } from "../eventHandlers/addressFormUiEventHandlers";
 
 export const addressFormUiService: ServiceDefinition = {
+	name: "addressFormUiService",
 	initialState: {
 		searchInputSelector: null,
 		streetSelector: null,
@@ -22,7 +23,7 @@ export const addressFormUiService: ServiceDefinition = {
 		zipcodeInputElement: null,
 	},
 	eventHandlers: {
-		SmartyAddress_receivedSmartyAddressConfig: updateConfig,
+		SmartyAddress_receivedSmartyAddressConfig: init,
 		AddressFormUiService_updatedConfig: findInputElements,
 		AutocompleteUiService_receivedNewAddressForForm: populateFormWithNewAddress,
 	},

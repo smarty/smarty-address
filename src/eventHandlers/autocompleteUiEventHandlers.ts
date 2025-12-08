@@ -1,4 +1,4 @@
-import {AbstractStateObject, BrowserEventHandler, EventHandler, UiSuggestionItem} from "../interfaces";
+import {AbstractStateObject, BrowserEventHandler, EventHandler, ServiceMethod, UiSuggestionItem} from "../interfaces";
 import {
 	buildAutocompleteDomElements, configureDynamicStyling,
 	hideElement,
@@ -139,11 +139,12 @@ export const formatSecondaryAddressSuggestions:EventHandler = ({event, state, se
 	showElement(state.dropdownElement);
 };
 
-// TODO: Compare with the AI-generated plugin to see what we can leverage from it
 const handleSearchInputOnChange:BrowserEventHandler = ({event, state}) => {
 	const searchInputValue = (event.target as HTMLInputElement)?.value;
+	// TODO: "UiService_searchInputCleared" event isn't handled anywhere yet.
 	const eventName = searchInputValue.length ? "UiService_requestedNewAddressSuggestions" : "UiService_searchInputCleared";
-	state.eventDispatcher.dispatch(eventName, {searchString: searchInputValue});
+	const selectedAddress = state.selectedSuggestionIndex >= 0 ? state.addressSuggestionResults[state.selectedSuggestionIndex].address : null;
+	state.eventDispatcher.dispatch(eventName, {searchString: searchInputValue, selectedAddress});
 };
 
 export const setupDom:EventHandler = ({event, state, setState}) => {
@@ -168,16 +169,14 @@ export const setupDom:EventHandler = ({event, state, setState}) => {
 	configureDynamicStyling(dynamicStylingHandler);
 };
 
-export const updateConfig:EventHandler = ({event, state, setState}) => {
+export const init:ServiceMethod = ({state, setState, utils}, config) => {
 	const previousTheme = state.theme;
-	const newTheme = event.detail?.theme;
+	const newTheme = config?.theme;
 	setState("theme", newTheme);
 
 	if (previousTheme !== state.theme) {
-		updateThemeClass(newTheme, previousTheme, state.dropdownWrapperElement);
+		utils.updateThemeClass(newTheme, previousTheme, state.dropdownWrapperElement);
 	}
-
-	state.eventDispatcher.dispatch("AutocompleteUiService_updatedConfig");
 };
 
 export const handleAutocompleteError:EventHandler = ({state}) => {

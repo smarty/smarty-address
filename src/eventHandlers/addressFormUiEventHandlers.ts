@@ -1,8 +1,8 @@
-import {EventHandler} from "../interfaces";
+import {EventHandler, ServiceMethod} from "../interfaces";
 import {findDomElement, getStreetLineFormValue} from "../utils/domUtils";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
-export const updateConfig:EventHandler = ({event, state, setState}) => {
+export const init:ServiceMethod = ({event, state, setState}) => {
 	setState("searchInputSelector", event.detail?.searchInputSelector);
 	setState("streetSelector", event.detail?.streetSelector);
 	setState("secondarySelector", event.detail?.secondarySelector);
