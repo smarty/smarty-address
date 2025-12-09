@@ -51,7 +51,6 @@ export interface BasicStateObject extends AbstractStateObject {
 
 export interface ServiceMethodsObject {[name: string]: WrappedServiceMethod}
 export interface ServicesObject {[name: string]: ServiceMethodsObject}
-export interface EventHandler {(props:EventHandlerProps):void}
 export interface ServiceMethod {(props:ServiceMethodProps, customProps?:any):void}
 export interface WrappedServiceMethod {(customProps?:any):void}
 
@@ -70,13 +69,8 @@ export interface AutocompleteUiServiceMethodProps extends ServiceMethodProps {
 	utils: AutocompleteUiServiceUtils,
 }
 
-export interface EventHandlerProps extends ServiceMethodProps {
-	event:CustomEvent,
-}
-
 export interface ServiceDefinition {
 	initialState: AbstractStateObject,
-	eventHandlers?: {[eventName: string]: EventHandler},
 	serviceMethods: {[eventName: string]: ServiceMethod},
 	utils?: ServiceDefinitionUtils,
 }

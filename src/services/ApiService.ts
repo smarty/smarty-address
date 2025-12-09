@@ -7,7 +7,6 @@ export const apiService: ServiceDefinition = {
 		autocompleteApiUrl: "",
 		apiKey: "",
 	},
-	eventHandlers: {},
 	serviceMethods: {
 		init,
 		fetchAddressSuggestions,

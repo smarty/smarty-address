@@ -35,7 +35,6 @@ export const autocompleteUiService: AutocompleteUiServiceDefinition = {
 		secondaryAddressSuggestionResults: [],
 		customStylesElement: null,
 	},
-	eventHandlers: {},
 	serviceMethods: {
 		init,
 		setupDom,

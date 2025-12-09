@@ -22,7 +22,6 @@ export const addressFormUiService: ServiceDefinition = {
 		stateInputElement: null,
 		zipcodeInputElement: null,
 	},
-	eventHandlers: {},
 	serviceMethods: {
 		init,
 		findInputElements,

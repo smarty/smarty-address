@@ -1,11 +1,11 @@
-import {EventHandler, ServiceDefinition, ServiceMethodsObject} from "../interfaces";
+import {ServiceDefinition, ServiceMethodsObject} from "../interfaces";
 import {EventDispatcher} from "./EventDispatcher";
 
 const allServices = {};
 
 export const initService = (
 	name:string,
-	{eventHandlers, initialState = {}, serviceMethods = {}, utils}:ServiceDefinition,
+	{initialState = {}, serviceMethods = {}, utils}:ServiceDefinition,
 	eventDispatcher:EventDispatcher,
 	instanceId:number,
 ):ServiceMethodsObject => {
@@ -27,17 +27,7 @@ export const initService = (
 		}
 	});
 
-	const eventHandlerWrapper = (eventHandler: EventHandler) => {
-		return (event: CustomEvent) => {
-			eventHandler({event, state, setState, utils, services: instanceServices});
-		};
-	};
-
 	instanceServices[name] = wrappedServiceMethods;
-
-	Object.entries(eventHandlers).forEach(([eventName, eventHandler]) => {
-		state.eventDispatcher.addEventListener(eventName, eventHandlerWrapper(eventHandler));
-	});
 
 	return instanceServices[name];
 };
