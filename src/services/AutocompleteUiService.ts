@@ -6,16 +6,18 @@ import {
 	formatSecondaryAddressSuggestions,
 	handleAutocompleteError,
 	setupDom,
-	handleAutocompleteSecondaryError, watchSearchInputForChanges,
+	handleAutocompleteSecondaryError, watchSearchInputForChanges, handleAutocompleteKeydown, handleSearchInputOnChange
 } from "../eventHandlers/autocompleteUiEventHandlers";
 
 import {
 	buildAutocompleteDomElements,
-	configureDynamicStyling, hideElement,
+	configureDynamicStyling,
+	createSecondarySuggestionElement,
+	createSuggestionElement, hideElement, highlightNewAddress, showElement, updateDropdownContents,
 	updateDynamicStyles,
 	updateThemeClass
 } from "../utils/domUtils";
-import {getInstanceClassName} from "../utils/uiUtils";
+import {getInstanceClassName, getMergedAddressSuggestions} from "../utils/uiUtils";
 
 export const autocompleteUiService: AutocompleteUiServiceDefinition = {
 	initialState: {
@@ -42,7 +44,9 @@ export const autocompleteUiService: AutocompleteUiServiceDefinition = {
 		formatSecondaryAddressSuggestions,
 		handleAutocompleteError,
 		handleAutocompleteSecondaryError,
-		handleSelectDropdownItem
+		handleSelectDropdownItem,
+		handleAutocompleteKeydown,
+		handleSearchInputOnChange,
 	},
 	utils: {
 		updateThemeClass,
@@ -51,5 +55,11 @@ export const autocompleteUiService: AutocompleteUiServiceDefinition = {
 		updateDynamicStyles,
 		configureDynamicStyling,
 		hideElement,
+		showElement,
+		getMergedAddressSuggestions,
+		highlightNewAddress,
+		updateDropdownContents,
+		createSecondarySuggestionElement,
+		createSuggestionElement,
 	},
 };

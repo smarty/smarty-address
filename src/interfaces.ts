@@ -74,13 +74,6 @@ export interface EventHandlerProps extends ServiceMethodProps {
 	event:CustomEvent,
 }
 
-export interface BrowserEventHandler {(props:BrowserEventHandlerProps):void}
-// TODO: These are the wrong props for this type of event
-export interface BrowserEventHandlerProps {
-	event:Event,
-	services:ServicesObject,
-}
-
 export interface ServiceDefinition {
 	initialState: AbstractStateObject,
 	eventHandlers?: {[eventName: string]: EventHandler},

@@ -1,38 +1,30 @@
 import {
-	AbstractStateObject,
-	AutocompleteUiServiceMethod, BrowserEventHandler, ServicesObject, UiSuggestionItem
+	AutocompleteUiServiceMethod, UiSuggestionItem
 } from "../interfaces";
-import {
-	hideElement,
-	highlightNewAddress,
-	showElement,
-	createSuggestionElement, createSecondarySuggestionElement, updateDropdownContents
-} from "../utils/domUtils";
-import {getMergedAddressSuggestions} from "../utils/uiUtils";
 
-export const watchSearchInputForChanges:AutocompleteUiServiceMethod = ({state, setState, services}) => {
+export const watchSearchInputForChanges:AutocompleteUiServiceMethod = ({state, services}) => {
 	const searchInputElement = state.searchInputElement;
 	searchInputElement.addEventListener("input", (event:Event) => {
-		handleSearchInputOnChange({event, services});
+		services.autocompleteUiService.handleSearchInputOnChange(event);
 	});
 
 	searchInputElement.addEventListener("focusout", () => {
 		// TODO: Re-enable this later
-		// hideElement(state.dropdownElement);
+		// utils.hideElement(state.dropdownElement);
 	});
 
 	searchInputElement.addEventListener("keydown", (event:KeyboardEvent) => {
-		handleAutocompleteKeydown(event.key, state, setState, services);
+		services.autocompleteUiService.handleAutocompleteKeydown(event.key);
 		// TODO: Figure out how to prevent 1Password from triggering when arrowing down (or selecting an address via the "enter" key). The way to do this is to update the attributes of the input element (e.g. `autocomplete="off"`). See the "test-site" repo for an example.
 	});
 };
 
 // TODO: Simplify this function so it no longer needs the full state and services objects.
-export const handleAutocompleteKeydown = (pressedKey:string, state:AbstractStateObject, setState:Function, services:ServicesObject) => {
-	const items = getMergedAddressSuggestions(state);
+export const handleAutocompleteKeydown:AutocompleteUiServiceMethod = ({state, setState, services, utils}, pressedKey:string) => {
+	const items = utils.getMergedAddressSuggestions(state);
 	const currentIndex = state.highlightedSuggestionIndex;
 	const handleHighlightChange = (indexChange:number) => {
-		const newHighlightIndex = highlightNewAddress(items, currentIndex, state.suggestionsElement, indexChange);
+		const newHighlightIndex = utils.highlightNewAddress(items, currentIndex, state.suggestionsElement, indexChange);
 		setState("highlightedSuggestionIndex", newHighlightIndex);
 	};
 
@@ -52,13 +44,13 @@ export const handleAutocompleteKeydown = (pressedKey:string, state:AbstractState
 			}
 			break;
 		case "Escape":
-			hideElement(state.dropdownElement);
+			utils.hideElement(state.dropdownElement);
 			break;
 	}
 };
 
-export const handleSelectDropdownItem:AutocompleteUiServiceMethod = ({state, setState}, addressIndex) => {
-	const mergedAddressSuggestions = getMergedAddressSuggestions(state);
+export const handleSelectDropdownItem:AutocompleteUiServiceMethod = ({state, setState, services, utils}, addressIndex) => {
+	const mergedAddressSuggestions = utils.getMergedAddressSuggestions(state);
 	const selectedAddress = mergedAddressSuggestions[addressIndex];
 	const {street_line, secondary = "", entries = 0} = selectedAddress.address;
 	const searchInputElement = state.searchInputElement;
@@ -70,26 +62,23 @@ export const handleSelectDropdownItem:AutocompleteUiServiceMethod = ({state, set
 		// TODO: How do users "back out" of the secondary address search? Right now it persists the "selectedAddress" value until the page is refreshed
 
 		searchInputElement.value = newSearchTerm;
-		state.eventDispatcher.dispatch(
-			"UiService_requestedSecondaryAddressSuggestions",
-			{
-				searchString: newSearchTerm,
-				selectedAddress: selectedAddress.address,
-			}
-		);
+		services.apiService.fetchSecondaryAddressSuggestions({
+			searchString: newSearchTerm,
+			selectedAddress: selectedAddress.address,
+		});
 	} else {
 		state.eventDispatcher.dispatch("AutocompleteUiService_receivedNewAddressForForm", {selectedAddress: selectedAddress.address});
-		hideElement(state.dropdownElement);
+		utils.hideElement(state.dropdownElement);
 	}
 };
 
-export const formatAddressSuggestions:AutocompleteUiServiceMethod = ({state, setState, services}, suggestions) => {
+export const formatAddressSuggestions:AutocompleteUiServiceMethod = ({state, setState, services, utils}, suggestions) => {
 	const suggestionItems = suggestions.map((address, addressIndex):UiSuggestionItem => {
 		const suggestionOnClickHandler = () => {
 			services.autocompleteUiService.handleSelectDropdownItem(addressIndex + state.selectedSuggestionIndex + 1);
 		};
 
-		const suggestionListElements = createSuggestionElement(address);
+		const suggestionListElements = utils.createSuggestionElement(address);
 		const suggestionElement = suggestionListElements["suggestionElement"];
 		suggestionElement.addEventListener("click", suggestionOnClickHandler);
 
@@ -101,22 +90,22 @@ export const formatAddressSuggestions:AutocompleteUiServiceMethod = ({state, set
 
 	setState("addressSuggestionResults", suggestionItems);
 	setState("secondaryAddressSuggestionResults", []);
-	updateDropdownContents(suggestionItems, state.suggestionsElement);
+	utils.updateDropdownContents(suggestionItems, state.suggestionsElement);
 
 	if (suggestionItems.length) {
-		setState("highlightedSuggestionIndex", highlightNewAddress(suggestionItems, 0, state.suggestionsElement, 0));
+		setState("highlightedSuggestionIndex", utils.highlightNewAddress(suggestionItems, 0, state.suggestionsElement, 0));
 	}
 
-	showElement(state.dropdownElement);
+	utils.showElement(state.dropdownElement);
 };
 
-export const formatSecondaryAddressSuggestions:AutocompleteUiServiceMethod = ({state, setState, services}, suggestions) => {
+export const formatSecondaryAddressSuggestions:AutocompleteUiServiceMethod = ({state, setState, services, utils}, suggestions) => {
 	const suggestionItems = suggestions.map((address, addressIndex):UiSuggestionItem => {
 		const suggestionOnClickHandler = () => {
 			services.autocompleteUiService.handleSelectDropdownItem(addressIndex + state.selectedSuggestionIndex + 1);
 		};
 
-		const suggestionListElements = createSecondarySuggestionElement(address);
+		const suggestionListElements = utils.createSecondarySuggestionElement(address);
 		const suggestionElement = suggestionListElements["secondarySuggestionElement"];
 		suggestionElement.addEventListener("click", suggestionOnClickHandler);
 
@@ -128,17 +117,17 @@ export const formatSecondaryAddressSuggestions:AutocompleteUiServiceMethod = ({s
 
 	setState("secondaryAddressSuggestionResults", suggestionItems);
 
-	const combinedSuggestionList = getMergedAddressSuggestions(state);
-	updateDropdownContents(combinedSuggestionList, state.suggestionsElement);
+	const combinedSuggestionList = utils.getMergedAddressSuggestions(state);
+	utils.updateDropdownContents(combinedSuggestionList, state.suggestionsElement);
 
 	if (suggestionItems.length) {
-		setState("highlightedSuggestionIndex", highlightNewAddress(combinedSuggestionList, -1, state.suggestionsElement, 0));
+		setState("highlightedSuggestionIndex", utils.highlightNewAddress(combinedSuggestionList, -1, state.suggestionsElement, 0));
 	}
 
-	showElement(state.dropdownElement);
+	utils.showElement(state.dropdownElement);
 };
 
-const handleSearchInputOnChange:BrowserEventHandler = ({event, services}) => {
+export const handleSearchInputOnChange:AutocompleteUiServiceMethod = ({services}, event) => {
 	const searchInputValue = (event.target as HTMLInputElement)?.value;
 	if (searchInputValue.length) {
 		services.apiService.fetchAddressSuggestions(searchInputValue);

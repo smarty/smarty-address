@@ -1,16 +1,19 @@
 import {ServiceDefinition} from "../interfaces";
 import {init, fetchAddressSuggestions, fetchSecondaryAddressSuggestions} from "../eventHandlers/apiEventHandlers";
+import {getAutocompleteApiResults} from "../utils/apiUtils";
 
 export const apiService: ServiceDefinition = {
 	initialState: {
 		autocompleteApiUrl: "",
 		apiKey: "",
 	},
-	eventHandlers: {
-		UiService_requestedSecondaryAddressSuggestions: fetchSecondaryAddressSuggestions,
-	},
+	eventHandlers: {},
 	serviceMethods: {
 		init,
 		fetchAddressSuggestions,
+		fetchSecondaryAddressSuggestions,
+	},
+	utils: {
+		getAutocompleteApiResults,
 	},
 };
