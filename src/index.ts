@@ -59,7 +59,6 @@ export default class SmartyAddress {
 			...config,
 		};
 		this.setupServices(config);
-		this.eventDispatcher.dispatch("SmartyAddress_receivedSmartyAddressConfig", config);
 	}
 
 	setupServices = (config:SmartyAddressConfig) => {

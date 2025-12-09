@@ -1,5 +1,4 @@
-import {EventHandler, ServiceMethod} from "../interfaces";
-import {getStreetLineFormValue} from "../utils/domUtils";
+import {ServiceMethod} from "../interfaces";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
 export const init:ServiceMethod = ({setState, services}, config) => {
@@ -42,12 +41,10 @@ export const findInputElements:ServiceMethod = ({state, setState, services, util
 	});
 };
 
-export const populateFormWithNewAddress:EventHandler = ({event, state}) => {
-	const {selectedAddress} = event.detail;
-
+export const populateFormWithNewAddress:ServiceMethod = ({state, utils}, selectedAddress) => {
 	// TODO: If elements aren't inputs, specify textContent instead of value
 	// TODO: Handle if elements (e.g. state input) are <select> elements
-	state.streetLineInputElement.value = getStreetLineFormValue(state, selectedAddress);
+	state.streetLineInputElement.value = utils.getStreetLineFormValue(state, selectedAddress);
 
 	if (state.secondaryInputElement) {
 		state.secondaryInputElement.value = selectedAddress.secondary;

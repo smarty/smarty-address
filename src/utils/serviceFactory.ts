@@ -18,7 +18,6 @@ export const initService = (
 	const setState = (name: string, newState: unknown) => {
 		// TODO: Make state updates more robust
 		state[name] = newState;
-		// TODO: Would it make sense to dispatch an event every time state is updated? If so, we would also need to know which service triggered the update (e.g. eventDispatcher.dispatch("uiService_stateUpdated", {name, newState})
 	};
 	const defaultProps = {state, setState, utils, services: instanceServices};
 

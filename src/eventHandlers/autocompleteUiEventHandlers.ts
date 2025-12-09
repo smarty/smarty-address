@@ -67,7 +67,7 @@ export const handleSelectDropdownItem:AutocompleteUiServiceMethod = ({state, set
 			selectedAddress: selectedAddress.address,
 		});
 	} else {
-		state.eventDispatcher.dispatch("AutocompleteUiService_receivedNewAddressForForm", {selectedAddress: selectedAddress.address});
+		services.addressFormUiService.populateFormWithNewAddress(selectedAddress.address);
 		utils.hideElement(state.dropdownElement);
 	}
 };

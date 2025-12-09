@@ -4,7 +4,7 @@ import {
 	populateFormWithNewAddress,
 	init
 } from "../eventHandlers/addressFormUiEventHandlers";
-import {findDomElement} from "../utils/domUtils";
+import {findDomElement, getStreetLineFormValue} from "../utils/domUtils";
 
 export const addressFormUiService: ServiceDefinition = {
 	initialState: {
@@ -22,14 +22,14 @@ export const addressFormUiService: ServiceDefinition = {
 		stateInputElement: null,
 		zipcodeInputElement: null,
 	},
-	eventHandlers: {
-		AutocompleteUiService_receivedNewAddressForForm: populateFormWithNewAddress,
-	},
+	eventHandlers: {},
 	serviceMethods: {
 		init,
 		findInputElements,
+		populateFormWithNewAddress,
 	},
 	utils: {
 		findDomElement,
+		getStreetLineFormValue,
 	},
 };
