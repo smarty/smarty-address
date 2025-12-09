@@ -7,9 +7,9 @@ export const init:ServiceMethod = async ({setState}, config) => {
 	setState("autocompleteApiUrl", config.autocompleteApiUrl);
 };
 
-export const fetchAddressSuggestions: EventHandler = async ({event, state, services}) => {
+export const fetchAddressSuggestions: ServiceMethod = async ({state, services}, searchString) => {
 	try {
-		const suggestions = await getAutocompleteApiResults(event.detail.searchString, state.apiKey, state.autocompleteApiUrl);
+		const suggestions = await getAutocompleteApiResults(searchString, state.apiKey, state.autocompleteApiUrl);
 		services.autocompleteUiService.formatAddressSuggestions(suggestions);
 	} catch (error) {
 		services.autocompleteUiService.handleAutocompleteError({errorName: error.message});

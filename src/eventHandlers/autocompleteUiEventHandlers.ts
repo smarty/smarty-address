@@ -12,9 +12,8 @@ import {getMergedAddressSuggestions} from "../utils/uiUtils";
 
 export const watchSearchInputForChanges:AutocompleteUiServiceMethod = ({state, setState, services}) => {
 	const searchInputElement = state.searchInputElement;
-	// TODO: Add event listeners for other DOM elements (v2)
 	searchInputElement.addEventListener("input", (event:Event) => {
-		handleSearchInputOnChange({event, state, setState});
+		handleSearchInputOnChange({event, services});
 	});
 
 	searchInputElement.addEventListener("focusout", () => {
@@ -139,12 +138,11 @@ export const formatSecondaryAddressSuggestions:AutocompleteUiServiceMethod = ({s
 	showElement(state.dropdownElement);
 };
 
-const handleSearchInputOnChange:BrowserEventHandler = ({event, state}) => {
+const handleSearchInputOnChange:BrowserEventHandler = ({event, services}) => {
 	const searchInputValue = (event.target as HTMLInputElement)?.value;
-	// TODO: "UiService_searchInputCleared" event isn't handled anywhere yet.
-	const eventName = searchInputValue.length ? "UiService_requestedNewAddressSuggestions" : "UiService_searchInputCleared";
-	const selectedAddress = state.selectedSuggestionIndex >= 0 ? state.addressSuggestionResults[state.selectedSuggestionIndex].address : null;
-	state.eventDispatcher.dispatch(eventName, {searchString: searchInputValue, selectedAddress});
+	if (searchInputValue.length) {
+		services.apiService.fetchAddressSuggestions(searchInputValue);
+	}
 };
 
 export const setupDom:AutocompleteUiServiceMethod = ({state, setState, services, utils}, addressFormElements) => {

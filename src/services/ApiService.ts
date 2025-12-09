@@ -7,10 +7,10 @@ export const apiService: ServiceDefinition = {
 		apiKey: "",
 	},
 	eventHandlers: {
-		UiService_requestedNewAddressSuggestions: fetchAddressSuggestions,
 		UiService_requestedSecondaryAddressSuggestions: fetchSecondaryAddressSuggestions,
 	},
 	serviceMethods: {
 		init,
+		fetchAddressSuggestions,
 	},
 };

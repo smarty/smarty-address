@@ -61,7 +61,4 @@ export const populateFormWithNewAddress:EventHandler = ({event, state}) => {
 	if (state.zipcodeInputElement) {
 		state.zipcodeInputElement.value = selectedAddress.zipcode;
 	}
-
-	// TODO: Consider splitting service and event names into separate strings
-	state.eventDispatcher.dispatch("AddressFormUiService_populatedFormWithAddress", {selectedAddress});
 };

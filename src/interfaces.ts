@@ -78,8 +78,7 @@ export interface BrowserEventHandler {(props:BrowserEventHandlerProps):void}
 // TODO: These are the wrong props for this type of event
 export interface BrowserEventHandlerProps {
 	event:Event,
-	state:BasicStateObject,
-	setState: {(name:string, newState:unknown):void},
+	services:ServicesObject,
 }
 
 export interface ServiceDefinition {
