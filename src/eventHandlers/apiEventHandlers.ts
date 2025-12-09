@@ -7,21 +7,21 @@ export const init:ServiceMethod = async ({setState}, config) => {
 	setState("autocompleteApiUrl", config.autocompleteApiUrl);
 };
 
-export const fetchAddressSuggestions: EventHandler = async ({event, state}) => {
+export const fetchAddressSuggestions: EventHandler = async ({event, state, services}) => {
 	try {
 		const suggestions = await getAutocompleteApiResults(event.detail.searchString, state.apiKey, state.autocompleteApiUrl);
-		state.eventDispatcher.dispatch("ApiService_receivedAddressSuggestions", {suggestions});
+		services.autocompleteUiService.formatAddressSuggestions(suggestions);
 	} catch (error) {
-		state.eventDispatcher.dispatch("ApiService_receivedApiErrorFetchingAddressSuggestions", {errorName: error.message});
+		services.autocompleteUiService.handleAutocompleteError({errorName: error.message});
 	}
 };
 
-export const fetchSecondaryAddressSuggestions: EventHandler = async ({event, state}) => {
+export const fetchSecondaryAddressSuggestions: EventHandler = async ({event, state, services}) => {
 	try {
 		const {selectedAddress, searchString} = event.detail;
 		const suggestions = await getAutocompleteApiResults(searchString, state.apiKey, state.autocompleteApiUrl, selectedAddress);
-		state.eventDispatcher.dispatch("ApiService_receivedSecondaryAddressSuggestions", {suggestions, selectedAddress});
+		services.autocompleteUiService.formatSecondaryAddressSuggestions(suggestions);
 	} catch (error) {
-		state.eventDispatcher.dispatch("ApiService_receivedApiErrorFetchingSecondaryAddressSuggestions", {errorName: error.message});
+		services.autocompleteUiService.handleAutocompleteSecondaryError({errorName: error.message});
 	}
 };

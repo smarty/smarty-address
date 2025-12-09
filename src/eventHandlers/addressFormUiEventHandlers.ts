@@ -1,19 +1,19 @@
 import {EventHandler, ServiceMethod} from "../interfaces";
-import {findDomElement, getStreetLineFormValue} from "../utils/domUtils";
+import {getStreetLineFormValue} from "../utils/domUtils";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
-export const init:ServiceMethod = ({event, state, setState}) => {
-	setState("searchInputSelector", event.detail?.searchInputSelector);
-	setState("streetSelector", event.detail?.streetSelector);
-	setState("secondarySelector", event.detail?.secondarySelector);
-	setState("citySelector", event.detail?.citySelector);
-	setState("stateSelector", event.detail?.stateSelector);
-	setState("zipcodeSelector", event.detail?.zipcodeSelector);
+export const init:ServiceMethod = ({setState, services}, config) => {
+	setState("searchInputSelector", config?.searchInputSelector);
+	setState("streetSelector", config?.streetSelector);
+	setState("secondarySelector", config?.secondarySelector);
+	setState("citySelector", config?.citySelector);
+	setState("stateSelector", config?.stateSelector);
+	setState("zipcodeSelector", config?.zipcodeSelector);
 
-	state.eventDispatcher.dispatch("AddressFormUiService_updatedConfig");
+	services.addressFormUiService.findInputElements();
 };
 
-export const findInputElements:EventHandler = ({state, setState}) => {
+export const findInputElements:ServiceMethod = ({state, setState, services, utils}) => {
 	const {
 		searchInputSelector,
 		streetSelector,
@@ -22,6 +22,7 @@ export const findInputElements:EventHandler = ({state, setState}) => {
 		stateSelector,
 		zipcodeSelector,
 	} = state;
+	const {findDomElement} = utils;
 
 	// TODO: Consider finding the DOM elements each time they're needed (instead of caching them)
 	setState("streetLineInputElement", findDomElement(streetSelector));
@@ -31,7 +32,7 @@ export const findInputElements:EventHandler = ({state, setState}) => {
 	setState("stateInputElement", findDomElement(stateSelector));
 	setState("zipcodeInputElement", findDomElement(zipcodeSelector));
 
-	state.eventDispatcher.dispatch("AddressFormUiService_foundInputElements", {
+	services.autocompleteUiService.setupDom({
 		searchInputElement: state.searchInputElement,
 		streetLineInputElement: state.streetLineInputElement,
 		secondaryInputElement: state.secondaryInputElement,

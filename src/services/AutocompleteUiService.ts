@@ -1,4 +1,4 @@
-import {ServiceDefinition} from "../interfaces";
+import {AutocompleteUiServiceDefinition} from "../interfaces";
 import {
 	handleSelectDropdownItem,
 	init,
@@ -6,13 +6,18 @@ import {
 	formatSecondaryAddressSuggestions,
 	handleAutocompleteError,
 	setupDom,
-	handleAutocompleteSecondaryError,
+	handleAutocompleteSecondaryError, watchSearchInputForChanges,
 } from "../eventHandlers/autocompleteUiEventHandlers";
 
-import {updateThemeClass} from "../utils/domUtils";
+import {
+	buildAutocompleteDomElements,
+	configureDynamicStyling, hideElement,
+	updateDynamicStyles,
+	updateThemeClass
+} from "../utils/domUtils";
+import {getInstanceClassName} from "../utils/uiUtils";
 
-export const autocompleteUiService: ServiceDefinition = {
-	name: "autocompleteUiService",
+export const autocompleteUiService: AutocompleteUiServiceDefinition = {
 	initialState: {
 		theme: null,
 		searchInputElement: null,
@@ -28,18 +33,23 @@ export const autocompleteUiService: ServiceDefinition = {
 		secondaryAddressSuggestionResults: [],
 		customStylesElement: null,
 	},
-	eventHandlers: {
-		AddressFormUiService_foundInputElements: setupDom,
-		ApiService_receivedAddressSuggestions: formatAddressSuggestions,
-		ApiService_receivedSecondaryAddressSuggestions: formatSecondaryAddressSuggestions,
-		UiService_addressSelected: handleSelectDropdownItem,
-		ApiService_receivedApiErrorFetchingAddressSuggestions: handleAutocompleteError,
-		ApiService_receivedApiErrorFetchingSecondaryAddressSuggestions: handleAutocompleteSecondaryError,
-	},
+	eventHandlers: {},
 	serviceMethods: {
 		init,
+		setupDom,
+		watchSearchInputForChanges,
+		formatAddressSuggestions,
+		formatSecondaryAddressSuggestions,
+		handleAutocompleteError,
+		handleAutocompleteSecondaryError,
+		handleSelectDropdownItem
 	},
 	utils: {
 		updateThemeClass,
+		getInstanceClassName,
+		buildAutocompleteDomElements,
+		updateDynamicStyles,
+		configureDynamicStyling,
+		hideElement,
 	},
 };

@@ -63,8 +63,8 @@ export default class SmartyAddress {
 	}
 
 	setupServices = (config:SmartyAddressConfig) => {
-		Object.entries(config.services).forEach(([, serviceDefinition]) => {
-			const serviceMethods = initService(serviceDefinition, this.eventDispatcher, this.instanceId);
+		Object.entries(config.services).forEach(([name, serviceDefinition]) => {
+			const serviceMethods = initService(name, serviceDefinition, this.eventDispatcher, this.instanceId);
 			if (serviceMethods.init) {
 				serviceMethods.init(config);
 			}

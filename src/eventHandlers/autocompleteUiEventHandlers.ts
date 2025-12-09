@@ -1,14 +1,16 @@
-import {AbstractStateObject, BrowserEventHandler, EventHandler, ServiceMethod, UiSuggestionItem} from "../interfaces";
 import {
-	buildAutocompleteDomElements, configureDynamicStyling,
+	AbstractStateObject,
+	AutocompleteUiServiceMethod, BrowserEventHandler, ServicesObject, UiSuggestionItem
+} from "../interfaces";
+import {
 	hideElement,
 	highlightNewAddress,
-	showElement, updateDynamicStyles, updateThemeClass,
+	showElement,
 	createSuggestionElement, createSecondarySuggestionElement, updateDropdownContents
 } from "../utils/domUtils";
-import {getInstanceClassName, getMergedAddressSuggestions} from "../utils/uiUtils";
+import {getMergedAddressSuggestions} from "../utils/uiUtils";
 
-export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
+export const watchSearchInputForChanges:AutocompleteUiServiceMethod = ({state, setState, services}) => {
 	const searchInputElement = state.searchInputElement;
 	// TODO: Add event listeners for other DOM elements (v2)
 	searchInputElement.addEventListener("input", (event:Event) => {
@@ -21,12 +23,13 @@ export const watchSearchInputForChanges:EventHandler = ({state, setState}) => {
 	});
 
 	searchInputElement.addEventListener("keydown", (event:KeyboardEvent) => {
-		handleAutocompleteKeydown(event.key, state, setState);
+		handleAutocompleteKeydown(event.key, state, setState, services);
 		// TODO: Figure out how to prevent 1Password from triggering when arrowing down (or selecting an address via the "enter" key). The way to do this is to update the attributes of the input element (e.g. `autocomplete="off"`). See the "test-site" repo for an example.
 	});
 };
 
-export const handleAutocompleteKeydown = (pressedKey:string, state:AbstractStateObject, setState:Function) => {
+// TODO: Simplify this function so it no longer needs the full state and services objects.
+export const handleAutocompleteKeydown = (pressedKey:string, state:AbstractStateObject, setState:Function, services:ServicesObject) => {
 	const items = getMergedAddressSuggestions(state);
 	const currentIndex = state.highlightedSuggestionIndex;
 	const handleHighlightChange = (indexChange:number) => {
@@ -45,7 +48,8 @@ export const handleAutocompleteKeydown = (pressedKey:string, state:AbstractState
 		case "Enter":
 			const selectedAddress = items[state.highlightedSuggestionIndex];
 			if (selectedAddress) {
-				state.eventDispatcher.dispatch("UiService_addressSelected", {selectedAddress});
+				// TODO: Fix the value that gets passed in here. It's not populating the correct address.
+				services.autocompleteUiService.handleSelectDropdownItem(state.selectedSuggestionIndex + 1);
 			}
 			break;
 		case "Escape":
@@ -54,8 +58,7 @@ export const handleAutocompleteKeydown = (pressedKey:string, state:AbstractState
 	}
 };
 
-export const handleSelectDropdownItem:EventHandler = ({event, state, setState}) => {
-	const addressIndex = event.detail.addressIndex;
+export const handleSelectDropdownItem:AutocompleteUiServiceMethod = ({state, setState}, addressIndex) => {
 	const mergedAddressSuggestions = getMergedAddressSuggestions(state);
 	const selectedAddress = mergedAddressSuggestions[addressIndex];
 	const {street_line, secondary = "", entries = 0} = selectedAddress.address;
@@ -81,11 +84,10 @@ export const handleSelectDropdownItem:EventHandler = ({event, state, setState}) 
 	}
 };
 
-export const formatAddressSuggestions:EventHandler = ({event, state, setState}) => {
-	const {suggestions} = event.detail;
+export const formatAddressSuggestions:AutocompleteUiServiceMethod = ({state, setState, services}, suggestions) => {
 	const suggestionItems = suggestions.map((address, addressIndex):UiSuggestionItem => {
 		const suggestionOnClickHandler = () => {
-			state.eventDispatcher.dispatch("UiService_addressSelected", {addressIndex: addressIndex + state.selectedSuggestionIndex + 1});
+			services.autocompleteUiService.handleSelectDropdownItem(addressIndex + state.selectedSuggestionIndex + 1);
 		};
 
 		const suggestionListElements = createSuggestionElement(address);
@@ -109,12 +111,10 @@ export const formatAddressSuggestions:EventHandler = ({event, state, setState}) 
 	showElement(state.dropdownElement);
 };
 
-export const formatSecondaryAddressSuggestions:EventHandler = ({event, state, setState}) => {
-	const {suggestions} = event.detail;
-
+export const formatSecondaryAddressSuggestions:AutocompleteUiServiceMethod = ({state, setState, services}, suggestions) => {
 	const suggestionItems = suggestions.map((address, addressIndex):UiSuggestionItem => {
 		const suggestionOnClickHandler = () => {
-			state.eventDispatcher.dispatch("UiService_addressSelected", {addressIndex: addressIndex + state.selectedSuggestionIndex + 1});
+			services.autocompleteUiService.handleSelectDropdownItem(addressIndex + state.selectedSuggestionIndex + 1);
 		};
 
 		const suggestionListElements = createSecondarySuggestionElement(address);
@@ -147,10 +147,10 @@ const handleSearchInputOnChange:BrowserEventHandler = ({event, state}) => {
 	state.eventDispatcher.dispatch(eventName, {searchString: searchInputValue, selectedAddress});
 };
 
-export const setupDom:EventHandler = ({event, state, setState}) => {
-	const instanceClassname = getInstanceClassName(state.instanceId);
-	setState("searchInputElement", event.detail.searchInputElement);
-	const elements = buildAutocompleteDomElements(instanceClassname);
+export const setupDom:AutocompleteUiServiceMethod = ({state, setState, services, utils}, addressFormElements) => {
+	const instanceClassname = utils.getInstanceClassName(state.instanceId);
+	setState("searchInputElement", addressFormElements.searchInputElement);
+	const elements = utils.buildAutocompleteDomElements(instanceClassname);
 	const {customStylesElement, dropdownWrapperElement} = elements;
 
 	document.body.appendChild(dropdownWrapperElement);
@@ -160,16 +160,15 @@ export const setupDom:EventHandler = ({event, state, setState}) => {
 		setState(elementKey, elements[elementKey]);
 	});
 
-	updateThemeClass(state.theme, [], dropdownWrapperElement);
-	// TODO: See if we can do this without needing to pass state/setState (or if we must, then trigger an event)
-	watchSearchInputForChanges({state, setState, event});
+	utils.updateThemeClass(state.theme, [], dropdownWrapperElement);
+	services.autocompleteUiService.watchSearchInputForChanges();
 
-	const dynamicStylingHandler = () => updateDynamicStyles(customStylesElement as HTMLStyleElement, state.searchInputElement, state.instanceId);
+	const dynamicStylingHandler = () => utils.updateDynamicStyles(customStylesElement as HTMLStyleElement, state.searchInputElement, state.instanceId);
 
-	configureDynamicStyling(dynamicStylingHandler);
+	utils.configureDynamicStyling(dynamicStylingHandler);
 };
 
-export const init:ServiceMethod = ({state, setState, utils}, config) => {
+export const init:AutocompleteUiServiceMethod = ({state, setState, utils}, config) => {
 	const previousTheme = state.theme;
 	const newTheme = config?.theme;
 	setState("theme", newTheme);
@@ -179,12 +178,12 @@ export const init:ServiceMethod = ({state, setState, utils}, config) => {
 	}
 };
 
-export const handleAutocompleteError:EventHandler = ({state}) => {
-	hideElement(state.dropdownElement);
+export const handleAutocompleteError:AutocompleteUiServiceMethod = ({state, utils}) => {
+	utils.hideElement(state.dropdownElement);
 };
 
-export const handleAutocompleteSecondaryError:EventHandler = ({state}) => {
+export const handleAutocompleteSecondaryError:AutocompleteUiServiceMethod = ({state, utils}) => {
 	// TODO: Implement better error handling here
-	hideElement(state.dropdownElement);
+	utils.hideElement(state.dropdownElement);
 };
 

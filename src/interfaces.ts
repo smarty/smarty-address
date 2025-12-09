@@ -40,6 +40,7 @@ export interface ApiErrorResponse {
 	message: string;
 }
 
+// TODO: Revisit the abstract/basic stateObject interfaces.
 export interface AbstractStateObject {
 	[index: string]: any;
 }
@@ -48,17 +49,8 @@ export interface BasicStateObject extends AbstractStateObject {
 	eventDispatcher: EventDispatcher,
 }
 
-// TODO: Figure out the "state" typing for specific services
-export interface UiStateObject extends BasicStateObject {
-	searchInputElement: HTMLInputElement,
-	streetLineInputElement: HTMLInputElement | null,
-	secondaryInputElement: HTMLInputElement | null,
-	cityInputElement: HTMLInputElement | null,
-	stateInputElement: HTMLInputElement | null,
-	zipcodeInputElement: HTMLInputElement | null,
-}
-
-export interface ServicesObject {[name: string]: WrappedServiceMethod}
+export interface ServiceMethodsObject {[name: string]: WrappedServiceMethod}
+export interface ServicesObject {[name: string]: ServiceMethodsObject}
 export interface EventHandler {(props:EventHandlerProps):void}
 export interface ServiceMethod {(props:ServiceMethodProps, customProps?:any):void}
 export interface WrappedServiceMethod {(customProps?:any):void}
@@ -66,8 +58,16 @@ export interface WrappedServiceMethod {(customProps?:any):void}
 export interface ServiceMethodProps {
 	state:BasicStateObject,
 	setState: {(name:string, newState:unknown):void},
-	services: {[name: string]: ServicesObject},
+	services: ServicesObject,
 	utils: {[name: string]: (...props:unknown[])=>unknown},
+}
+
+export interface AutocompleteUiServiceMethod extends ServiceMethod {
+	(props:AutocompleteUiServiceMethodProps, customProps?:any):void,
+}
+
+export interface AutocompleteUiServiceMethodProps extends ServiceMethodProps {
+	utils: AutocompleteUiServiceUtils,
 }
 
 export interface EventHandlerProps extends ServiceMethodProps {
@@ -83,11 +83,38 @@ export interface BrowserEventHandlerProps {
 }
 
 export interface ServiceDefinition {
-	name: string,
 	initialState: AbstractStateObject,
 	eventHandlers?: {[eventName: string]: EventHandler},
 	serviceMethods: {[eventName: string]: ServiceMethod},
-	utils?: {[eventName: string]: (...args:unknown[])=>unknown},
+	utils?: ServiceDefinitionUtils,
+}
+
+export interface ServiceDefinitionUtils {[eventName: string]: (...args:unknown[])=>unknown}
+
+export interface AutocompleteUiServiceUtils extends ServiceDefinitionUtils {
+		updateThemeClass: (newTheme:string[], previousTheme:string[], dropdownWrapperElement:HTMLElement)=>void,
+		getInstanceClassName: (instanceId:number)=>string,
+		buildAutocompleteDomElements: (instanceClassname:string)=>Record<string, HTMLElement>,
+}
+
+export interface AutocompleteUiServiceDefinition extends ServiceDefinition {
+	initialState: {
+		theme: string,
+		searchInputElement: HTMLInputElement,
+
+		dropdownWrapperElement: HTMLElement,
+		dropdownElement: HTMLElement,
+		suggestionsElement: HTMLElement,
+		poweredBySmartyElement: HTMLElement,
+
+		highlightedSuggestionIndex: number,
+		selectedSuggestionIndex: number,
+		// TODO: Be more specific with what type of object is expected here (e.g. AddressSuggestion)
+		addressSuggestionResults: object[],
+		secondaryAddressSuggestionResults: object[],
+		customStylesElement: HTMLElement,
+	},
+	utils: AutocompleteUiServiceUtils,
 }
 
 export interface ServiceDefinitionMap {[eventName: string]:ServiceDefinition}

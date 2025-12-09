@@ -1,13 +1,14 @@
-import {EventHandler, ServiceDefinition, ServicesObject} from "../interfaces";
+import {EventHandler, ServiceDefinition, ServiceMethodsObject} from "../interfaces";
 import {EventDispatcher} from "./EventDispatcher";
 
 const allServices = {};
 
 export const initService = (
-	{name, eventHandlers, initialState = {}, serviceMethods = {}, utils}:ServiceDefinition,
+	name:string,
+	{eventHandlers, initialState = {}, serviceMethods = {}, utils}:ServiceDefinition,
 	eventDispatcher:EventDispatcher,
 	instanceId:number,
-):ServicesObject => {
+):ServiceMethodsObject => {
 	if (!allServices[instanceId]) allServices[instanceId] = {};
 	const instanceServices = allServices[instanceId];
 

@@ -2,7 +2,6 @@ import {ServiceDefinition} from "../interfaces";
 import {init, fetchAddressSuggestions, fetchSecondaryAddressSuggestions} from "../eventHandlers/apiEventHandlers";
 
 export const apiService: ServiceDefinition = {
-	name: "apiService",
 	initialState: {
 		autocompleteApiUrl: "",
 		apiKey: "",

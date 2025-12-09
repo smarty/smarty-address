@@ -4,9 +4,9 @@ import {
 	populateFormWithNewAddress,
 	init
 } from "../eventHandlers/addressFormUiEventHandlers";
+import {findDomElement} from "../utils/domUtils";
 
 export const addressFormUiService: ServiceDefinition = {
-	name: "addressFormUiService",
 	initialState: {
 		searchInputSelector: null,
 		streetSelector: null,
@@ -23,8 +23,13 @@ export const addressFormUiService: ServiceDefinition = {
 		zipcodeInputElement: null,
 	},
 	eventHandlers: {
-		SmartyAddress_receivedSmartyAddressConfig: init,
-		AddressFormUiService_updatedConfig: findInputElements,
 		AutocompleteUiService_receivedNewAddressForForm: populateFormWithNewAddress,
+	},
+	serviceMethods: {
+		init,
+		findInputElements,
+	},
+	utils: {
+		findDomElement,
 	},
 };
