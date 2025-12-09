@@ -1,18 +1,16 @@
 import {ServiceDefinition, ServiceMethodsObject} from "../interfaces";
-import {EventDispatcher} from "./EventDispatcher";
 
 const allServices = {};
 
 export const initService = (
 	name:string,
 	{initialState = {}, serviceMethods = {}, utils}:ServiceDefinition,
-	eventDispatcher:EventDispatcher,
 	instanceId:number,
 ):ServiceMethodsObject => {
 	if (!allServices[instanceId]) allServices[instanceId] = {};
 	const instanceServices = allServices[instanceId];
 
-	const state = {eventDispatcher, instanceId, ...initialState};
+	const state = {instanceId, ...initialState};
 	const wrappedServiceMethods = {};
 
 	const setState = (name: string, newState: unknown) => {

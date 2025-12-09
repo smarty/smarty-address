@@ -1,4 +1,4 @@
-import {AddressSuggestion, BasicStateObject, UiSuggestionItem} from "../interfaces";
+import {AddressSuggestion, UiSuggestionItem} from "../interfaces";
 import {formatStyleBlock, getFormattedAddressSuggestion, getHslFromColorString, getInstanceClassName} from "./uiUtils";
 import {getSmartyLogo} from "./getSmartyLogo";
 
@@ -76,7 +76,7 @@ export const scrollToHighlightedSuggestion = (highlightedElement:HTMLElement, co
 	}
 };
 
-export const getStreetLineFormValue = ({secondaryInputElement, cityInputElement, stateInputElement, zipcodeInputElement}:BasicStateObject, address:AddressSuggestion) => {
+export const getStreetLineFormValue = ({secondaryInputElement, cityInputElement, stateInputElement, zipcodeInputElement}, address:AddressSuggestion) => {
 	const streetLineValues = [address.street_line];
 
 	if (!secondaryInputElement && address.secondary?.length) {

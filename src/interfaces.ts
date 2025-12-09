@@ -1,5 +1,3 @@
-import {EventDispatcher} from "./utils/EventDispatcher";
-
 export interface DefaultSmartyAddressConfig {
 	services:ServiceDefinitionMap,
 	theme:string[],
@@ -45,17 +43,13 @@ export interface AbstractStateObject {
 	[index: string]: any;
 }
 
-export interface BasicStateObject extends AbstractStateObject {
-	eventDispatcher: EventDispatcher,
-}
-
 export interface ServiceMethodsObject {[name: string]: WrappedServiceMethod}
 export interface ServicesObject {[name: string]: ServiceMethodsObject}
 export interface ServiceMethod {(props:ServiceMethodProps, customProps?:any):void}
 export interface WrappedServiceMethod {(customProps?:any):void}
 
 export interface ServiceMethodProps {
-	state:BasicStateObject,
+	state:AbstractStateObject,
 	setState: {(name:string, newState:unknown):void},
 	services: ServicesObject,
 	utils: {[name: string]: (...props:unknown[])=>unknown},
@@ -71,11 +65,11 @@ export interface AutocompleteUiServiceMethodProps extends ServiceMethodProps {
 
 export interface ServiceDefinition {
 	initialState: AbstractStateObject,
-	serviceMethods: {[eventName: string]: ServiceMethod},
+	serviceMethods: {[name: string]: ServiceMethod},
 	utils?: ServiceDefinitionUtils,
 }
 
-export interface ServiceDefinitionUtils {[eventName: string]: (...args:unknown[])=>unknown}
+export interface ServiceDefinitionUtils {[name: string]: (...args:unknown[])=>unknown}
 
 export interface AutocompleteUiServiceUtils extends ServiceDefinitionUtils {
 		updateThemeClass: (newTheme:string[], previousTheme:string[], dropdownWrapperElement:HTMLElement)=>void,
@@ -103,7 +97,7 @@ export interface AutocompleteUiServiceDefinition extends ServiceDefinition {
 	utils: AutocompleteUiServiceUtils,
 }
 
-export interface ServiceDefinitionMap {[eventName: string]:ServiceDefinition}
+export interface ServiceDefinitionMap {[name: string]:ServiceDefinition}
 
 export interface UiSuggestionItem {
 	address: AddressSuggestion,

@@ -3,7 +3,6 @@ import {
 	SmartyAddressConfig
 } from "./interfaces";
 import {apiService} from "./services/ApiService";
-import {EventDispatcher} from "./utils/EventDispatcher";
 import {initService} from "./utils/serviceFactory";
 import {themes} from "./themes";
 import {defineStyles} from "./utils/appUtils";
@@ -41,8 +40,6 @@ export default class SmartyAddress {
 	}
 
 	private static instances:SmartyAddress[] = [];
-
-	private eventDispatcher = new EventDispatcher();
 	private instanceId;
 
 	// TODO: update "config" type/interface to be more specific
@@ -63,7 +60,7 @@ export default class SmartyAddress {
 
 	setupServices = (config:SmartyAddressConfig) => {
 		Object.entries(config.services).forEach(([name, serviceDefinition]) => {
-			const serviceMethods = initService(name, serviceDefinition, this.eventDispatcher, this.instanceId);
+			const serviceMethods = initService(name, serviceDefinition, this.instanceId);
 			if (serviceMethods.init) {
 				serviceMethods.init(config);
 			}
