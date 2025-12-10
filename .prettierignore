@@ -1,0 +1,10 @@
+# Ignore artifacts:
+build
+coverage
+.idea
+.swc
+.vscode
+dist/
+README.md
+package.json
+package-lock.json
