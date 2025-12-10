@@ -28,7 +28,7 @@ export const themeStyles = {
     "padding": "var(--smartyAddress__spacingNone)",
     "overflow-y": "var(--smartyAddress__dropdownOverflowY)",
     "max-height": "var(--smartyAddress__heightLarge1)",
-    "scrollbar-color": "var(--smartyAddress__surfaceBaseTertiaryColor) var(--smartyAddress__surfaceBasePrimaryColor)", // TODO: Make sure we didn't break this line
+    "scrollbar-color": "var(--smartyAddress__surfaceBaseTertiaryColor) var(--smartyAddress__surfaceBasePrimaryColor)",
     "scrollbar-width": "var(--smartyAddress__scrollbarWidth)",
 },
 

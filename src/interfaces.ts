@@ -12,7 +12,6 @@ export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 	secondarySelector?: string,
 	citySelector?: string,
 	stateSelector?: string,
-	// TODO: Should this be renamed to "postalCodeSelector"?
 	zipcodeSelector?: string,
 }
 
