@@ -5,25 +5,30 @@ import {
 	RgbaColor,
 	StylesObject,
 } from "../interfaces";
-import {getRgbaFromCssColor} from "./domUtils";
+import { getRgbaFromCssColor } from "./domUtils";
 
-export const getFormattedAddressSuggestion = (suggestion:AddressSuggestion, isSecondary:boolean = false) => {
-	const {street_line, secondary = "", city, state, zipcode} = suggestion;
+export const getFormattedAddressSuggestion = (
+	suggestion: AddressSuggestion,
+	isSecondary: boolean = false,
+) => {
+	const { street_line, secondary = "", city, state, zipcode } = suggestion;
 	const streetText = isSecondary ? "…" : street_line;
 
 	return `${streetText} ${secondary}, ${city}, ${state} ${zipcode}`;
 };
 
-export const formatStyleBlock = (selector:string, styles:{}) => {
-	const stylesString = Object.entries(styles).map(([property, value]) => `${property}: ${value};`).join("\n");
+export const formatStyleBlock = (selector: string, styles: {}) => {
+	const stylesString = Object.entries(styles)
+		.map(([property, value]) => `${property}: ${value};`)
+		.join("\n");
 	return `${selector} {\n${stylesString}\n}`;
 };
 
-export const getInstanceClassName = (instanceId:number) => {
+export const getInstanceClassName = (instanceId: number) => {
 	return `smartyAddress__instance_${instanceId}`;
 };
 
-const rgbToHsl = ({red, green, blue, alpha}:RgbaColor):HslColor => {
+const rgbToHsl = ({ red, green, blue, alpha }: RgbaColor): HslColor => {
 	red /= 255;
 	green /= 255;
 	blue /= 255;
@@ -32,20 +37,19 @@ const rgbToHsl = ({red, green, blue, alpha}:RgbaColor):HslColor => {
 	const delta = cmax - cmin;
 	const minMaxAverage = (cmin + cmax) / 2;
 
-	let	hue = 0;
+	let hue = 0;
 	const lightness = convertDecimalToPercentage(minMaxAverage);
-	const saturation = convertDecimalToPercentage(delta === 0 ? 0 : delta / (1 - Math.abs(2 * minMaxAverage - 1)));
+	const saturation = convertDecimalToPercentage(
+		delta === 0 ? 0 : delta / (1 - Math.abs(2 * minMaxAverage - 1)),
+	);
 
 	if (delta === 0) {
 		hue = 0;
-	}
-	else if (cmax === red) {
+	} else if (cmax === red) {
 		hue = ((green - blue) / delta) % 6;
-	}
-	else if (cmax === green) {
+	} else if (cmax === green) {
 		hue = (blue - red) / delta + 2;
-	}
-	else {
+	} else {
 		hue = (red - green) / delta + 4;
 	}
 
@@ -55,23 +59,25 @@ const rgbToHsl = ({red, green, blue, alpha}:RgbaColor):HslColor => {
 		hue += 360;
 	}
 
-	return {hue, saturation, lightness, alpha};
+	return { hue, saturation, lightness, alpha };
 };
 
-export const convertDecimalToPercentage = (decimal:number) => {
+export const convertDecimalToPercentage = (decimal: number) => {
 	return +(decimal * 100);
 };
 
-export const getHslFromColorString = (colorString:CSSStyleDeclaration) => {
+export const getHslFromColorString = (colorString: CSSStyleDeclaration) => {
 	const rgbaColor = getRgbaFromCssColor(colorString);
 	return rgbToHsl(rgbaColor);
 };
 
-export const convertStylesObjectToCssBlock = (stylesObject:StylesObject) => {
+export const convertStylesObjectToCssBlock = (stylesObject: StylesObject) => {
 	const selectorsBlock = Object.entries(stylesObject).map(([selector, selectorStyles]) => {
-		const stylesBlock = Object.entries(selectorStyles).map(([key, value]) => {
-			return `${key}: ${value};`;
-		}).join("\n\t");
+		const stylesBlock = Object.entries(selectorStyles)
+			.map(([key, value]) => {
+				return `${key}: ${value};`;
+			})
+			.join("\n\t");
 
 		return `\n${selector} {\n\t${stylesBlock}\n}`;
 	});
@@ -79,13 +85,13 @@ export const convertStylesObjectToCssBlock = (stylesObject:StylesObject) => {
 	return selectorsBlock.join("");
 };
 
-export const getMergedAddressSuggestions = (state:AbstractStateObject) => {
-	const {
-		addressSuggestionResults,
-		secondaryAddressSuggestionResults,
-		selectedSuggestionIndex
-	} = state;
+export const getMergedAddressSuggestions = (state: AbstractStateObject) => {
+	const { addressSuggestionResults, secondaryAddressSuggestionResults, selectedSuggestionIndex } =
+		state;
 
-
-	return addressSuggestionResults.toSpliced(selectedSuggestionIndex + 1, 0, ...secondaryAddressSuggestionResults);
+	return addressSuggestionResults.toSpliced(
+		selectedSuggestionIndex + 1,
+		0,
+		...secondaryAddressSuggestionResults,
+	);
 };
