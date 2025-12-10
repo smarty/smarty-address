@@ -1,14 +1,11 @@
-import {
-	DefaultSmartyAddressConfig,
-	SmartyAddressConfig
-} from "./interfaces";
-import {apiService} from "./services/ApiService";
-import {initService} from "./utils/serviceFactory";
-import {themes} from "./themes";
-import {defineStyles} from "./utils/appUtils";
-import {US_AUTOCOMPLETE_PRO_API_URL} from "./constants";
-import {autocompleteUiService} from "./services/AutocompleteUiService";
-import {addressFormUiService} from "./services/AddressFormUiService";
+import { DefaultSmartyAddressConfig, SmartyAddressConfig } from "./interfaces";
+import { apiService } from "./services/ApiService";
+import { initService } from "./utils/serviceFactory";
+import { themes } from "./themes";
+import { defineStyles } from "./utils/appUtils";
+import { US_AUTOCOMPLETE_PRO_API_URL } from "./constants";
+import { autocompleteUiService } from "./services/AutocompleteUiService";
+import { addressFormUiService } from "./services/AddressFormUiService";
 // TODO: Update readme
 // TODO: Update tsconfig.json
 // TODO: Add ability to destroy an instance of SmartyAddress (and remove all associated elements from DOM)
@@ -22,7 +19,7 @@ import {addressFormUiService} from "./services/AddressFormUiService";
 // TODO: Handle populating select lists (e.g. for "state")
 
 export default class SmartyAddress {
-	static defaultConfig:DefaultSmartyAddressConfig = {
+	static defaultConfig: DefaultSmartyAddressConfig = {
 		theme: themes.default,
 		services: {
 			autocompleteUiService,
@@ -35,7 +32,7 @@ export default class SmartyAddress {
 		defineStyles();
 	}
 
-	private static instances:SmartyAddress[] = [];
+	private static instances: SmartyAddress[] = [];
 	private instanceId;
 
 	// TODO: update "config" type/interface to be more specific
@@ -52,14 +49,14 @@ export default class SmartyAddress {
 			...config,
 		};
 		this.setupServices(config);
-	}
+	};
 
-	setupServices = (config:SmartyAddressConfig) => {
+	setupServices = (config: SmartyAddressConfig) => {
 		Object.entries(config.services).forEach(([name, serviceDefinition]) => {
 			const serviceMethods = initService(name, serviceDefinition, this.instanceId);
 			if (serviceMethods.init) {
 				serviceMethods.init(config);
 			}
 		});
-	}
+	};
 }

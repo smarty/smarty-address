@@ -1,18 +1,18 @@
 export interface DefaultSmartyAddressConfig {
-	services:ServiceDefinitionMap,
-	theme:string[],
-	autocompleteApiUrl:string,
+	services: ServiceDefinitionMap;
+	theme: string[];
+	autocompleteApiUrl: string;
 }
 
 export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 	// TODO: Talk to Jeffrey and Adam about correct naming of fields/properties
-	embeddedKey:string,
-	searchInputSelector:string,
-	streetLineSelector?: string,
-	secondarySelector?: string,
-	citySelector?: string,
-	stateSelector?: string,
-	zipcodeSelector?: string,
+	embeddedKey: string;
+	searchInputSelector: string;
+	streetLineSelector?: string;
+	secondarySelector?: string;
+	citySelector?: string;
+	stateSelector?: string;
+	zipcodeSelector?: string;
 }
 
 export interface AddressSuggestion {
@@ -42,77 +42,93 @@ export interface AbstractStateObject {
 	[index: string]: any;
 }
 
-export interface ServiceMethodsObject {[name: string]: WrappedServiceMethod}
-export interface ServicesObject {[name: string]: ServiceMethodsObject}
-export interface ServiceMethod {(props:ServiceMethodProps, customProps?:any):void}
-export interface WrappedServiceMethod {(customProps?:any):void}
+export interface ServiceMethodsObject {
+	[name: string]: WrappedServiceMethod;
+}
+export interface ServicesObject {
+	[name: string]: ServiceMethodsObject;
+}
+export interface ServiceMethod {
+	(props: ServiceMethodProps, customProps?: any): void;
+}
+export interface WrappedServiceMethod {
+	(customProps?: any): void;
+}
 
 export interface ServiceMethodProps {
-	state:AbstractStateObject,
-	setState: {(name:string, newState:unknown):void},
-	services: ServicesObject,
-	utils: {[name: string]: (...props:unknown[])=>unknown},
+	state: AbstractStateObject;
+	setState: { (name: string, newState: unknown): void };
+	services: ServicesObject;
+	utils: { [name: string]: (...props: unknown[]) => unknown };
 }
 
 export interface AutocompleteUiServiceMethod extends ServiceMethod {
-	(props:AutocompleteUiServiceMethodProps, customProps?:any):void,
+	(props: AutocompleteUiServiceMethodProps, customProps?: any): void;
 }
 
 export interface AutocompleteUiServiceMethodProps extends ServiceMethodProps {
-	utils: AutocompleteUiServiceUtils,
+	utils: AutocompleteUiServiceUtils;
 }
 
 export interface ServiceDefinition {
-	initialState: AbstractStateObject,
-	serviceMethods: {[name: string]: ServiceMethod},
-	utils?: ServiceDefinitionUtils,
+	initialState: AbstractStateObject;
+	serviceMethods: { [name: string]: ServiceMethod };
+	utils?: ServiceDefinitionUtils;
 }
 
-export interface ServiceDefinitionUtils {[name: string]: (...args:unknown[])=>unknown}
+export interface ServiceDefinitionUtils {
+	[name: string]: (...args: unknown[]) => unknown;
+}
 
 export interface AutocompleteUiServiceUtils extends ServiceDefinitionUtils {
-		updateThemeClass: (newTheme:string[], previousTheme:string[], dropdownWrapperElement:HTMLElement)=>void,
-		getInstanceClassName: (instanceId:number)=>string,
-		buildAutocompleteDomElements: (instanceClassname:string)=>Record<string, HTMLElement>,
+	updateThemeClass: (
+		newTheme: string[],
+		previousTheme: string[],
+		dropdownWrapperElement: HTMLElement,
+	) => void;
+	getInstanceClassName: (instanceId: number) => string;
+	buildAutocompleteDomElements: (instanceClassname: string) => Record<string, HTMLElement>;
 }
 
 export interface AutocompleteUiServiceDefinition extends ServiceDefinition {
 	initialState: {
-		theme: string,
-		searchInputElement: HTMLInputElement,
+		theme: string;
+		searchInputElement: HTMLInputElement;
 
-		dropdownWrapperElement: HTMLElement,
-		dropdownElement: HTMLElement,
-		suggestionsElement: HTMLElement,
-		poweredBySmartyElement: HTMLElement,
+		dropdownWrapperElement: HTMLElement;
+		dropdownElement: HTMLElement;
+		suggestionsElement: HTMLElement;
+		poweredBySmartyElement: HTMLElement;
 
-		highlightedSuggestionIndex: number,
-		selectedSuggestionIndex: number,
+		highlightedSuggestionIndex: number;
+		selectedSuggestionIndex: number;
 		// TODO: Be more specific with what type of object is expected here (e.g. AddressSuggestion)
-		addressSuggestionResults: object[],
-		secondaryAddressSuggestionResults: object[],
-		customStylesElement: HTMLElement,
-	},
-	utils: AutocompleteUiServiceUtils,
+		addressSuggestionResults: object[];
+		secondaryAddressSuggestionResults: object[];
+		customStylesElement: HTMLElement;
+	};
+	utils: AutocompleteUiServiceUtils;
 }
 
-export interface ServiceDefinitionMap {[name: string]:ServiceDefinition}
+export interface ServiceDefinitionMap {
+	[name: string]: ServiceDefinition;
+}
 
 export interface UiSuggestionItem {
-	address: AddressSuggestion,
-	suggestionElement: HTMLElement,
+	address: AddressSuggestion;
+	suggestionElement: HTMLElement;
 }
 
 export interface RgbaColor {
-	red: number,
-	green: number,
-	blue: number,
-	alpha: number,
+	red: number;
+	green: number;
+	blue: number;
+	alpha: number;
 }
 
 export interface HslColor {
-	hue: number,
-	saturation: number,
-	lightness: number,
-	alpha: number,
+	hue: number;
+	saturation: number;
+	lightness: number;
+	alpha: number;
 }
