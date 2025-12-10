@@ -1,12 +1,21 @@
-import {AddressSuggestion, UiSuggestionItem} from "../interfaces";
-import {formatStyleBlock, getFormattedAddressSuggestion, getHslFromColorString, getInstanceClassName} from "./uiUtils";
-import {getSmartyLogo} from "./getSmartyLogo";
+import { AddressSuggestion, UiSuggestionItem } from "../interfaces";
+import {
+	formatStyleBlock,
+	getFormattedAddressSuggestion,
+	getHslFromColorString,
+	getInstanceClassName,
+} from "./uiUtils";
+import { getSmartyLogo } from "./getSmartyLogo";
 
 export const findDomElement = (selector?: string): HTMLElement | null => {
 	return selector ? document.querySelector(selector) : null;
 };
 
-export const createDomElement = (tagName: string, classList: string[] = [], children: (HTMLElement | Text)[] = []) => {
+export const createDomElement = (
+	tagName: string,
+	classList: string[] = [],
+	children: (HTMLElement | Text)[] = [],
+) => {
 	const element = document.createElement(tagName);
 	element.classList.add(...classList);
 	children.forEach((child) => {
@@ -17,21 +26,41 @@ export const createDomElement = (tagName: string, classList: string[] = [], chil
 };
 
 export const createSuggestionElement = (suggestion) => {
-	const {entries = 0} = suggestion;
+	const { entries = 0 } = suggestion;
 	const addressElementClasses = ["smartyAddress__autocompleteAddress"];
 	const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
 	const entriesElementClasses = ["smartyAddress__suggestionEntries"];
 	const suggestionElementClasses = ["smartyAddress__suggestion"];
 
-	const entriesChildren = entries > 1 ? [{text: `${entries} entries`}] : undefined;
+	const entriesChildren = entries > 1 ? [{ text: `${entries} entries` }] : undefined;
 
 	const elementsMap = [
-		{name: "suggestionElement", elementType: "li", className: suggestionElementClasses, attributes: {"data-address": JSON.stringify(suggestion)}, children: [
-				{elementType: "div", className: addressWrapperElementClasses, children: [
-						{name: "addressElement", elementType: "div", className: addressElementClasses, children: [{text: getFormattedAddressSuggestion(suggestion)}]},
-						{name: "entriesElement", elementType: "div", className: entriesElementClasses, children: entriesChildren},
-					]},
-			]},
+		{
+			name: "suggestionElement",
+			elementType: "li",
+			className: suggestionElementClasses,
+			attributes: { "data-address": JSON.stringify(suggestion) },
+			children: [
+				{
+					elementType: "div",
+					className: addressWrapperElementClasses,
+					children: [
+						{
+							name: "addressElement",
+							elementType: "div",
+							className: addressElementClasses,
+							children: [{ text: getFormattedAddressSuggestion(suggestion) }],
+						},
+						{
+							name: "entriesElement",
+							elementType: "div",
+							className: entriesElementClasses,
+							children: entriesChildren,
+						},
+					],
+				},
+			],
+		},
 	];
 
 	return buildElementsFromMap(elementsMap);
@@ -43,27 +72,50 @@ export const createSecondarySuggestionElement = (suggestion) => {
 	const secondarySuggestionElementClasses = ["smartyAddress__secondarySuggestion"];
 
 	const elementsMap = [
-		{name: "secondarySuggestionElement", elementType: "li", className: secondarySuggestionElementClasses, attributes: {"data-address": JSON.stringify(suggestion)}, children: [
-				{elementType: "div", className: addressWrapperElementClasses, children: [
-						{name: "addressElement", elementType: "div", className: addressElementClasses, children: [{text: getFormattedAddressSuggestion(suggestion, true)}]}
-					]}
-			]},
+		{
+			name: "secondarySuggestionElement",
+			elementType: "li",
+			className: secondarySuggestionElementClasses,
+			attributes: { "data-address": JSON.stringify(suggestion) },
+			children: [
+				{
+					elementType: "div",
+					className: addressWrapperElementClasses,
+					children: [
+						{
+							name: "addressElement",
+							elementType: "div",
+							className: addressElementClasses,
+							children: [{ text: getFormattedAddressSuggestion(suggestion, true) }],
+						},
+					],
+				},
+			],
+		},
 	];
 
 	return buildElementsFromMap(elementsMap);
 };
 
-export const updateDropdownContents = (addressSuggestionResults:UiSuggestionItem[], suggestionsElement:HTMLElement) => {
-	suggestionsElement.replaceChildren(...addressSuggestionResults.map(item => item.suggestionElement));
+export const updateDropdownContents = (
+	addressSuggestionResults: UiSuggestionItem[],
+	suggestionsElement: HTMLElement,
+) => {
+	suggestionsElement.replaceChildren(
+		...addressSuggestionResults.map((item) => item.suggestionElement),
+	);
 };
 
-export const getElementStyles = (element:HTMLElement, property:string):CSSStyleDeclaration => {
-	const styles:CSSStyleDeclaration = window.getComputedStyle(element);
+export const getElementStyles = (element: HTMLElement, property: string): CSSStyleDeclaration => {
+	const styles: CSSStyleDeclaration = window.getComputedStyle(element);
 
 	return styles[property] ?? "rgba(0, 0, 0, 0)";
 };
 
-export const scrollToHighlightedSuggestion = (highlightedElement:HTMLElement, container:HTMLElement) => {
+export const scrollToHighlightedSuggestion = (
+	highlightedElement: HTMLElement,
+	container: HTMLElement,
+) => {
 	const elementTop = highlightedElement.offsetTop;
 	const elementBottom = elementTop + highlightedElement.offsetHeight;
 	const containerTop = container.scrollTop;
@@ -76,7 +128,10 @@ export const scrollToHighlightedSuggestion = (highlightedElement:HTMLElement, co
 	}
 };
 
-export const getStreetLineFormValue = ({secondaryInputElement, cityInputElement, stateInputElement, zipcodeInputElement}, address:AddressSuggestion) => {
+export const getStreetLineFormValue = (
+	{ secondaryInputElement, cityInputElement, stateInputElement, zipcodeInputElement },
+	address: AddressSuggestion,
+) => {
 	const streetLineValues = [address.street_line];
 
 	if (!secondaryInputElement && address.secondary?.length) {
@@ -92,26 +147,32 @@ export const getStreetLineFormValue = ({secondaryInputElement, cityInputElement,
 	return streetLineValues.join(", ");
 };
 
-export const showElement = (element:HTMLElement) => {
+export const showElement = (element: HTMLElement) => {
 	// TODO: Create a single place to store all class names
 	element.classList.remove("smartyAddress__hidden");
 };
 
-export const hideElement = (element:HTMLElement) => {
+export const hideElement = (element: HTMLElement) => {
 	element.classList.add("smartyAddress__hidden");
 };
 
-export const getNearestStyledElement = (element:HTMLElement, colorProperty:string):HTMLElement => {
+export const getNearestStyledElement = (
+	element: HTMLElement,
+	colorProperty: string,
+): HTMLElement => {
 	// TODO: What about background-images, gradients, styles defined in a sibling (instead of ancestor), and other edge cases?
 	const colorValue = getElementStyles(element, colorProperty);
-	const {alpha} = getRgbaFromCssColor(colorValue);
+	const { alpha } = getRgbaFromCssColor(colorValue);
 
-	return alpha < .1 && element.parentElement ? getNearestStyledElement(element.parentElement, colorProperty) : element;
+	return alpha < 0.1 && element.parentElement
+		? getNearestStyledElement(element.parentElement, colorProperty)
+		: element;
 };
 
-export const getRgbaFromCssColor = (cssColor:CSSStyleDeclaration) => {
+export const getRgbaFromCssColor = (cssColor: CSSStyleDeclaration) => {
 	const canvas = document.createElement("canvas");
-	canvas.width = 1; canvas.height = 1;
+	canvas.width = 1;
+	canvas.height = 1;
 	// TODO: review "canvas.getContext()" config options
 	// TODO: Make sure this solution works cross-browser
 	const context = canvas.getContext("2d", { willReadFrequently: true });
@@ -123,12 +184,15 @@ export const getRgbaFromCssColor = (cssColor:CSSStyleDeclaration) => {
 	const [red, green, blue, aByte] = context.getImageData(0, 0, 1, 1).data;
 	const alpha = Math.round((aByte / 255) * 1000) / 1000;
 
-	return {red, green, blue, alpha};
-}
+	return { red, green, blue, alpha };
+};
 
-export const updateDynamicStyles = (stylesElement:HTMLStyleElement, searchInputElement:HTMLInputElement, instanceId:number) => {
-
-	const {left, bottom, width} = searchInputElement.getBoundingClientRect();
+export const updateDynamicStyles = (
+	stylesElement: HTMLStyleElement,
+	searchInputElement: HTMLInputElement,
+	instanceId: number,
+) => {
+	const { left, bottom, width } = searchInputElement.getBoundingClientRect();
 	const scrollY = window.scrollY;
 	const scrollX = window.scrollX;
 
@@ -137,10 +201,10 @@ export const updateDynamicStyles = (stylesElement:HTMLStyleElement, searchInputE
 	const colorElement = getNearestStyledElement(searchInputElement, "color");
 	const inputBackgroundColor = getElementStyles(backgroundColorElement, "backgroundColor");
 	const inputTextColor = getElementStyles(colorElement, "color");
-	const {hue, saturation, lightness} = getHslFromColorString(inputBackgroundColor);
+	const { hue, saturation, lightness } = getHslFromColorString(inputBackgroundColor);
 
-	const isLightMode = lightness  > 50;
-	const useBlueLogo = lightness  > 75;
+	const isLightMode = lightness > 50;
+	const useBlueLogo = lightness > 75;
 
 	const secondaryLightness = isLightMode ? lightness - 10 : lightness + 10;
 	const tertiaryLightness = isLightMode ? lightness - 20 : lightness + 20;
@@ -169,8 +233,14 @@ export const updateDynamicStyles = (stylesElement:HTMLStyleElement, searchInputE
 		"--smartyAddress__dropdownWidth": `${width}px`,
 	};
 
-	const colorsStyleBlock = formatStyleBlock(`.smartyAddress__color_dynamic.${getInstanceClassName(instanceId)}`, dynamicColorStyles)
-	const positionStyleBlock = formatStyleBlock(`.smartyAddress__position_dynamic.${getInstanceClassName(instanceId)}`, dynamicPositionStyles)
+	const colorsStyleBlock = formatStyleBlock(
+		`.smartyAddress__color_dynamic.${getInstanceClassName(instanceId)}`,
+		dynamicColorStyles,
+	);
+	const positionStyleBlock = formatStyleBlock(
+		`.smartyAddress__position_dynamic.${getInstanceClassName(instanceId)}`,
+		dynamicPositionStyles,
+	);
 	stylesElement.innerHTML = `${colorsStyleBlock} ${positionStyleBlock}`;
 };
 
@@ -178,13 +248,24 @@ export const updateDynamicStyles = (stylesElement:HTMLStyleElement, searchInputE
 const buildElementsFromMap = (fullElementsMap) => {
 	const elements = {};
 
-	const buildElement = ({name, text, elementType, className = [], attributes = {}, children = []}) => {
-		const element = text ? document.createTextNode(text) : createDomElement(elementType, className, children.map(buildElement));
+	const buildElement = ({
+		name,
+		text,
+		elementType,
+		className = [],
+		attributes = {},
+		children = [],
+	}) => {
+		const element = text
+			? document.createTextNode(text)
+			: createDomElement(elementType, className, children.map(buildElement));
 		Object.entries(attributes).forEach(([attr, value]) => {
 			element.setAttribute(attr, value);
 		});
 
-		if (name) {elements[name] = element}
+		if (name) {
+			elements[name] = element;
+		}
 
 		return element;
 	};
@@ -194,32 +275,61 @@ const buildElementsFromMap = (fullElementsMap) => {
 	return elements;
 };
 
-export const buildAutocompleteDomElements = (instanceClassname:string):Record<string, HTMLElement> => {
+export const buildAutocompleteDomElements = (
+	instanceClassname: string,
+): Record<string, HTMLElement> => {
 	const darkLogoElementClasses = ["smartyAddress__smartyLogoDark"];
 	const lightLogoElementClasses = ["smartyAddress__smartyLogoLight"];
 	const suggestionsElementClasses = ["smartyAddress__suggestionsElement"];
 	const poweredByElementClasses = ["smartyAddress__poweredBy"];
 	const dropdownElementInitialClasses = ["smartyAddress__dropdownElement", "smartyAddress__hidden"];
-	const dropdownWrapperElementClasses = ["smartyAddress__suggestionsWrapperElement", instanceClassname];
-
-	const elementsMap = [
-		{name: "customStylesElement", elementType: "style"},
-		{name: "dropdownWrapperElement", elementType: "div", className: dropdownWrapperElementClasses, children: [
-			{name: "dropdownElement", elementType: "div", className: dropdownElementInitialClasses, attributes: {role: "listbox"}, children: [
-				{name: "suggestionsElement", elementType: "ul", className: suggestionsElementClasses},
-				{name: "poweredBySmartyElement", elementType: "div", className: poweredByElementClasses, children: [
-						{text: "Powered by"},
-						{elementType: "img", className: darkLogoElementClasses, attributes: {src: getSmartyLogo("#0066FF")}},
-						{elementType: "img", className: lightLogoElementClasses, attributes: {src: getSmartyLogo("#FFFFFF")}},
-				]},
-			]},
-		]},
+	const dropdownWrapperElementClasses = [
+		"smartyAddress__suggestionsWrapperElement",
+		instanceClassname,
 	];
 
-	return  buildElementsFromMap(elementsMap);
+	const elementsMap = [
+		{ name: "customStylesElement", elementType: "style" },
+		{
+			name: "dropdownWrapperElement",
+			elementType: "div",
+			className: dropdownWrapperElementClasses,
+			children: [
+				{
+					name: "dropdownElement",
+					elementType: "div",
+					className: dropdownElementInitialClasses,
+					attributes: { role: "listbox" },
+					children: [
+						{ name: "suggestionsElement", elementType: "ul", className: suggestionsElementClasses },
+						{
+							name: "poweredBySmartyElement",
+							elementType: "div",
+							className: poweredByElementClasses,
+							children: [
+								{ text: "Powered by" },
+								{
+									elementType: "img",
+									className: darkLogoElementClasses,
+									attributes: { src: getSmartyLogo("#0066FF") },
+								},
+								{
+									elementType: "img",
+									className: lightLogoElementClasses,
+									attributes: { src: getSmartyLogo("#FFFFFF") },
+								},
+							],
+						},
+					],
+				},
+			],
+		},
+	];
+
+	return buildElementsFromMap(elementsMap);
 };
 
-export const configureDynamicStyling = (dynamicStylingHandler:Function) => {
+export const configureDynamicStyling = (dynamicStylingHandler: Function) => {
 	// TODO: Do we need to separate "color" and "position" functionality?
 	// TODO: Do we need to setup polling or a mutation observer so we can also recalculate these values when sizes/positions/colors change for other reasons besides scroll/resize?
 
@@ -229,7 +339,12 @@ export const configureDynamicStyling = (dynamicStylingHandler:Function) => {
 };
 
 // TODO: Figure out how to simplify this function
-export const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:number, suggestionsElement:HTMLElement, indexChange:number) => {
+export const highlightNewAddress = (
+	items: UiSuggestionItem[],
+	currentIndex: number,
+	suggestionsElement: HTMLElement,
+	indexChange: number,
+) => {
 	const newIndex = (currentIndex + indexChange + items.length) % items.length;
 
 	items.forEach((item, i) => {
@@ -241,7 +356,11 @@ export const highlightNewAddress = (items:UiSuggestionItem[], currentIndex:numbe
 	return newIndex;
 };
 
-export const updateThemeClass = (newTheme:string[], previousTheme:string[] = [], dropdownWrapperElement:HTMLElement) => {
+export const updateThemeClass = (
+	newTheme: string[],
+	previousTheme: string[] = [],
+	dropdownWrapperElement: HTMLElement,
+) => {
 	if (dropdownWrapperElement) {
 		dropdownWrapperElement.classList.remove(...previousTheme);
 		dropdownWrapperElement.classList.add(...newTheme);
