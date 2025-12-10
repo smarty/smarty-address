@@ -1,3 +1,4 @@
+// TODO: Extend "ServiceMethod" type to be more specific
 import {ServiceMethod} from "../interfaces";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 

@@ -3,7 +3,7 @@ import {
 	findInputElements,
 	populateFormWithNewAddress,
 	init
-} from "../eventHandlers/addressFormUiEventHandlers";
+} from "../serviceMethods/addressFormUiMethods";
 import {findDomElement, getStreetLineFormValue} from "../utils/domUtils";
 
 export const addressFormUiService: ServiceDefinition = {

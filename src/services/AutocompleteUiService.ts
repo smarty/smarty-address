@@ -7,7 +7,7 @@ import {
 	handleAutocompleteError,
 	setupDom,
 	handleAutocompleteSecondaryError, watchSearchInputForChanges, handleAutocompleteKeydown, handleSearchInputOnChange
-} from "../eventHandlers/autocompleteUiEventHandlers";
+} from "../serviceMethods/autocompleteUiServiceMethods";
 
 import {
 	buildAutocompleteDomElements,

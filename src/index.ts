@@ -43,7 +43,7 @@ export default class SmartyAddress {
 	private instanceId;
 
 	// TODO: update "config" type/interface to be more specific
-	// TODO: Verify config is valid before setting up services or dispatching events
+	// TODO: Verify config is valid before setting up services
 	constructor(config: SmartyAddressConfig) {
 		SmartyAddress.instances.push(this);
 		this.instanceId = SmartyAddress.instances.length;
