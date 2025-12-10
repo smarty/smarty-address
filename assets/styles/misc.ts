@@ -7,5 +7,5 @@ export const miscStyles = {
 		"--smartyAddress__dropdownWidth": "100%",
 		"--smartyAddress__dropdownPositionTop": "0",
 		"--smartyAddress__dropdownPositionLeft": "0",
-	}
+	},
 };

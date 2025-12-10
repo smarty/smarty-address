@@ -13,5 +13,5 @@ export const spacingStyles = {
 
 		"--smartyAddress__heightLarge1": "500px",
 		"--smartyAddress__scrollbarWidth": "thin",
-	}
+	},
 };

@@ -19,6 +19,5 @@ export const baseStyles = {
 		"--smartyAddress__suggestionWhitespace": "nowrap",
 		"--smartyAddress__suggestionOverflow": "ellipsis",
 		"--smartyAddress__suggestionOverflowX": "hidden",
-	}
+	},
 };
-

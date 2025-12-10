@@ -1,5 +1,4 @@
 export const colorStyles = {
-
 	".smartyAddress__color_dark": {
 		// TODO: update theme with the correct colors
 		"--smartyAddress__textBasePrimaryColor": "#eee",
@@ -39,5 +38,5 @@ export const colorStyles = {
 
 		"--smartyAddress__largeShadow1": "0 12px 24px 0 rgba(4, 34, 75, 0.10)",
 		"--smartyAddress__largeShadow2": "0 20px 40px 0 rgba(21, 27, 35, 0.06)",
-	}
+	},
 };
