@@ -1,6 +1,10 @@
-import {ServiceDefinition} from "../interfaces";
-import {init, fetchAddressSuggestions, fetchSecondaryAddressSuggestions} from "../serviceMethods/apiServiceMethods";
-import {getAutocompleteApiResults} from "../utils/apiUtils";
+import { ServiceDefinition } from "../interfaces";
+import {
+	init,
+	fetchAddressSuggestions,
+	fetchSecondaryAddressSuggestions,
+} from "../serviceMethods/apiServiceMethods";
+import { getAutocompleteApiResults } from "../utils/apiUtils";
 
 export const apiService: ServiceDefinition = {
 	initialState: {
