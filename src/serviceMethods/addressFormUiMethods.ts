@@ -1,8 +1,8 @@
 // TODO: Extend "ServiceMethod" type to be more specific
-import {ServiceMethod} from "../interfaces";
+import { ServiceMethod } from "../interfaces";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
-export const init:ServiceMethod = ({setState, services}, config) => {
+export const init: ServiceMethod = ({ setState, services }, config) => {
 	setState("searchInputSelector", config?.searchInputSelector);
 	setState("streetSelector", config?.streetSelector);
 	setState("secondarySelector", config?.secondarySelector);
@@ -13,7 +13,7 @@ export const init:ServiceMethod = ({setState, services}, config) => {
 	services.addressFormUiService.findInputElements();
 };
 
-export const findInputElements:ServiceMethod = ({state, setState, services, utils}) => {
+export const findInputElements: ServiceMethod = ({ state, setState, services, utils }) => {
 	const {
 		searchInputSelector,
 		streetSelector,
@@ -22,11 +22,14 @@ export const findInputElements:ServiceMethod = ({state, setState, services, util
 		stateSelector,
 		zipcodeSelector,
 	} = state;
-	const {findDomElement} = utils;
+	const { findDomElement } = utils;
 
 	// TODO: Consider finding the DOM elements each time they're needed (instead of caching them)
 	setState("streetLineInputElement", findDomElement(streetSelector));
-	setState("searchInputElement", findDomElement(searchInputSelector) ?? state.streetLineInputElement);
+	setState(
+		"searchInputElement",
+		findDomElement(searchInputSelector) ?? state.streetLineInputElement,
+	);
 	setState("secondaryInputElement", findDomElement(secondarySelector));
 	setState("cityInputElement", findDomElement(citySelector));
 	setState("stateInputElement", findDomElement(stateSelector));
@@ -42,7 +45,7 @@ export const findInputElements:ServiceMethod = ({state, setState, services, util
 	});
 };
 
-export const populateFormWithNewAddress:ServiceMethod = ({state, utils}, selectedAddress) => {
+export const populateFormWithNewAddress: ServiceMethod = ({ state, utils }, selectedAddress) => {
 	// TODO: If elements aren't inputs, specify textContent instead of value
 	// TODO: Handle if elements (e.g. state input) are <select> elements
 	state.streetLineInputElement.value = utils.getStreetLineFormValue(state, selectedAddress);
