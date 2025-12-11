@@ -1,5 +1,5 @@
 import { ServiceDefinition } from "../../interfaces";
-import { findInputElements, populateFormWithNewAddress, init } from "./handlers";
+import { findInputElements, populateFormWithNewAddress, init } from "./AddressFormUiHandlers";
 import { findDomElement, getStreetLineFormValue } from "../../utils/domUtils";
 
 export const addressFormUiService: ServiceDefinition = {

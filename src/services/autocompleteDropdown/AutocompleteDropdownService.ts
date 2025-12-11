@@ -10,7 +10,7 @@ import {
 	watchSearchInputForChanges,
 	handleAutocompleteKeydown,
 	handleSearchInputOnChange,
-} from "./handlers";
+} from "./autocompleteDropdownHandlers";
 
 import {
 	buildAutocompleteDomElements,

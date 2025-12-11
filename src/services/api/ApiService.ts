@@ -1,5 +1,5 @@
 import { ServiceDefinition } from "../../interfaces";
-import { init, fetchAddressSuggestions, fetchSecondaryAddressSuggestions } from "./handlers";
+import { init, fetchAddressSuggestions, fetchSecondaryAddressSuggestions } from "./apiHandlers";
 import { getAutocompleteApiResults } from "../../utils/apiUtils";
 
 export const apiService: ServiceDefinition = {
