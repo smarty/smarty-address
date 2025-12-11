@@ -1,12 +1,12 @@
-import { ServiceMethod } from "../interfaces";
+import { ServiceHandler } from "../../interfaces";
 // TODO: Add support for additional input fields (e.g. max_results, include_only_zip_codes, etc.). These would likely be set as "config" values
 
-export const init: ServiceMethod = async ({ setState }, config) => {
+export const init: ServiceHandler = async ({ setState }, config) => {
 	setState("apiKey", config.embeddedKey);
 	setState("autocompleteApiUrl", config.autocompleteApiUrl);
 };
 
-export const fetchAddressSuggestions: ServiceMethod = async (
+export const fetchAddressSuggestions: ServiceHandler = async (
 	{ state, services, utils },
 	searchString,
 ) => {
@@ -22,7 +22,7 @@ export const fetchAddressSuggestions: ServiceMethod = async (
 	}
 };
 
-export const fetchSecondaryAddressSuggestions: ServiceMethod = async (
+export const fetchSecondaryAddressSuggestions: ServiceHandler = async (
 	{ state, services, utils },
 	{ selectedAddress, searchString },
 ) => {

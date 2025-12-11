@@ -1,4 +1,4 @@
-import {AutocompleteUiServiceDefinition} from "../interfaces";
+import { AutocompleteDropdownServiceDefinition } from "../../interfaces";
 import {
 	handleSelectDropdownItem,
 	init,
@@ -6,20 +6,27 @@ import {
 	formatSecondaryAddressSuggestions,
 	handleAutocompleteError,
 	setupDom,
-	handleAutocompleteSecondaryError, watchSearchInputForChanges, handleAutocompleteKeydown, handleSearchInputOnChange
-} from "../serviceMethods/autocompleteUiServiceMethods";
+	handleAutocompleteSecondaryError,
+	watchSearchInputForChanges,
+	handleAutocompleteKeydown,
+	handleSearchInputOnChange,
+} from "./handlers";
 
 import {
 	buildAutocompleteDomElements,
 	configureDynamicStyling,
 	createSecondarySuggestionElement,
-	createSuggestionElement, hideElement, highlightNewAddress, showElement, updateDropdownContents,
+	createSuggestionElement,
+	hideElement,
+	highlightNewAddress,
+	showElement,
+	updateDropdownContents,
 	updateDynamicStyles,
-	updateThemeClass
-} from "../utils/domUtils";
-import {getInstanceClassName, getMergedAddressSuggestions} from "../utils/uiUtils";
+	updateThemeClass,
+} from "../../utils/domUtils";
+import { getInstanceClassName, getMergedAddressSuggestions } from "../../utils/uiUtils";
 
-export const autocompleteUiService: AutocompleteUiServiceDefinition = {
+export const autocompleteDropdownService: AutocompleteDropdownServiceDefinition = {
 	initialState: {
 		theme: null,
 		searchInputElement: null,
@@ -35,7 +42,7 @@ export const autocompleteUiService: AutocompleteUiServiceDefinition = {
 		secondaryAddressSuggestionResults: [],
 		customStylesElement: null,
 	},
-	serviceMethods: {
+	serviceHandlers: {
 		init,
 		setupDom,
 		watchSearchInputForChanges,

@@ -1,12 +1,12 @@
-import { ServiceDefinition, ServiceMethodsObject } from "../interfaces";
+import { ServiceDefinition, ServiceHandlersObject } from "../interfaces";
 
 const allServices = {};
 
 export const initService = (
 	name: string,
-	{ initialState = {}, serviceMethods = {}, utils }: ServiceDefinition,
+	{ initialState = {}, serviceHandlers = {}, utils }: ServiceDefinition,
 	instanceId: number,
-): ServiceMethodsObject => {
+): ServiceHandlersObject => {
 	if (!allServices[instanceId]) allServices[instanceId] = {};
 	const instanceServices = allServices[instanceId];
 
@@ -19,7 +19,7 @@ export const initService = (
 	};
 	const defaultProps = { state, setState, utils, services: instanceServices };
 
-	Object.entries(serviceMethods).forEach(([actionName, action]) => {
+	Object.entries(serviceHandlers).forEach(([actionName, action]) => {
 		wrappedServiceMethods[actionName] = (customProps: object) => {
 			return action(defaultProps, customProps);
 		};

@@ -1,10 +1,6 @@
-import { ServiceDefinition } from "../interfaces";
-import {
-	findInputElements,
-	populateFormWithNewAddress,
-	init,
-} from "../serviceMethods/addressFormUiMethods";
-import { findDomElement, getStreetLineFormValue } from "../utils/domUtils";
+import { ServiceDefinition } from "../../interfaces";
+import { findInputElements, populateFormWithNewAddress, init } from "./handlers";
+import { findDomElement, getStreetLineFormValue } from "../../utils/domUtils";
 
 export const addressFormUiService: ServiceDefinition = {
 	initialState: {
@@ -22,7 +18,7 @@ export const addressFormUiService: ServiceDefinition = {
 		stateInputElement: null,
 		zipcodeInputElement: null,
 	},
-	serviceMethods: {
+	serviceHandlers: {
 		init,
 		findInputElements,
 		populateFormWithNewAddress,

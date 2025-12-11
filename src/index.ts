@@ -1,11 +1,11 @@
 import { DefaultSmartyAddressConfig, SmartyAddressConfig } from "./interfaces";
-import { apiService } from "./services/ApiService";
+import { apiService } from "./services/api/ApiService";
 import { initService } from "./utils/serviceFactory";
 import { themes } from "./themes";
 import { defineStyles } from "./utils/appUtils";
 import { US_AUTOCOMPLETE_PRO_API_URL } from "./constants";
-import { autocompleteUiService } from "./services/AutocompleteUiService";
-import { addressFormUiService } from "./services/AddressFormUiService";
+import { autocompleteDropdownService } from "./services/autocompleteDropdown/AutocompleteDropdownService";
+import { addressFormUiService } from "./services/addressFormUi/AddressFormUiService";
 // TODO: Update readme
 // TODO: Update tsconfig.json
 // TODO: Add ability to destroy an instance of SmartyAddress (and remove all associated elements from DOM)
@@ -22,7 +22,7 @@ export default class SmartyAddress {
 	static defaultConfig: DefaultSmartyAddressConfig = {
 		theme: themes.default,
 		services: {
-			autocompleteUiService,
+			autocompleteDropdownService,
 			addressFormUiService,
 			apiService,
 		},

@@ -42,37 +42,37 @@ export interface AbstractStateObject {
 	[index: string]: any;
 }
 
-export interface ServiceMethodsObject {
-	[name: string]: WrappedServiceMethod;
+export interface ServiceHandlersObject {
+	[name: string]: WrappedServiceHandler;
 }
 export interface ServicesObject {
-	[name: string]: ServiceMethodsObject;
+	[name: string]: ServiceHandlersObject;
 }
-export interface ServiceMethod {
-	(props: ServiceMethodProps, customProps?: any): void;
+export interface ServiceHandler {
+	(props: ServiceHandlerProps, customProps?: any): void;
 }
-export interface WrappedServiceMethod {
+export interface WrappedServiceHandler {
 	(customProps?: any): void;
 }
 
-export interface ServiceMethodProps {
+export interface ServiceHandlerProps {
 	state: AbstractStateObject;
 	setState: { (name: string, newState: unknown): void };
 	services: ServicesObject;
 	utils: { [name: string]: (...props: unknown[]) => unknown };
 }
 
-export interface AutocompleteUiServiceMethod extends ServiceMethod {
-	(props: AutocompleteUiServiceMethodProps, customProps?: any): void;
+export interface AutocompleteDropdownServiceHandler extends ServiceHandler {
+	(props: AutocompleteDropdownServiceHandlerProps, customProps?: any): void;
 }
 
-export interface AutocompleteUiServiceMethodProps extends ServiceMethodProps {
-	utils: AutocompleteUiServiceUtils;
+export interface AutocompleteDropdownServiceHandlerProps extends ServiceHandlerProps {
+	utils: AutocompleteDropdownServiceUtils;
 }
 
 export interface ServiceDefinition {
 	initialState: AbstractStateObject;
-	serviceMethods: { [name: string]: ServiceMethod };
+	serviceHandlers: { [name: string]: ServiceHandler };
 	utils?: ServiceDefinitionUtils;
 }
 
@@ -80,7 +80,7 @@ export interface ServiceDefinitionUtils {
 	[name: string]: (...args: unknown[]) => unknown;
 }
 
-export interface AutocompleteUiServiceUtils extends ServiceDefinitionUtils {
+export interface AutocompleteDropdownServiceUtils extends ServiceDefinitionUtils {
 	updateThemeClass: (
 		newTheme: string[],
 		previousTheme: string[],
@@ -90,7 +90,7 @@ export interface AutocompleteUiServiceUtils extends ServiceDefinitionUtils {
 	buildAutocompleteDomElements: (instanceClassname: string) => Record<string, HTMLElement>;
 }
 
-export interface AutocompleteUiServiceDefinition extends ServiceDefinition {
+export interface AutocompleteDropdownServiceDefinition extends ServiceDefinition {
 	initialState: {
 		theme: string;
 		searchInputElement: HTMLInputElement;
@@ -107,7 +107,7 @@ export interface AutocompleteUiServiceDefinition extends ServiceDefinition {
 		secondaryAddressSuggestionResults: object[];
 		customStylesElement: HTMLElement;
 	};
-	utils: AutocompleteUiServiceUtils;
+	utils: AutocompleteDropdownServiceUtils;
 }
 
 export interface ServiceDefinitionMap {

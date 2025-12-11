@@ -1,6 +1,9 @@
-import { AutocompleteUiServiceMethod, UiSuggestionItem } from "../interfaces";
+import { AutocompleteDropdownServiceHandler, UiSuggestionItem } from "../../interfaces";
 
-export const watchSearchInputForChanges: AutocompleteUiServiceMethod = ({ state, services }) => {
+export const watchSearchInputForChanges: AutocompleteDropdownServiceHandler = ({
+	state,
+	services,
+}) => {
 	const searchInputElement = state.searchInputElement;
 	searchInputElement.addEventListener("input", (event: Event) => {
 		services.autocompleteUiService.handleSearchInputOnChange(event);
@@ -13,12 +16,12 @@ export const watchSearchInputForChanges: AutocompleteUiServiceMethod = ({ state,
 
 	searchInputElement.addEventListener("keydown", (event: KeyboardEvent) => {
 		services.autocompleteUiService.handleAutocompleteKeydown(event.key);
-		// TODO: Figure out how to prevent 1Password from triggering when arrowing down (or selecting an address via the "enter" key). The way to do this is to update the attributes of the input element (e.g. `autocomplete="off"`). See the "test-site" repo for an example.
+		// TODO: Figure out how to prevent 1Password from triggering when arrowing down (or selecting an address via the "enter" key). The way to do this is to update the attributes of the input element (e.g. `autocompleteDropdown="off"`). See the "test-site" repo for an example.
 	});
 };
 
 // TODO: Simplify this function so it no longer needs the full state and services objects.
-export const handleAutocompleteKeydown: AutocompleteUiServiceMethod = (
+export const handleAutocompleteKeydown: AutocompleteDropdownServiceHandler = (
 	{ state, setState, services, utils },
 	pressedKey: string,
 ) => {
@@ -55,7 +58,7 @@ export const handleAutocompleteKeydown: AutocompleteUiServiceMethod = (
 	}
 };
 
-export const handleSelectDropdownItem: AutocompleteUiServiceMethod = (
+export const handleSelectDropdownItem: AutocompleteDropdownServiceHandler = (
 	{ state, setState, services, utils },
 	addressIndex,
 ) => {
@@ -81,7 +84,7 @@ export const handleSelectDropdownItem: AutocompleteUiServiceMethod = (
 	}
 };
 
-export const formatAddressSuggestions: AutocompleteUiServiceMethod = (
+export const formatAddressSuggestions: AutocompleteDropdownServiceHandler = (
 	{ state, setState, services, utils },
 	suggestions,
 ) => {
@@ -116,7 +119,7 @@ export const formatAddressSuggestions: AutocompleteUiServiceMethod = (
 	utils.showElement(state.dropdownElement);
 };
 
-export const formatSecondaryAddressSuggestions: AutocompleteUiServiceMethod = (
+export const formatSecondaryAddressSuggestions: AutocompleteDropdownServiceHandler = (
 	{ state, setState, services, utils },
 	suggestions,
 ) => {
@@ -152,14 +155,17 @@ export const formatSecondaryAddressSuggestions: AutocompleteUiServiceMethod = (
 	utils.showElement(state.dropdownElement);
 };
 
-export const handleSearchInputOnChange: AutocompleteUiServiceMethod = ({ services }, event) => {
+export const handleSearchInputOnChange: AutocompleteDropdownServiceHandler = (
+	{ services },
+	event,
+) => {
 	const searchInputValue = (event.target as HTMLInputElement)?.value;
 	if (searchInputValue.length) {
 		services.apiService.fetchAddressSuggestions(searchInputValue);
 	}
 };
 
-export const setupDom: AutocompleteUiServiceMethod = (
+export const setupDom: AutocompleteDropdownServiceHandler = (
 	{ state, setState, services, utils },
 	addressFormElements,
 ) => {
@@ -188,7 +194,7 @@ export const setupDom: AutocompleteUiServiceMethod = (
 	utils.configureDynamicStyling(dynamicStylingHandler);
 };
 
-export const init: AutocompleteUiServiceMethod = ({ state, setState, utils }, config) => {
+export const init: AutocompleteDropdownServiceHandler = ({ state, setState, utils }, config) => {
 	const previousTheme = state.theme;
 	const newTheme = config?.theme;
 	setState("theme", newTheme);
@@ -198,11 +204,14 @@ export const init: AutocompleteUiServiceMethod = ({ state, setState, utils }, co
 	}
 };
 
-export const handleAutocompleteError: AutocompleteUiServiceMethod = ({ state, utils }) => {
+export const handleAutocompleteError: AutocompleteDropdownServiceHandler = ({ state, utils }) => {
 	utils.hideElement(state.dropdownElement);
 };
 
-export const handleAutocompleteSecondaryError: AutocompleteUiServiceMethod = ({ state, utils }) => {
+export const handleAutocompleteSecondaryError: AutocompleteDropdownServiceHandler = ({
+	state,
+	utils,
+}) => {
 	// TODO: Implement better error handling here
 	utils.hideElement(state.dropdownElement);
 };
