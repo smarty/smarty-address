@@ -35,7 +35,7 @@ export const findInputElements: ServiceHandler = ({ state, setState, services, u
 	setState("stateInputElement", findDomElement(stateSelector));
 	setState("zipcodeInputElement", findDomElement(zipcodeSelector));
 
-	services.autocompleteUiService.setupDom({
+	services.autocompleteDropdownService.setupDom({
 		searchInputElement: state.searchInputElement,
 		streetLineInputElement: state.streetLineInputElement,
 		secondaryInputElement: state.secondaryInputElement,

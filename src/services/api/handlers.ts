@@ -16,9 +16,9 @@ export const fetchAddressSuggestions: ServiceHandler = async (
 			state.apiKey,
 			state.autocompleteApiUrl,
 		);
-		services.autocompleteUiService.formatAddressSuggestions(suggestions);
+		services.autocompleteDropdownService.formatAddressSuggestions(suggestions);
 	} catch (error) {
-		services.autocompleteUiService.handleAutocompleteError({ errorName: error.message });
+		services.autocompleteDropdownService.handleAutocompleteError({ errorName: error.message });
 	}
 };
 
@@ -33,8 +33,10 @@ export const fetchSecondaryAddressSuggestions: ServiceHandler = async (
 			state.autocompleteApiUrl,
 			selectedAddress,
 		);
-		services.autocompleteUiService.formatSecondaryAddressSuggestions(suggestions);
+		services.autocompleteDropdownService.formatSecondaryAddressSuggestions(suggestions);
 	} catch (error) {
-		services.autocompleteUiService.handleAutocompleteSecondaryError({ errorName: error.message });
+		services.autocompleteDropdownService.handleAutocompleteSecondaryError({
+			errorName: error.message,
+		});
 	}
 };

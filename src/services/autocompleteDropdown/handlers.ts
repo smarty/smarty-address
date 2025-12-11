@@ -6,7 +6,7 @@ export const watchSearchInputForChanges: AutocompleteDropdownServiceHandler = ({
 }) => {
 	const searchInputElement = state.searchInputElement;
 	searchInputElement.addEventListener("input", (event: Event) => {
-		services.autocompleteUiService.handleSearchInputOnChange(event);
+		services.autocompleteDropdownService.handleSearchInputOnChange(event);
 	});
 
 	searchInputElement.addEventListener("focusout", () => {
@@ -15,7 +15,7 @@ export const watchSearchInputForChanges: AutocompleteDropdownServiceHandler = ({
 	});
 
 	searchInputElement.addEventListener("keydown", (event: KeyboardEvent) => {
-		services.autocompleteUiService.handleAutocompleteKeydown(event.key);
+		services.autocompleteDropdownService.handleAutocompleteKeydown(event.key);
 		// TODO: Figure out how to prevent 1Password from triggering when arrowing down (or selecting an address via the "enter" key). The way to do this is to update the attributes of the input element (e.g. `autocompleteDropdown="off"`). See the "test-site" repo for an example.
 	});
 };
@@ -49,7 +49,9 @@ export const handleAutocompleteKeydown: AutocompleteDropdownServiceHandler = (
 			const selectedAddress = items[state.highlightedSuggestionIndex];
 			if (selectedAddress) {
 				// TODO: Fix the value that gets passed in here. It's not populating the correct address.
-				services.autocompleteUiService.handleSelectDropdownItem(state.selectedSuggestionIndex + 1);
+				services.autocompleteDropdownService.handleSelectDropdownItem(
+					state.selectedSuggestionIndex + 1,
+				);
 			}
 			break;
 		case "Escape":
@@ -90,7 +92,7 @@ export const formatAddressSuggestions: AutocompleteDropdownServiceHandler = (
 ) => {
 	const suggestionItems = suggestions.map((address, addressIndex): UiSuggestionItem => {
 		const suggestionOnClickHandler = () => {
-			services.autocompleteUiService.handleSelectDropdownItem(
+			services.autocompleteDropdownService.handleSelectDropdownItem(
 				addressIndex + state.selectedSuggestionIndex + 1,
 			);
 		};
@@ -125,7 +127,7 @@ export const formatSecondaryAddressSuggestions: AutocompleteDropdownServiceHandl
 ) => {
 	const suggestionItems = suggestions.map((address, addressIndex): UiSuggestionItem => {
 		const suggestionOnClickHandler = () => {
-			services.autocompleteUiService.handleSelectDropdownItem(
+			services.autocompleteDropdownService.handleSelectDropdownItem(
 				addressIndex + state.selectedSuggestionIndex + 1,
 			);
 		};
@@ -182,7 +184,7 @@ export const setupDom: AutocompleteDropdownServiceHandler = (
 	});
 
 	utils.updateThemeClass(state.theme, [], dropdownWrapperElement);
-	services.autocompleteUiService.watchSearchInputForChanges();
+	services.autocompleteDropdownService.watchSearchInputForChanges();
 
 	const dynamicStylingHandler = () =>
 		utils.updateDynamicStyles(
