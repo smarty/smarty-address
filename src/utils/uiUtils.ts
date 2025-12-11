@@ -13,8 +13,9 @@ export const getFormattedAddressSuggestion = (
 ) => {
 	const { street_line, secondary = "", city, state, zipcode } = suggestion;
 	const streetText = isSecondary ? "…" : street_line;
+	const secondaryText = secondary.length ? ` ${secondary}` : secondary;
 
-	return `${streetText} ${secondary}, ${city}, ${state} ${zipcode}`;
+	return `${streetText}${secondaryText}, ${city}, ${state} ${zipcode}`;
 };
 
 export const formatStyleBlock = (selector: string, styles: {}) => {
