@@ -160,7 +160,6 @@ export const getNearestStyledElement = (
 	element: HTMLElement,
 	colorProperty: string,
 ): HTMLElement => {
-	// TODO: What about background-images, gradients, styles defined in a sibling (instead of ancestor), and other edge cases?
 	const colorValue = getElementStyles(element, colorProperty);
 	const { alpha } = getRgbaFromCssColor(colorValue);
 
@@ -197,7 +196,6 @@ export const updateDynamicStyles = (
 	const scrollX = window.scrollX;
 
 	const backgroundColorElement = getNearestStyledElement(searchInputElement, "backgroundColor");
-	// TODO: Do we also want to inherit boundingBoxPositions from this element? Probably not because it's super risky, but maybe we allow the user to pass in "offset-x" and "offset-y" config values to handle edge cases
 	const colorElement = getNearestStyledElement(searchInputElement, "color");
 	const inputBackgroundColor = getElementStyles(backgroundColorElement, "backgroundColor");
 	const inputTextColor = getElementStyles(colorElement, "color");

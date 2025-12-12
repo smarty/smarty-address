@@ -14,8 +14,6 @@ import { US_AUTOCOMPLETE_PRO_API_URL } from "./constants";
 // TODO: Update code to use international names for address fields, variable names, etc. (e.g. postal code instead of zipcode)
 // TODO: Add "backoff" for autocomplete results (add config option to make this customizable)
 // TODO: Add config option for "min characters" before api request is sent
-// TODO: Add ShadCdn to test site (see https://ui.shadcn.com/)
-// TODO: Handle populating select lists (e.g. for "state")
 
 export default class SmartyAddress {
 	static defaultConfig: DefaultSmartyAddressConfig = {

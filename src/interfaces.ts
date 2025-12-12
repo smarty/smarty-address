@@ -37,7 +37,6 @@ export interface ApiErrorResponse {
 	message: string;
 }
 
-// TODO: Revisit the abstract/basic stateObject interfaces.
 export interface AbstractStateObject {
 	[index: string]: any;
 }
