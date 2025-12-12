@@ -1,5 +1,3 @@
-import { getInstanceClassName } from "./utils/uiUtils";
-
 export interface DefaultSmartyAddressConfig {
 	services: ServiceDefinitionMap;
 	theme: string[];
@@ -71,14 +69,6 @@ export interface ServiceHandlerProps {
 	utils: { [name: string]: (...props: unknown[]) => unknown };
 }
 
-export interface AutocompleteDropdownServiceHandler extends ServiceHandler {
-	(props: AutocompleteDropdownServiceHandlerProps, customProps?: any): void;
-}
-
-export interface AutocompleteDropdownServiceHandlerProps extends ServiceHandlerProps {
-	utils: AutocompleteDropdownServiceUtils;
-}
-
 export interface ServiceDefinition {
 	initialState: AbstractStateObject;
 	serviceHandlers: ServiceHandlerMap;
@@ -87,36 +77,6 @@ export interface ServiceDefinition {
 
 export interface ServiceDefinitionUtils {
 	[name: string]: (...args: unknown[]) => unknown;
-}
-
-export interface AutocompleteDropdownServiceUtils extends ServiceDefinitionUtils {
-	updateThemeClass: (
-		newTheme: string[],
-		previousTheme: string[],
-		dropdownWrapperElement: HTMLElement,
-	) => void;
-	getInstanceClassName: typeof getInstanceClassName;
-	buildAutocompleteDomElements: (instanceClassname: string) => Record<string, HTMLElement>;
-}
-
-export interface AutocompleteDropdownServiceDefinition extends ServiceDefinition {
-	initialState: {
-		theme: string;
-		searchInputElement: HTMLInputElement;
-
-		dropdownWrapperElement: HTMLElement;
-		dropdownElement: HTMLElement;
-		suggestionsElement: HTMLElement;
-		poweredBySmartyElement: HTMLElement;
-
-		highlightedSuggestionIndex: number;
-		selectedSuggestionIndex: number;
-		// TODO: Be more specific with what type of object is expected here (e.g. AddressSuggestion)
-		addressSuggestionResults: object[];
-		secondaryAddressSuggestionResults: object[];
-		customStylesElement: HTMLElement;
-	};
-	utils: AutocompleteDropdownServiceUtils;
 }
 
 export interface ServiceDefinitionMap {

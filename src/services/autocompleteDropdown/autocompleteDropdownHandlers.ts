@@ -1,4 +1,5 @@
-import { AutocompleteDropdownServiceHandler, UiSuggestionItem } from "../../interfaces";
+import { UiSuggestionItem } from "../../interfaces";
+import { AutocompleteDropdownServiceHandler } from "./AutocompleteDropdownService";
 
 export const watchSearchInputForChanges: AutocompleteDropdownServiceHandler = ({
 	state,

@@ -1,4 +1,10 @@
-import { AutocompleteDropdownServiceDefinition } from "../../interfaces";
+import {
+	AbstractStateObject,
+	ServiceDefinition,
+	ServiceHandler,
+	ServiceHandlerMap,
+	ServiceHandlerProps,
+} from "../../interfaces";
 import {
 	handleSelectDropdownItem,
 	init,
@@ -26,46 +32,61 @@ import {
 } from "../../utils/domUtils";
 import { getInstanceClassName, getMergedAddressSuggestions } from "../../utils/uiUtils";
 
-export const autocompleteDropdownService: AutocompleteDropdownServiceDefinition = {
-	initialState: {
-		theme: null,
-		searchInputElement: null,
+const initialState: AbstractStateObject = {
+	theme: null,
+	searchInputElement: null,
 
-		dropdownWrapperElement: null,
-		dropdownElement: null,
-		suggestionsElement: null,
-		poweredBySmartyElement: null,
+	dropdownWrapperElement: null,
+	dropdownElement: null,
+	suggestionsElement: null,
+	poweredBySmartyElement: null,
 
-		highlightedSuggestionIndex: 0,
-		selectedSuggestionIndex: -1,
-		addressSuggestionResults: [],
-		secondaryAddressSuggestionResults: [],
-		customStylesElement: null,
-	},
-	serviceHandlers: {
-		init,
-		setupDom,
-		watchSearchInputForChanges,
-		formatAddressSuggestions,
-		formatSecondaryAddressSuggestions,
-		handleAutocompleteError,
-		handleAutocompleteSecondaryError,
-		handleSelectDropdownItem,
-		handleAutocompleteKeydown,
-		handleSearchInputOnChange,
-	},
-	utils: {
-		updateThemeClass,
-		getInstanceClassName,
-		buildAutocompleteDomElements,
-		updateDynamicStyles,
-		configureDynamicStyling,
-		hideElement,
-		showElement,
-		getMergedAddressSuggestions,
-		highlightNewAddress,
-		updateDropdownContents,
-		createSecondarySuggestionElement,
-		createSuggestionElement,
-	},
+	highlightedSuggestionIndex: 0,
+	selectedSuggestionIndex: -1,
+	addressSuggestionResults: [],
+	secondaryAddressSuggestionResults: [],
+	customStylesElement: null,
 } as const;
+
+const serviceHandlers: ServiceHandlerMap = {
+	init,
+	setupDom,
+	watchSearchInputForChanges,
+	formatAddressSuggestions,
+	formatSecondaryAddressSuggestions,
+	handleAutocompleteError,
+	handleAutocompleteSecondaryError,
+	handleSelectDropdownItem,
+	handleAutocompleteKeydown,
+	handleSearchInputOnChange,
+};
+
+const utils = {
+	updateThemeClass,
+	getInstanceClassName,
+	buildAutocompleteDomElements,
+	updateDynamicStyles,
+	configureDynamicStyling,
+	hideElement,
+	showElement,
+	getMergedAddressSuggestions,
+	highlightNewAddress,
+	updateDropdownContents,
+	createSecondarySuggestionElement,
+	createSuggestionElement,
+};
+
+export const autocompleteDropdownService: ServiceDefinition = {
+	initialState,
+	serviceHandlers,
+	utils,
+} as const;
+
+interface AutocompleteDropdownServiceHandlerProps extends ServiceHandlerProps {
+	utils: typeof utils;
+	state: typeof initialState;
+}
+
+export interface AutocompleteDropdownServiceHandler extends ServiceHandler {
+	(props: AutocompleteDropdownServiceHandlerProps, customProps?: any): any;
+}
