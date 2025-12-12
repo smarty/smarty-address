@@ -68,4 +68,4 @@ export const autocompleteDropdownService: AutocompleteDropdownServiceDefinition 
 		createSecondarySuggestionElement,
 		createSuggestionElement,
 	},
-};
+} as const;

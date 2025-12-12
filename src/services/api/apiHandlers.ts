@@ -1,14 +1,14 @@
-import { ServiceHandler } from "../../interfaces";
+import { ApiServiceHandler } from "./ApiService";
 // TODO: Add support for additional input fields (e.g. max_results, include_only_zip_codes, etc.). These would likely be set as "config" values
 
-export const init: ServiceHandler = async ({ setState }, config) => {
+export const init: ApiServiceHandler = async ({ setState }, config) => {
 	setState("apiKey", config.embeddedKey);
 	setState("autocompleteApiUrl", config.autocompleteApiUrl);
 };
 
-export const fetchAddressSuggestions: ServiceHandler = async (
+export const fetchAddressSuggestions: ApiServiceHandler = async (
 	{ state, services, utils },
-	searchString,
+	searchString: string,
 ) => {
 	try {
 		const suggestions = await utils.getAutocompleteApiResults(
@@ -22,7 +22,7 @@ export const fetchAddressSuggestions: ServiceHandler = async (
 	}
 };
 
-export const fetchSecondaryAddressSuggestions: ServiceHandler = async (
+export const fetchSecondaryAddressSuggestions: ApiServiceHandler = async (
 	{ state, services, utils },
 	{ selectedAddress, searchString },
 ) => {

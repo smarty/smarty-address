@@ -1,3 +1,5 @@
+import { getInstanceClassName } from "./utils/uiUtils";
+
 export interface DefaultSmartyAddressConfig {
 	services: ServiceDefinitionMap;
 	theme: string[];
@@ -46,13 +48,20 @@ export interface ServiceHandlersObject {
 	[name: string]: WrappedServiceHandler;
 }
 export interface ServicesObject {
-	[name: string]: ServiceHandlersObject;
+	apiService?: ServiceHandlersObject;
+	addressFormUiService?: ServiceHandlersObject;
+	autocompleteDropdownService?: ServiceHandlersObject;
+	[serviceName: string]: ServiceHandlersObject;
 }
 export interface ServiceHandler {
-	(props: ServiceHandlerProps, customProps?: any): void;
+	(props: ServiceHandlerProps, customProps?: any): any;
+}
+
+export interface ServiceHandlerMap {
+	[name: string]: ServiceHandler;
 }
 export interface WrappedServiceHandler {
-	(customProps?: any): void;
+	(customProps?: any): any;
 }
 
 export interface ServiceHandlerProps {
@@ -72,7 +81,7 @@ export interface AutocompleteDropdownServiceHandlerProps extends ServiceHandlerP
 
 export interface ServiceDefinition {
 	initialState: AbstractStateObject;
-	serviceHandlers: { [name: string]: ServiceHandler };
+	serviceHandlers: ServiceHandlerMap;
 	utils?: ServiceDefinitionUtils;
 }
 
@@ -86,7 +95,7 @@ export interface AutocompleteDropdownServiceUtils extends ServiceDefinitionUtils
 		previousTheme: string[],
 		dropdownWrapperElement: HTMLElement,
 	) => void;
-	getInstanceClassName: (instanceId: number) => string;
+	getInstanceClassName: typeof getInstanceClassName;
 	buildAutocompleteDomElements: (instanceClassname: string) => Record<string, HTMLElement>;
 }
 
