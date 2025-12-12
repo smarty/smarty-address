@@ -16,6 +16,8 @@ import {
 	watchSearchInputForChanges,
 	handleAutocompleteKeydown,
 	handleSearchInputOnChange,
+	closeDropdown,
+	openDropdown,
 } from "./autocompleteDropdownHandlers";
 
 import {
@@ -41,6 +43,7 @@ const initialState: AbstractStateObject = {
 	suggestionsElement: null,
 	poweredBySmartyElement: null,
 
+	dropdownIsOpen: false,
 	highlightedSuggestionIndex: 0,
 	selectedSuggestionIndex: -1,
 	addressSuggestionResults: [],
@@ -59,6 +62,8 @@ const serviceHandlers: ServiceHandlerMap = {
 	handleSelectDropdownItem,
 	handleAutocompleteKeydown,
 	handleSearchInputOnChange,
+	closeDropdown,
+	openDropdown,
 };
 
 const utils = {

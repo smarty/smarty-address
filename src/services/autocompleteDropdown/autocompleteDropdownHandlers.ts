@@ -6,18 +6,22 @@ export const watchSearchInputForChanges: AutocompleteDropdownServiceHandler = ({
 	services,
 }) => {
 	const searchInputElement = state.searchInputElement;
+	searchInputElement.setAttribute("autocomplete", "smarty");
+	searchInputElement.setAttribute("aria-autocomplete", "list");
+	searchInputElement.setAttribute("role", "combobox");
+	searchInputElement.setAttribute("aria-expanded", "true");
+
 	searchInputElement.addEventListener("input", (event: Event) => {
 		services.autocompleteDropdownService.handleSearchInputOnChange(event);
 	});
 
 	searchInputElement.addEventListener("focusout", () => {
 		// TODO: Re-enable this later
-		// utils.hideElement(state.dropdownElement);
+		// services.autocompleteDropdownService.closeDropdown();
 	});
 
 	searchInputElement.addEventListener("keydown", (event: KeyboardEvent) => {
 		services.autocompleteDropdownService.handleAutocompleteKeydown(event.key);
-		// TODO: Figure out how to prevent 1Password from triggering when arrowing down (or selecting an address via the "enter" key). The way to do this is to update the attributes of the input element (e.g. `autocompleteDropdown="off"`). See the "test-site" repo for an example.
 	});
 };
 
@@ -56,7 +60,7 @@ export const handleAutocompleteKeydown: AutocompleteDropdownServiceHandler = (
 			}
 			break;
 		case "Escape":
-			utils.hideElement(state.dropdownElement);
+			services.autocompleteDropdownService.closeDropdown();
 			break;
 	}
 };
@@ -83,7 +87,7 @@ export const handleSelectDropdownItem: AutocompleteDropdownServiceHandler = (
 		});
 	} else {
 		services.addressFormUiService.populateFormWithNewAddress(selectedAddress.address);
-		utils.hideElement(state.dropdownElement);
+		services.autocompleteDropdownService.closeDropdown();
 	}
 };
 
@@ -119,7 +123,7 @@ export const formatAddressSuggestions: AutocompleteDropdownServiceHandler = (
 		);
 	}
 
-	utils.showElement(state.dropdownElement);
+	services.autocompleteDropdownService.openDropdown();
 };
 
 export const formatSecondaryAddressSuggestions: AutocompleteDropdownServiceHandler = (
@@ -155,7 +159,7 @@ export const formatSecondaryAddressSuggestions: AutocompleteDropdownServiceHandl
 		);
 	}
 
-	utils.showElement(state.dropdownElement);
+	services.autocompleteDropdownService.openDropdown();
 };
 
 export const handleSearchInputOnChange: AutocompleteDropdownServiceHandler = (
@@ -207,14 +211,25 @@ export const init: AutocompleteDropdownServiceHandler = ({ state, setState, util
 	}
 };
 
-export const handleAutocompleteError: AutocompleteDropdownServiceHandler = ({ state, utils }) => {
-	utils.hideElement(state.dropdownElement);
+export const handleAutocompleteError: AutocompleteDropdownServiceHandler = ({ services }) => {
+	services.autocompleteDropdownService.closeDropdown();
 };
 
 export const handleAutocompleteSecondaryError: AutocompleteDropdownServiceHandler = ({
-	state,
-	utils,
+	services,
 }) => {
 	// TODO: Implement better error handling here
+	services.autocompleteDropdownService.closeDropdown();
+};
+
+export const closeDropdown: AutocompleteDropdownServiceHandler = ({ state, utils }) => {
+	state.searchInputElement.setAttribute("aria-expanded", "false");
+	state.dropdownIsOpen = false;
 	utils.hideElement(state.dropdownElement);
+};
+
+export const openDropdown: AutocompleteDropdownServiceHandler = ({ state, utils }) => {
+	state.searchInputElement.setAttribute("aria-expanded", "true");
+	state.dropdownIsOpen = true;
+	utils.showElement(state.dropdownElement);
 };
