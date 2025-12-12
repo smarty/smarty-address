@@ -1,8 +1,7 @@
-// TODO: Extend "ServiceMethod" type to be more specific
-import { ServiceHandler } from "../../interfaces";
+import { addressFormUiServiceHandler } from "./AddressFormUiService";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
-export const init: ServiceHandler = ({ setState, services }, config) => {
+export const init: addressFormUiServiceHandler = ({ setState, services }, config) => {
 	setState("searchInputSelector", config?.searchInputSelector);
 	setState("streetSelector", config?.streetSelector);
 	setState("secondarySelector", config?.secondarySelector);
@@ -13,7 +12,12 @@ export const init: ServiceHandler = ({ setState, services }, config) => {
 	services.addressFormUiService.findInputElements();
 };
 
-export const findInputElements: ServiceHandler = ({ state, setState, services, utils }) => {
+export const findInputElements: addressFormUiServiceHandler = ({
+	state,
+	setState,
+	services,
+	utils,
+}) => {
 	const {
 		searchInputSelector,
 		streetSelector,
@@ -45,7 +49,10 @@ export const findInputElements: ServiceHandler = ({ state, setState, services, u
 	});
 };
 
-export const populateFormWithNewAddress: ServiceHandler = ({ state, utils }, selectedAddress) => {
+export const populateFormWithNewAddress: addressFormUiServiceHandler = (
+	{ state, utils },
+	selectedAddress,
+) => {
 	// TODO: If elements aren't inputs, specify textContent instead of value
 	// TODO: Handle if elements (e.g. state input) are <select> elements
 	state.streetLineInputElement.value = utils.getStreetLineFormValue(state, selectedAddress);
