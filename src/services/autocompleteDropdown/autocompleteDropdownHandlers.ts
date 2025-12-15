@@ -28,47 +28,51 @@ export const watchSearchInputForChanges: AutocompleteDropdownServiceHandler = ({
 	});
 };
 
-// TODO: Simplify this function so it no longer needs the full state and services objects.
 export const handleAutocompleteKeydown: AutocompleteDropdownServiceHandler = (
-	{ state, setState, services, utils },
+	{ state, services },
 	{ pressedKey, event }: { pressedKey: string; event: KeyboardEvent },
 ) => {
 	if (state.dropdownIsOpen) {
-		const items = utils.getMergedAddressSuggestions(state);
-		const handleHighlightChange = (indexChange: number) => {
-			const newHighlightIndex = utils.highlightNewAddress(
-				items,
-				state.highlightedSuggestionIndex,
-				state.suggestionsElement,
-				indexChange,
-			);
-			setState("highlightedSuggestionIndex", newHighlightIndex);
+		const handledKeys = {
+			ArrowDown: () => {
+				services.autocompleteDropdownService.highlightNewAddress(1);
+			},
+			ArrowUp: () => {
+				services.autocompleteDropdownService.highlightNewAddress(-1);
+			},
+			Enter: () => {
+				services.autocompleteDropdownService.handleSelectDropdownItem(
+					state.highlightedSuggestionIndex,
+				);
+			},
+			Escape: () => {
+				services.autocompleteDropdownService.closeDropdown();
+			},
 		};
 
-		switch (pressedKey) {
-			case "ArrowDown":
-				handleHighlightChange(1);
-				event.preventDefault();
-				break;
-			case "ArrowUp":
-				handleHighlightChange(-1);
-				event.preventDefault();
-				break;
-			case "Enter":
-				const selectedAddress = items[state.highlightedSuggestionIndex];
-				if (selectedAddress) {
-					services.autocompleteDropdownService.handleSelectDropdownItem(
-						state.highlightedSuggestionIndex,
-					);
-				}
-				event.preventDefault();
-				break;
-			case "Escape":
-				services.autocompleteDropdownService.closeDropdown();
-				event.preventDefault();
-				break;
+		if (handledKeys[pressedKey]) {
+			handledKeys[pressedKey]();
+			event.preventDefault();
 		}
 	}
+};
+
+export const highlightNewAddress: AutocompleteDropdownServiceHandler = (
+	{ state, setState, utils },
+	indexChange: number,
+) => {
+	const items = utils.getMergedAddressSuggestions(state);
+	const currentIndex = state.highlightedSuggestionIndex;
+	const newIndex = (currentIndex + indexChange + items.length) % items.length;
+
+	items.forEach((item, i) => {
+		item.suggestionElement.setAttribute("aria-selected", i === newIndex ? "true" : "false");
+	});
+
+	utils.scrollToHighlightedSuggestion(items[newIndex].suggestionElement, state.suggestionsElement);
+	setState("highlightedSuggestionIndex", newIndex);
+
+	return newIndex;
 };
 
 export const handleSelectDropdownItem: AutocompleteDropdownServiceHandler = (
@@ -125,7 +129,7 @@ export const formatAddressSuggestions: AutocompleteDropdownServiceHandler = (
 	if (suggestionItems.length) {
 		setState(
 			"highlightedSuggestionIndex",
-			utils.highlightNewAddress(suggestionItems, 0, state.suggestionsElement, 0),
+			services.autocompleteDropdownService.highlightNewAddress(0),
 		);
 	}
 
@@ -161,7 +165,7 @@ export const formatSecondaryAddressSuggestions: AutocompleteDropdownServiceHandl
 	if (suggestionItems.length) {
 		setState(
 			"highlightedSuggestionIndex",
-			utils.highlightNewAddress(combinedSuggestionList, -1, state.suggestionsElement, 0),
+			services.autocompleteDropdownService.highlightNewAddress(0),
 		);
 	}
 

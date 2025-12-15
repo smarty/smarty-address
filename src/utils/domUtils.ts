@@ -336,24 +336,6 @@ export const configureDynamicStyling = (dynamicStylingHandler: Function) => {
 	window.addEventListener("resize", () => dynamicStylingHandler);
 };
 
-// TODO: Figure out how to simplify this function
-export const highlightNewAddress = (
-	items: UiSuggestionItem[],
-	currentIndex: number,
-	suggestionsElement: HTMLElement,
-	indexChange: number,
-) => {
-	const newIndex = (currentIndex + indexChange + items.length) % items.length;
-
-	items.forEach((item, i) => {
-		item.suggestionElement.setAttribute("aria-selected", i === newIndex ? "true" : "false");
-	});
-
-	scrollToHighlightedSuggestion(items[newIndex].suggestionElement, suggestionsElement);
-
-	return newIndex;
-};
-
 export const updateThemeClass = (
 	newTheme: string[],
 	previousTheme: string[] = [],
