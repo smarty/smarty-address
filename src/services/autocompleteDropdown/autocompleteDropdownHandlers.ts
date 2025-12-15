@@ -33,41 +33,41 @@ export const handleAutocompleteKeydown: AutocompleteDropdownServiceHandler = (
 	{ state, setState, services, utils },
 	{ pressedKey, event }: { pressedKey: string; event: KeyboardEvent },
 ) => {
-	const items = utils.getMergedAddressSuggestions(state);
-	const handleHighlightChange = (indexChange: number) => {
-		const newHighlightIndex = utils.highlightNewAddress(
-			items,
-			state.highlightedSuggestionIndex,
-			state.suggestionsElement,
-			indexChange,
-		);
-		setState("highlightedSuggestionIndex", newHighlightIndex);
-	};
+	if (state.dropdownIsOpen) {
+		const items = utils.getMergedAddressSuggestions(state);
+		const handleHighlightChange = (indexChange: number) => {
+			const newHighlightIndex = utils.highlightNewAddress(
+				items,
+				state.highlightedSuggestionIndex,
+				state.suggestionsElement,
+				indexChange,
+			);
+			setState("highlightedSuggestionIndex", newHighlightIndex);
+		};
 
-	// TODO: Only run these actions if the dropdown is open
-	switch (pressedKey) {
-		case "ArrowDown":
-			handleHighlightChange(1);
-			event.preventDefault();
-			break;
-		case "ArrowUp":
-			handleHighlightChange(-1);
-			event.preventDefault();
-			break;
-		case "Enter":
-			const selectedAddress = items[state.highlightedSuggestionIndex];
-			if (selectedAddress) {
-				// TODO: Fix the value that gets passed in here. It's not populating the correct address.
-				services.autocompleteDropdownService.handleSelectDropdownItem(
-					state.highlightedSuggestionIndex,
-				);
-			}
-			event.preventDefault();
-			break;
-		case "Escape":
-			services.autocompleteDropdownService.closeDropdown();
-			event.preventDefault();
-			break;
+		switch (pressedKey) {
+			case "ArrowDown":
+				handleHighlightChange(1);
+				event.preventDefault();
+				break;
+			case "ArrowUp":
+				handleHighlightChange(-1);
+				event.preventDefault();
+				break;
+			case "Enter":
+				const selectedAddress = items[state.highlightedSuggestionIndex];
+				if (selectedAddress) {
+					services.autocompleteDropdownService.handleSelectDropdownItem(
+						state.highlightedSuggestionIndex,
+					);
+				}
+				event.preventDefault();
+				break;
+			case "Escape":
+				services.autocompleteDropdownService.closeDropdown();
+				event.preventDefault();
+				break;
+		}
 	}
 };
 
