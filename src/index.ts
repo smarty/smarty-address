@@ -29,6 +29,7 @@ export default class SmartyAddress {
 		defineStyles();
 	}
 	static themes = themes;
+	static services = SmartyAddress.defaultConfig.services;
 
 	private static instances: SmartyAddress[] = [];
 	private instanceId;
