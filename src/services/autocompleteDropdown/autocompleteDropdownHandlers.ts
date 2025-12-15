@@ -21,14 +21,17 @@ export const watchSearchInputForChanges: AutocompleteDropdownServiceHandler = ({
 	});
 
 	searchInputElement.addEventListener("keydown", (event: KeyboardEvent) => {
-		services.autocompleteDropdownService.handleAutocompleteKeydown(event.key);
+		services.autocompleteDropdownService.handleAutocompleteKeydown({
+			pressedKey: event.key,
+			event,
+		});
 	});
 };
 
 // TODO: Simplify this function so it no longer needs the full state and services objects.
 export const handleAutocompleteKeydown: AutocompleteDropdownServiceHandler = (
 	{ state, setState, services, utils },
-	pressedKey: string,
+	{ pressedKey, event }: { pressedKey: string; event: KeyboardEvent },
 ) => {
 	const items = utils.getMergedAddressSuggestions(state);
 	const handleHighlightChange = (indexChange: number) => {
@@ -45,9 +48,11 @@ export const handleAutocompleteKeydown: AutocompleteDropdownServiceHandler = (
 	switch (pressedKey) {
 		case "ArrowDown":
 			handleHighlightChange(1);
+			event.preventDefault();
 			break;
 		case "ArrowUp":
 			handleHighlightChange(-1);
+			event.preventDefault();
 			break;
 		case "Enter":
 			const selectedAddress = items[state.highlightedSuggestionIndex];
@@ -57,9 +62,11 @@ export const handleAutocompleteKeydown: AutocompleteDropdownServiceHandler = (
 					state.highlightedSuggestionIndex,
 				);
 			}
+			event.preventDefault();
 			break;
 		case "Escape":
 			services.autocompleteDropdownService.closeDropdown();
+			event.preventDefault();
 			break;
 	}
 };
