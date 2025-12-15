@@ -31,11 +31,10 @@ export const handleAutocompleteKeydown: AutocompleteDropdownServiceHandler = (
 	pressedKey: string,
 ) => {
 	const items = utils.getMergedAddressSuggestions(state);
-	const currentIndex = state.highlightedSuggestionIndex;
 	const handleHighlightChange = (indexChange: number) => {
 		const newHighlightIndex = utils.highlightNewAddress(
 			items,
-			currentIndex,
+			state.highlightedSuggestionIndex,
 			state.suggestionsElement,
 			indexChange,
 		);
@@ -55,7 +54,7 @@ export const handleAutocompleteKeydown: AutocompleteDropdownServiceHandler = (
 			if (selectedAddress) {
 				// TODO: Fix the value that gets passed in here. It's not populating the correct address.
 				services.autocompleteDropdownService.handleSelectDropdownItem(
-					state.selectedSuggestionIndex + 1,
+					state.highlightedSuggestionIndex,
 				);
 			}
 			break;
