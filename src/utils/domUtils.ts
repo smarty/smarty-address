@@ -327,6 +327,13 @@ export const buildAutocompleteDomElements = (
 	return buildElementsFromMap(elementsMap);
 };
 
+export const configureSearchInputForAutocomplete = (searchInputElement: HTMLInputElement) => {
+	searchInputElement.setAttribute("autocomplete", "smarty");
+	searchInputElement.setAttribute("aria-autocomplete", "list");
+	searchInputElement.setAttribute("role", "combobox");
+	searchInputElement.setAttribute("aria-expanded", "true");
+};
+
 export const configureDynamicStyling = (dynamicStylingHandler: Function) => {
 	// TODO: Do we need to separate "color" and "position" functionality?
 	// TODO: Do we need to setup polling or a mutation observer so we can also recalculate these values when sizes/positions/colors change for other reasons besides scroll/resize?

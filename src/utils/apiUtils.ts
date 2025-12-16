@@ -21,7 +21,7 @@ export const getAutocompleteApiResults = async (
 	autocompleteApiUrl: string,
 	selectedAddress: AddressSuggestion = null,
 ) => {
-	// TODO: Add support for additional input fields (e.g. max_results, include_only_zip_codes, etc.). These would likely be set as "config" values
+	// TODO: Add support for additional input fields (e.g. max_results, include_only_zip_codes, etc.).
 	try {
 		const requestData = {
 			"auth-id": apiKey,

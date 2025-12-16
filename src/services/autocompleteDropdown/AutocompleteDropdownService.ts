@@ -32,6 +32,7 @@ import {
 	updateDropdownContents,
 	updateDynamicStyles,
 	updateThemeClass,
+	configureSearchInputForAutocomplete,
 } from "../../utils/domUtils";
 import { getInstanceClassName, getMergedAddressSuggestions } from "../../utils/uiUtils";
 
@@ -81,6 +82,7 @@ const utils = {
 	scrollToHighlightedSuggestion,
 	createSecondarySuggestionElement,
 	createSuggestionElement,
+	configureSearchInputForAutocomplete,
 };
 
 export const autocompleteDropdownService: ServiceDefinition = {

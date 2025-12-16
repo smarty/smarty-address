@@ -4,34 +4,33 @@ import { AutocompleteDropdownServiceHandler } from "./AutocompleteDropdownServic
 export const watchSearchInputForChanges: AutocompleteDropdownServiceHandler = ({
 	state,
 	services,
+	utils,
 }) => {
 	const searchInputElement = state.searchInputElement;
-	searchInputElement.setAttribute("autocomplete", "smarty");
-	searchInputElement.setAttribute("aria-autocomplete", "list");
-	searchInputElement.setAttribute("role", "combobox");
-	searchInputElement.setAttribute("aria-expanded", "true");
+	utils.configureSearchInputForAutocomplete(searchInputElement);
 
-	searchInputElement.addEventListener("input", (event: Event) => {
-		services.autocompleteDropdownService.handleSearchInputOnChange(event);
-	});
+	searchInputElement.addEventListener(
+		"input",
+		services.autocompleteDropdownService.handleSearchInputOnChange,
+	);
 
-	searchInputElement.addEventListener("focusout", () => {
-		// TODO: Re-enable this later
-		// services.autocompleteDropdownService.closeDropdown();
-	});
+	// TODO: Re-enable this later, but make sure selecting secondaries still works
+	// searchInputElement.addEventListener(
+	// 	"focusout",
+	// 	services.autocompleteDropdownService.closeDropdown,
+	// );
 
-	searchInputElement.addEventListener("keydown", (event: KeyboardEvent) => {
-		services.autocompleteDropdownService.handleAutocompleteKeydown({
-			pressedKey: event.key,
-			event,
-		});
-	});
+	searchInputElement.addEventListener(
+		"keydown",
+		services.autocompleteDropdownService.handleAutocompleteKeydown,
+	);
 };
 
 export const handleAutocompleteKeydown: AutocompleteDropdownServiceHandler = (
 	{ state, services },
-	{ pressedKey, event }: { pressedKey: string; event: KeyboardEvent },
+	event: KeyboardEvent,
 ) => {
+	const pressedKey = event.key;
 	if (state.dropdownIsOpen) {
 		const handledKeys = {
 			ArrowDown: () => {
