@@ -65,7 +65,7 @@ export const unknownError = {
 	message: "SmartyAddress: an unknown error has occurred.",
 };
 
-export const TranslatedUsAutocompleteAddress = (address) => {
+export const getTranslatedUsAutocompleteAddress = (address) => {
 	const translatedAddress = {};
 	const street = address.streetLine ? `${address.streetLine}` : "";
 	const secondary = address.secondary ? ` ${address.secondary}` : "";
