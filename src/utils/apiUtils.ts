@@ -65,6 +65,27 @@ export const unknownError = {
 	message: "SmartyAddress: an unknown error has occurred.",
 };
 
+export default class TranslatedUsAutocompleteAddress {
+	constructor(address = {}) {
+		const street = address.streetLine ? `${address.streetLine}` : "";
+		const secondary = address.secondary ? ` ${address.secondary}` : "";
+		const city = address.city ? ` ${address.city},` : "";
+		const state = address.state ? ` ${address.state}` : "";
+		const zipCode = address.zipcode ? ` ${address.zipcode}` : "";
+		this.entriesText = address.entries > 1 ? `+ ${address.entries} addresses` : "";
+		this.isEllipsesDisplayed = address.entries > 1;
+		this.fullAddress = street + secondary + city + state + zipCode;
+		this.street = address.streetLine;
+		this.secondary = secondary;
+		this.entries = address.entries;
+		this.city = address.city;
+		this.state = address.state;
+		this.zipCode = address.zipcode;
+		this.selected =
+			this.street + this.secondary + " (" + this.entries + ") " + this.city + state + zipCode;
+	}
+}
+
 const knownAutocompleteErrors = [
 	{
 		name: "authenticationRequired",
