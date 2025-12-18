@@ -172,12 +172,23 @@ export const formatSecondaryAddressSuggestions: AutocompleteDropdownServiceHandl
 };
 
 export const handleSearchInputOnChange: AutocompleteDropdownServiceHandler = (
-	{ services },
+	{ state, services, utils },
 	event,
 ) => {
 	const searchInputValue = (event.target as HTMLInputElement)?.value;
+	const { selectedSuggestionIndex } = state;
+
+	const mergedAddressSuggestions = utils.getMergedAddressSuggestions(state);
+	const selectedAddress = mergedAddressSuggestions[selectedSuggestionIndex];
+
+	const apiMethod =
+		selectedSuggestionIndex > -1 ? "fetchSecondaryAddressSuggestions" : "fetchAddressSuggestions";
+
 	if (searchInputValue.length) {
-		services.apiService.fetchAddressSuggestions(searchInputValue);
+		services.apiService[apiMethod]({
+			searchString: searchInputValue,
+			selectedAddress: selectedAddress?.address,
+		});
 	}
 };
 

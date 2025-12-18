@@ -8,7 +8,7 @@ export const init: ApiServiceHandler = async ({ setState }, config) => {
 
 export const fetchAddressSuggestions: ApiServiceHandler = async (
 	{ state, services, utils },
-	searchString: string,
+	{ searchString }: { searchString: string },
 ) => {
 	try {
 		const suggestions = await utils.getAutocompleteApiResults(
