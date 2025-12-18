@@ -66,21 +66,24 @@ export const unknownError = {
 };
 
 export const getTranslatedUsAutocompleteAddress = (address) => {
-	const translatedAddress = {};
-	const street = address.streetLine ? `${address.streetLine}` : "";
-	const secondary = address.secondary ? ` ${address.secondary}` : "";
-	const city = address.city ? ` ${address.city},` : "";
-	const state = address.state ? ` ${address.state}` : "";
-	const zipCode = address.zipcode ? ` ${address.zipcode}` : "";
-	translatedAddress.entriesText = address.entries > 1 ? `+ ${address.entries} addresses` : "";
-	translatedAddress.isEllipsesDisplayed = address.entries > 1;
-	translatedAddress.fullAddress = street + secondary + city + state + zipCode;
-	translatedAddress.street = address.streetLine;
-	translatedAddress.secondary = secondary;
-	translatedAddress.entries = address.entries;
-	translatedAddress.city = address.city;
-	translatedAddress.state = address.state;
-	translatedAddress.zipCode = address.zipcode;
+	const translatedAddress = {
+		street: address.streetLine,
+		entries: address.entries,
+		city: address.city,
+		state: address.state,
+		zipCode: address.zipcode,
+		isEllipsesDisplayed: address.entries > 1,
+		entriesText: address.entries > 1 ? `+ ${address.entries} addresses` : "",
+	};
+
+	const formattedStreet = address.streetLine ? `${address.streetLine}` : "";
+	const formattedSecondary = address.secondary ? ` ${address.secondary}` : "";
+	const formattedCity = address.city ? ` ${address.city},` : "";
+	const formattedState = address.state ? ` ${address.state}` : "";
+	const formattedZipCode = address.zipcode ? ` ${address.zipcode}` : "";
+	translatedAddress.fullAddress =
+		formattedStreet + formattedSecondary + formattedCity + formattedState + formattedZipCode;
+	translatedAddress.secondary = formattedSecondary;
 	translatedAddress.selected =
 		translatedAddress.street +
 		translatedAddress.secondary +
@@ -88,8 +91,8 @@ export const getTranslatedUsAutocompleteAddress = (address) => {
 		translatedAddress.entries +
 		") " +
 		translatedAddress.city +
-		state +
-		zipCode;
+		formattedState +
+		formattedZipCode;
 
 	return translatedAddress;
 };
