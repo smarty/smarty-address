@@ -14,6 +14,7 @@ import { US_AUTOCOMPLETE_PRO_API_URL } from "./constants";
 // TODO: Update code to use international names for address fields, variable names, etc. (e.g. postal code instead of zipcode)
 // TODO: Add "backoff" for autocomplete results (add config option to make this customizable)
 // TODO: Add config option for "min characters" before api request is sent
+// TODO: Log autocomplete api calls for copy/paste scenarios (maybe just compare the length of the string to the previous search instead of watching the paste event). This can use the user-agent param in the query string.
 
 export default class SmartyAddress {
 	static defaultConfig: DefaultSmartyAddressConfig = {

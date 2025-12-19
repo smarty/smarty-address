@@ -4,7 +4,7 @@ import { APP_VERSION } from "../constants";
 // TODO: Dynamically update the version to match `package.json`
 const USER_AGENT = `name:smarty-address-plugin,version:${APP_VERSION}`;
 
-export const formatSelectedAddress = ({
+const formatSelectedAddress = ({
 	street_line,
 	secondary = "",
 	city,
@@ -12,7 +12,34 @@ export const formatSelectedAddress = ({
 	zipcode,
 	entries,
 }: AddressSuggestion) => {
-	return `${street_line} ${secondary} (${entries}) ${city} ${state} ${zipcode}`;
+	const formattedSecondary = secondary ? ` ${secondary}` : "";
+	const formattedCity = city ? ` ${city}` : "";
+	const formattedState = state ? ` ${state}` : "";
+	const formattedZipCode = zipcode ? ` ${zipcode}` : "";
+	const formattedAddress = `${street_line}${formattedSecondary} (${entries})${formattedCity}${formattedState}${formattedZipCode}`;
+
+	return formattedAddress;
+};
+
+const getSelectedAddressForSecondarySearch = async (
+	searchString: string,
+	apiKey: string,
+	autocompleteApiUrl: string,
+	selectedAddress: AddressSuggestion = null,
+) => {
+	const primarySuggestions = await getAutocompleteApiResults(
+		searchString,
+		apiKey,
+		autocompleteApiUrl,
+	);
+	const matchingResult = primarySuggestions.find((suggestion) => {
+		return (
+			suggestion.street_line.trim() === selectedAddress.street_line.trim() &&
+			suggestion.secondary.includes(selectedAddress.secondary.trim())
+		);
+	});
+
+	return matchingResult;
 };
 
 export const getAutocompleteApiResults = async (
@@ -23,11 +50,20 @@ export const getAutocompleteApiResults = async (
 ) => {
 	// TODO: Add support for additional input fields (e.g. max_results, include_only_zip_codes, etc.).
 	try {
+		const matchingResult = selectedAddress
+			? await getSelectedAddressForSecondarySearch(
+					searchString,
+					apiKey,
+					autocompleteApiUrl,
+					selectedAddress,
+				)
+			: null;
+
 		const requestData = {
 			"auth-id": apiKey,
 			"user-agent": USER_AGENT,
 			search: searchString,
-			selected: selectedAddress ? formatSelectedAddress(selectedAddress) : "",
+			selected: matchingResult ? formatSelectedAddress(matchingResult) : "",
 		};
 
 		const params = new URLSearchParams(requestData);
@@ -63,38 +99,6 @@ export const getApiError = (statusCode: number, errorsResponse: { errors: ApiErr
 export const unknownError = {
 	name: "unknownError",
 	message: "SmartyAddress: an unknown error has occurred.",
-};
-
-export const getTranslatedUsAutocompleteAddress = (address) => {
-	const translatedAddress = {
-		street: address.streetLine,
-		entries: address.entries,
-		city: address.city,
-		state: address.state,
-		zipCode: address.zipcode,
-		isEllipsesDisplayed: address.entries > 1,
-		entriesText: address.entries > 1 ? `+ ${address.entries} addresses` : "",
-	};
-
-	const formattedStreet = address.streetLine ? `${address.streetLine}` : "";
-	const formattedSecondary = address.secondary ? ` ${address.secondary}` : "";
-	const formattedCity = address.city ? ` ${address.city},` : "";
-	const formattedState = address.state ? ` ${address.state}` : "";
-	const formattedZipCode = address.zipcode ? ` ${address.zipcode}` : "";
-	translatedAddress.fullAddress =
-		formattedStreet + formattedSecondary + formattedCity + formattedState + formattedZipCode;
-	translatedAddress.secondary = formattedSecondary;
-	translatedAddress.selected =
-		translatedAddress.street +
-		translatedAddress.secondary +
-		" (" +
-		translatedAddress.entries +
-		") " +
-		translatedAddress.city +
-		formattedState +
-		formattedZipCode;
-
-	return translatedAddress;
 };
 
 const knownAutocompleteErrors = [
