@@ -6,19 +6,15 @@ const USER_AGENT = `name:smarty-address-plugin,version:${APP_VERSION}`;
 
 const formatSelectedAddress = ({
 	street_line,
-	secondary = "",
+	secondary,
+	entries,
 	city,
 	state,
 	zipcode,
-	entries,
 }: AddressSuggestion) => {
-	const formattedSecondary = secondary ? ` ${secondary}` : "";
-	const formattedCity = city ? ` ${city}` : "";
-	const formattedState = state ? ` ${state}` : "";
-	const formattedZipCode = zipcode ? ` ${zipcode}` : "";
-	const formattedAddress = `${street_line}${formattedSecondary} (${entries})${formattedCity}${formattedState}${formattedZipCode}`;
+	const addressComponents = [street_line, secondary, `(${entries})`, city, state, zipcode];
 
-	return formattedAddress;
+	return addressComponents.filter(Boolean).join(" ");
 };
 
 const getSelectedAddressForSecondarySearch = async (
