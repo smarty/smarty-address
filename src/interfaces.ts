@@ -15,6 +15,11 @@ export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 	zipcodeSelector?: string;
 }
 
+export interface ApiConfig {
+	apiKey: string;
+	autocompleteApiUrl: string;
+}
+
 export interface AddressSuggestion {
 	street_line: string;
 	secondary?: string;

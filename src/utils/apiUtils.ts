@@ -1,4 +1,4 @@
-import { AddressSuggestion, ApiErrorResponse } from "../interfaces";
+import { AddressSuggestion, ApiConfig, ApiErrorResponse } from "../interfaces";
 import { APP_VERSION } from "../constants";
 
 // TODO: Dynamically update the version to match `package.json`
@@ -17,17 +17,10 @@ const formatSelectedAddress = ({
 	return addressComponents.filter(Boolean).join(" ");
 };
 
-const getSelectedAddressForSecondarySearch = async (
-	searchString: string,
-	apiKey: string,
-	autocompleteApiUrl: string,
-	selectedAddress: AddressSuggestion = null,
+export const getMatchingResult = (
+	primarySuggestions: AddressSuggestion[],
+	selectedAddress: AddressSuggestion,
 ) => {
-	const primarySuggestions = await getAutocompleteApiResults(
-		searchString,
-		apiKey,
-		autocompleteApiUrl,
-	);
 	const matchingResult = primarySuggestions.find((suggestion) => {
 		return (
 			suggestion.street_line.trim() === selectedAddress.street_line.trim() &&
@@ -39,31 +32,21 @@ const getSelectedAddressForSecondarySearch = async (
 };
 
 export const getAutocompleteApiResults = async (
+	apiConfig: ApiConfig,
 	searchString: string,
-	apiKey: string,
-	autocompleteApiUrl: string,
 	selectedAddress: AddressSuggestion = null,
 ) => {
 	// TODO: Add support for additional input fields (e.g. max_results, include_only_zip_codes, etc.).
 	try {
-		const matchingResult = selectedAddress
-			? await getSelectedAddressForSecondarySearch(
-					searchString,
-					apiKey,
-					autocompleteApiUrl,
-					selectedAddress,
-				)
-			: null;
-
 		const requestData = {
-			"auth-id": apiKey,
+			"auth-id": apiConfig.apiKey,
 			"user-agent": USER_AGENT,
 			search: searchString,
-			selected: matchingResult ? formatSelectedAddress(matchingResult) : "",
+			selected: selectedAddress ? formatSelectedAddress(selectedAddress) : "",
 		};
 
 		const params = new URLSearchParams(requestData);
-		const response = await fetch(`${autocompleteApiUrl}?${params}`);
+		const response = await fetch(`${apiConfig.autocompleteApiUrl}?${params}`);
 
 		if (response.ok) {
 			const { suggestions } = (await response.json()) as { suggestions: AddressSuggestion[] };

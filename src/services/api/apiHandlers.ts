@@ -1,4 +1,5 @@
 import { ApiServiceHandler } from "./ApiService";
+import { AddressSuggestion, ApiConfig } from "../../interfaces";
 // TODO: Add support for additional input fields (e.g. max_results, include_only_zip_codes, etc.). These would likely be set as "config" values
 
 export const init: ApiServiceHandler = async ({ setState }, config) => {
@@ -6,15 +7,18 @@ export const init: ApiServiceHandler = async ({ setState }, config) => {
 	setState("autocompleteApiUrl", config.autocompleteApiUrl);
 };
 
+export const getApiConfig: ApiServiceHandler = ({ state }): ApiConfig => {
+	return { apiKey: state.apiKey, autocompleteApiUrl: state.autocompleteApiUrl };
+};
+
 export const fetchAddressSuggestions: ApiServiceHandler = async (
-	{ state, services, utils },
+	{ services, utils },
 	{ searchString }: { searchString: string },
 ) => {
 	try {
 		const suggestions = await utils.getAutocompleteApiResults(
+			services.apiService.getApiConfig(),
 			searchString,
-			state.apiKey,
-			state.autocompleteApiUrl,
 		);
 		services.autocompleteDropdownService.formatAddressSuggestions(suggestions);
 	} catch (error) {
@@ -23,16 +27,28 @@ export const fetchAddressSuggestions: ApiServiceHandler = async (
 };
 
 export const fetchSecondaryAddressSuggestions: ApiServiceHandler = async (
-	{ state, services, utils },
+	{ services, utils },
 	{ selectedAddress, searchString },
 ) => {
+	const apiConfig = services.apiService.getApiConfig();
+
 	try {
-		const suggestions = await utils.getAutocompleteApiResults(
-			searchString,
-			state.apiKey,
-			state.autocompleteApiUrl,
-			selectedAddress,
-		);
+		const primarySuggestions = await utils.getAutocompleteApiResults(apiConfig, searchString);
+
+		const getSecondarySuggestions = async (
+			searchString: string,
+			selectedAddress: AddressSuggestion,
+			primarySuggestions: AddressSuggestion[],
+		) => {
+			const newSelectedAddress = utils.getMatchingResult(primarySuggestions, selectedAddress);
+
+			return await utils.getAutocompleteApiResults(apiConfig, searchString, newSelectedAddress);
+		};
+
+		const suggestions = selectedAddress
+			? await getSecondarySuggestions(searchString, selectedAddress, primarySuggestions)
+			: primarySuggestions;
+
 		services.autocompleteDropdownService.formatSecondaryAddressSuggestions(suggestions);
 	} catch (error) {
 		services.autocompleteDropdownService.handleAutocompleteSecondaryError({

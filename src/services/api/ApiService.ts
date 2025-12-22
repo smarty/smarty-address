@@ -5,8 +5,13 @@ import {
 	ServiceHandlerMap,
 	ServiceHandlerProps,
 } from "../../interfaces";
-import { init, fetchAddressSuggestions, fetchSecondaryAddressSuggestions } from "./apiHandlers";
-import { getAutocompleteApiResults } from "../../utils/apiUtils";
+import {
+	init,
+	fetchAddressSuggestions,
+	fetchSecondaryAddressSuggestions,
+	getApiConfig,
+} from "./apiHandlers";
+import { getAutocompleteApiResults, getMatchingResult } from "../../utils/apiUtils";
 
 const initialState: AbstractStateObject = {
 	autocompleteApiUrl: "",
@@ -15,12 +20,14 @@ const initialState: AbstractStateObject = {
 
 const serviceHandlers: ServiceHandlerMap = {
 	init,
+	getApiConfig,
 	fetchAddressSuggestions,
 	fetchSecondaryAddressSuggestions,
 } as const;
 
 const utils = {
 	getAutocompleteApiResults,
+	getMatchingResult,
 } as const;
 
 export const apiService: ServiceDefinition = {
