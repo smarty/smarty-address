@@ -86,7 +86,7 @@ export const handleSelectDropdownItem: AutocompleteDropdownServiceHandler = (
 
 	if (entries > 1) {
 		const newSearchTerm = `${street_line} ${secondary}`;
-		// TODO: How do users "back out" of the secondary address search? Right now it persists the "selectedAddress" value until the page is refreshed
+		setState("selectedAddressSearchTerm", newSearchTerm);
 
 		searchInputElement.value = newSearchTerm;
 		services.apiService.fetchSecondaryAddressSuggestions({
@@ -171,10 +171,15 @@ export const formatSecondaryAddressSuggestions: AutocompleteDropdownServiceHandl
 };
 
 export const handleSearchInputOnChange: AutocompleteDropdownServiceHandler = (
-	{ state, services, utils },
+	{ state, setState, services, utils },
 	event,
 ) => {
 	const searchInputValue = (event.target as HTMLInputElement)?.value;
+
+	if (!searchInputValue.startsWith(state.selectedAddressSearchTerm)) {
+		setState("selectedSuggestionIndex", -1);
+	}
+
 	const { selectedSuggestionIndex } = state;
 
 	const mergedAddressSuggestions = utils.getMergedAddressSuggestions(state);

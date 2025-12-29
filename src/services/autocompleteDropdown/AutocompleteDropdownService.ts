@@ -45,6 +45,7 @@ const initialState: AbstractStateObject = {
 	suggestionsElement: null,
 	poweredBySmartyElement: null,
 
+	selectedAddressSearchTerm: "",
 	dropdownIsOpen: false,
 	highlightedSuggestionIndex: 0,
 	selectedSuggestionIndex: -1,
