@@ -87,12 +87,12 @@ export const handleSelectDropdownItem: AutocompleteDropdownServiceHandler = (
 	if (entries > 1) {
 		const newSearchTerm = `${street_line} ${secondary}`;
 		setState("selectedAddressSearchTerm", newSearchTerm);
-
 		searchInputElement.value = newSearchTerm;
 		services.apiService.fetchSecondaryAddressSuggestions({
 			searchString: newSearchTerm,
 			selectedAddress: selectedAddress.address,
 		});
+		searchInputElement.focus();
 	} else {
 		services.addressFormUiService.populateFormWithNewAddress(selectedAddress.address);
 		services.autocompleteDropdownService.closeDropdown();
@@ -174,6 +174,7 @@ export const handleSearchInputOnChange: AutocompleteDropdownServiceHandler = (
 	{ state, setState, services, utils },
 	event,
 ) => {
+	// TODO: handle secondary searches where there are no matching results (right now it shows the suffixes of non-secondary results)
 	const searchInputValue = (event.target as HTMLInputElement)?.value;
 
 	if (!searchInputValue.startsWith(state.selectedAddressSearchTerm)) {
