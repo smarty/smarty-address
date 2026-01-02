@@ -174,7 +174,6 @@ export const handleSearchInputOnChange: AutocompleteDropdownServiceHandler = (
 	{ state, setState, services, utils },
 	event,
 ) => {
-	// TODO: handle secondary searches where there are no matching results (right now it shows the suffixes of non-secondary results)
 	const searchInputValue = (event.target as HTMLInputElement)?.value;
 
 	if (!searchInputValue.startsWith(state.selectedAddressSearchTerm)) {

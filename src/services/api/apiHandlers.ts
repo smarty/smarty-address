@@ -32,11 +32,9 @@ export const fetchSecondaryAddressSuggestions: ApiServiceHandler = async (
 		const apiConfig = services.apiService.getApiConfig();
 		const primarySuggestions = await utils.getAutocompleteApiResults(apiConfig, searchString);
 		const newSelectedAddress = utils.getMatchingResult(primarySuggestions, selectedAddress);
-		const suggestions = await utils.getAutocompleteApiResults(
-			apiConfig,
-			searchString,
-			newSelectedAddress,
-		);
+		const suggestions = newSelectedAddress
+			? await utils.getAutocompleteApiResults(apiConfig, searchString, newSelectedAddress)
+			: [];
 
 		services.autocompleteDropdownService.formatSecondaryAddressSuggestions(suggestions);
 	} catch (error) {
