@@ -35,6 +35,7 @@ export const getAutocompleteApiResults = async (
 	apiConfig: ApiConfig,
 	searchString: string,
 	selectedAddress: AddressSuggestion = null,
+	fetchFn: typeof fetch = fetch,
 ) => {
 	try {
 		const requestData = {
@@ -45,7 +46,7 @@ export const getAutocompleteApiResults = async (
 		};
 
 		const params = new URLSearchParams(requestData);
-		const response = await fetch(`${apiConfig.autocompleteApiUrl}?${params}`);
+		const response = await fetchFn(`${apiConfig.autocompleteApiUrl}?${params}`);
 
 		if (response.ok) {
 			const { suggestions } = (await response.json()) as { suggestions: AddressSuggestion[] };
