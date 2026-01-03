@@ -59,6 +59,12 @@ export const getAutocompleteApiResults = async (
 			throw new Error(error.name);
 		}
 	} catch (error) {
+		if (error instanceof Error) {
+			const knownErrorNames = knownAutocompleteErrors.map((e) => e.name);
+			if (knownErrorNames.includes(error.message)) {
+				throw error;
+			}
+		}
 		console.error(unknownError.message);
 		throw new Error(unknownError.name);
 	}
