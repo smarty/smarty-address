@@ -59,13 +59,28 @@ describe("apiUtils", () => {
 			autocompleteApiUrl: "https://api.example.com/autocomplete",
 		};
 
+		const createMockFetchSuccess = (suggestions: AddressSuggestion[]) => {
+			return jest.fn().mockResolvedValue({
+				ok: true,
+				json: async () => ({ suggestions }),
+			});
+		};
+
+		const createMockFetchError = (status: number, errorResponse: any) => {
+			return jest.fn().mockResolvedValue({
+				ok: false,
+				status,
+				json: jest.fn().mockResolvedValue(errorResponse),
+			});
+		};
+
+		const createMockFetchFailure = (error: Error) => {
+			return jest.fn().mockRejectedValue(error);
+		};
+
 		it("should return suggestions on successful response", async () => {
 			const mockSuggestions: AddressSuggestion[] = [basicAddressWithoutSecondary];
-
-			const mockFetch = jest.fn().mockResolvedValue({
-				ok: true,
-				json: async () => ({ suggestions: mockSuggestions }),
-			});
+			const mockFetch = createMockFetchSuccess(mockSuggestions);
 
 			const result = await getAutocompleteApiResults(
 				mockApiConfig,
@@ -83,11 +98,7 @@ describe("apiUtils", () => {
 
 		it("should include selected address in request when provided", async () => {
 			const mockSuggestions: AddressSuggestion[] = [];
-
-			const mockFetch = jest.fn().mockResolvedValue({
-				ok: true,
-				json: async () => ({ suggestions: mockSuggestions }),
-			});
+			const mockFetch = createMockFetchSuccess(mockSuggestions);
 
 			await getAutocompleteApiResults(mockApiConfig, "123 Main", completeAddressWithSecondary, mockFetch as any);
 
@@ -97,20 +108,8 @@ describe("apiUtils", () => {
 		});
 
 		it("should throw error on API error response", async () => {
-			const mockErrorResponse = {
-				errors: [
-					{
-						id: 1611079217,
-						message: "Authentication failed",
-					},
-				],
-			};
-
-			const mockFetch = jest.fn().mockResolvedValue({
-				ok: false,
-				status: 401,
-				json: jest.fn().mockResolvedValue(mockErrorResponse),
-			});
+			const mockErrorResponse = createErrorResponse(1611079217, "Authentication failed");
+			const mockFetch = createMockFetchError(401, mockErrorResponse);
 
 			const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
 
@@ -122,8 +121,7 @@ describe("apiUtils", () => {
 		});
 
 		it("should throw unknown error on network failure", async () => {
-			const mockFetch = jest.fn().mockRejectedValue(new Error("Network error"));
-
+			const mockFetch = createMockFetchFailure(new Error("Network error"));
 			const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation();
 
 			await expect(
@@ -135,10 +133,7 @@ describe("apiUtils", () => {
 
 		it("should include API key and user agent in request", async () => {
 			const mockSuggestions: AddressSuggestion[] = [];
-			const mockFetch = jest.fn().mockResolvedValue({
-				ok: true,
-				json: async () => ({ suggestions: mockSuggestions }),
-			});
+			const mockFetch = createMockFetchSuccess(mockSuggestions);
 
 			await getAutocompleteApiResults(mockApiConfig, "123 Main", null, mockFetch as any);
 
