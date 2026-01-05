@@ -3,6 +3,7 @@ import {
 	getAutocompleteApiResults,
 	getApiError,
 	unknownError,
+	createErrorResponse,
 } from "./apiUtils";
 import { AddressSuggestion, ApiConfig } from "../interfaces";
 
@@ -247,14 +248,7 @@ describe("apiUtils", () => {
 
 	describe("getApiError", () => {
 		it("should return authentication error for 401 with matching error ID", () => {
-			const errorResponse = {
-				errors: [
-					{
-						id: 1611079217,
-						message: "Authentication failed",
-					},
-				],
-			};
+			const errorResponse = createErrorResponse(1611079217, "Authentication failed");
 
 			const result = getApiError(401, errorResponse);
 
@@ -263,14 +257,7 @@ describe("apiUtils", () => {
 		});
 
 		it("should return security rate limit error for 429 with matching error ID", () => {
-			const errorResponse = {
-				errors: [
-					{
-						id: 1730482419,
-						message: "Rate limit exceeded",
-					},
-				],
-			};
+			const errorResponse = createErrorResponse(1730482419, "Rate limit exceeded");
 
 			const result = getApiError(429, errorResponse);
 
@@ -279,14 +266,7 @@ describe("apiUtils", () => {
 		});
 
 		it("should return plan rate limit error for 429 with different error ID", () => {
-			const errorResponse = {
-				errors: [
-					{
-						id: 1637696258,
-						message: "Rate limit exceeded",
-					},
-				],
-			};
+			const errorResponse = createErrorResponse(1637696258, "Rate limit exceeded");
 
 			const result = getApiError(429, errorResponse);
 
@@ -295,14 +275,7 @@ describe("apiUtils", () => {
 		});
 
 		it("should return unknown error for unrecognized status code", () => {
-			const errorResponse = {
-				errors: [
-					{
-						id: 999999,
-						message: "Some error",
-					},
-				],
-			};
+			const errorResponse = createErrorResponse(999999, "Some error");
 
 			const result = getApiError(500, errorResponse);
 
@@ -310,14 +283,7 @@ describe("apiUtils", () => {
 		});
 
 		it("should return unknown error for unrecognized error ID", () => {
-			const errorResponse = {
-				errors: [
-					{
-						id: 999999,
-						message: "Unknown error",
-					},
-				],
-			};
+			const errorResponse = createErrorResponse(999999, "Unknown error");
 
 			const result = getApiError(401, errorResponse);
 

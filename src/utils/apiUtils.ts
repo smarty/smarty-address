@@ -86,6 +86,10 @@ export const unknownError = {
 	message: "SmartyAddress: an unknown error has occurred.",
 };
 
+export const createErrorResponse = (id: number, message: string) => ({
+	errors: [{ id, message }],
+});
+
 const knownAutocompleteErrors = [
 	{
 		name: "authenticationRequired",
