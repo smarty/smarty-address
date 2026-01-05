@@ -83,6 +83,7 @@ export const getApiError = (statusCode: number, errorsResponse: { errors: ApiErr
 
 export const unknownError = {
 	name: "unknownError",
+	statusCode: 0,
 	message: "SmartyAddress: an unknown error has occurred.",
 };
 
