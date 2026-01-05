@@ -7,44 +7,47 @@ import {
 } from "./apiUtils";
 import { AddressSuggestion, ApiConfig } from "../interfaces";
 import {
-	mainStreetApt1,
-	oakAveUnit2,
-	elmStSuite3,
-	mainStreetApt1Extended,
-	mainStreetApt1WithWhitespace,
-	mainStreetBasic,
+	completeAddressWithSecondary,
+	completeAddressWithSecondaryAlternate,
+	completeAddressWithSecondaryForNoMatch,
+	completeAddressWithExtendedSecondary,
+	completeAddressWithExtraWhitespace,
+	basicAddressWithoutSecondary,
 } from "./apiUtils.fixtures";
 
 describe("apiUtils", () => {
 	describe("getMatchingResult", () => {
 		it("should find a matching suggestion by street_line and secondary", () => {
-			const primarySuggestions: AddressSuggestion[] = [mainStreetApt1, oakAveUnit2];
+			const primarySuggestions: AddressSuggestion[] = [
+				completeAddressWithSecondary,
+				completeAddressWithSecondaryAlternate,
+			];
 
-			const result = getMatchingResult(primarySuggestions, mainStreetApt1);
+			const result = getMatchingResult(primarySuggestions, completeAddressWithSecondary);
 
 			expect(result).toEqual(primarySuggestions[0]);
 		});
 
 		it("should return undefined when no match is found", () => {
-			const primarySuggestions: AddressSuggestion[] = [mainStreetApt1];
+			const primarySuggestions: AddressSuggestion[] = [completeAddressWithSecondary];
 
-			const result = getMatchingResult(primarySuggestions, elmStSuite3);
+			const result = getMatchingResult(primarySuggestions, completeAddressWithSecondaryForNoMatch);
 
 			expect(result).toBeUndefined();
 		});
 
 		it("should match when secondary contains the selected secondary", () => {
-			const primarySuggestions: AddressSuggestion[] = [mainStreetApt1Extended];
+			const primarySuggestions: AddressSuggestion[] = [completeAddressWithExtendedSecondary];
 
-			const result = getMatchingResult(primarySuggestions, mainStreetApt1);
+			const result = getMatchingResult(primarySuggestions, completeAddressWithSecondary);
 
 			expect(result).toEqual(primarySuggestions[0]);
 		});
 
 		it("should trim whitespace when comparing street_line", () => {
-			const primarySuggestions: AddressSuggestion[] = [mainStreetApt1WithWhitespace];
+			const primarySuggestions: AddressSuggestion[] = [completeAddressWithExtraWhitespace];
 
-			const result = getMatchingResult(primarySuggestions, mainStreetApt1);
+			const result = getMatchingResult(primarySuggestions, completeAddressWithSecondary);
 
 			expect(result).toEqual(primarySuggestions[0]);
 		});
@@ -57,7 +60,7 @@ describe("apiUtils", () => {
 		};
 
 		it("should return suggestions on successful response", async () => {
-			const mockSuggestions: AddressSuggestion[] = [mainStreetBasic];
+			const mockSuggestions: AddressSuggestion[] = [basicAddressWithoutSecondary];
 
 			const mockFetch = jest.fn().mockResolvedValue({
 				ok: true,
@@ -86,7 +89,7 @@ describe("apiUtils", () => {
 				json: async () => ({ suggestions: mockSuggestions }),
 			});
 
-			await getAutocompleteApiResults(mockApiConfig, "123 Main", mainStreetApt1, mockFetch as any);
+			await getAutocompleteApiResults(mockApiConfig, "123 Main", completeAddressWithSecondary, mockFetch as any);
 
 			expect(mockFetch).toHaveBeenCalledWith(
 				expect.stringContaining("selected=123+Main+St+Apt+1"),
