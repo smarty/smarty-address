@@ -13,7 +13,7 @@ import {
 	completeAddressWithExtendedSecondary,
 	completeAddressWithExtraWhitespace,
 	basicAddressWithoutSecondary,
-} from "./apiUtils.fixtures";
+} from "./addressSuggestions.fixtures";
 
 describe("apiUtils", () => {
 	describe("getMatchingResult", () => {
@@ -100,11 +100,14 @@ describe("apiUtils", () => {
 			const mockSuggestions: AddressSuggestion[] = [];
 			const mockFetch = createMockFetchSuccess(mockSuggestions);
 
-			await getAutocompleteApiResults(mockApiConfig, "123 Main", completeAddressWithSecondary, mockFetch as any);
-
-			expect(mockFetch).toHaveBeenCalledWith(
-				expect.stringContaining("selected=123+Main+St+Apt+1"),
+			await getAutocompleteApiResults(
+				mockApiConfig,
+				"123 Main",
+				completeAddressWithSecondary,
+				mockFetch as any,
 			);
+
+			expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("selected=123+Main+St+Apt+1"));
 		});
 
 		it("should throw error on API error response", async () => {
@@ -137,12 +140,8 @@ describe("apiUtils", () => {
 
 			await getAutocompleteApiResults(mockApiConfig, "123 Main", null, mockFetch as any);
 
-			expect(mockFetch).toHaveBeenCalledWith(
-				expect.stringContaining("auth-id=test-api-key"),
-			);
-			expect(mockFetch).toHaveBeenCalledWith(
-				expect.stringContaining("user-agent="),
-			);
+			expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("auth-id=test-api-key"));
+			expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("user-agent="));
 		});
 	});
 
