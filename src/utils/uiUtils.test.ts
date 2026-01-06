@@ -7,66 +7,47 @@ import {
 	convertStylesObjectToCssBlock,
 	getMergedAddressSuggestions,
 } from "./uiUtils";
-import { AddressSuggestion, AbstractStateObject, StylesObject } from "../interfaces";
+import { AbstractStateObject, StylesObject } from "../interfaces";
 import * as domUtils from "./domUtils";
+import {
+	basicAddressWithoutSecondary,
+	completeAddressWithSecondary,
+	completeAddressWithSecondaryAlternate,
+	completeAddressWithSecondaryForNoMatch,
+} from "./addressSuggestions.fixtures";
 
 jest.mock("./domUtils");
 
 describe("uiUtils", () => {
 	describe("getFormattedAddressSuggestion", () => {
 		it("should format a suggestion without secondary", () => {
-			const suggestion: AddressSuggestion = {
-				street_line: "123 Main St",
-				city: "Springfield",
-				state: "IL",
-				zipcode: "62701",
+			const result = getFormattedAddressSuggestion({
+				...basicAddressWithoutSecondary,
 				secondary: "",
-			};
-
-			const result = getFormattedAddressSuggestion(suggestion);
+			});
 
 			expect(result).toBe("123 Main St, Springfield, IL 62701");
 		});
 
 		it("should format a suggestion with secondary", () => {
-			const suggestion: AddressSuggestion = {
-				street_line: "123 Main St",
-				secondary: "Apt 1",
-				city: "Springfield",
-				state: "IL",
-				zipcode: "62701",
-			};
-
-			const result = getFormattedAddressSuggestion(suggestion);
+			const result = getFormattedAddressSuggestion(completeAddressWithSecondary);
 
 			expect(result).toBe("123 Main St Apt 1, Springfield, IL 62701");
 		});
 
 		it("should use ellipsis for secondary suggestions", () => {
-			const suggestion: AddressSuggestion = {
-				street_line: "123 Main St",
-				secondary: "Apt 1",
-				city: "Springfield",
-				state: "IL",
-				zipcode: "62701",
-			};
-
-			const result = getFormattedAddressSuggestion(suggestion, true);
+			const result = getFormattedAddressSuggestion(completeAddressWithSecondary, true);
 
 			expect(result).toBe("… Apt 1, Springfield, IL 62701");
 		});
 
 		it("should handle missing secondary field", () => {
-			const suggestion: AddressSuggestion = {
-				street_line: "456 Oak Ave",
-				city: "Chicago",
-				state: "IL",
-				zipcode: "60601",
-			} as AddressSuggestion;
+			const result = getFormattedAddressSuggestion({
+				...completeAddressWithSecondaryAlternate,
+				secondary: undefined,
+			} as any);
 
-			const result = getFormattedAddressSuggestion(suggestion);
-
-			expect(result).toBe("456 Oak Ave, Chicago, IL 60601");
+			expect(result).toBe("456 Oak Ave, Springfield, IL 62702");
 		});
 	});
 
@@ -320,117 +301,55 @@ display: flex;
 
 	describe("getMergedAddressSuggestions", () => {
 		it("should merge secondary suggestions after selected suggestion", () => {
-			const primarySuggestions: AddressSuggestion[] = [
-				{
-					street_line: "123 Main St",
-					city: "Springfield",
-					state: "IL",
-					zipcode: "62701",
-					secondary: "",
-				},
-				{
-					street_line: "456 Oak Ave",
-					city: "Chicago",
-					state: "IL",
-					zipcode: "60601",
-					secondary: "",
-				},
-			];
-
-			const secondarySuggestions: AddressSuggestion[] = [
-				{
-					street_line: "123 Main St",
-					secondary: "Apt 1",
-					city: "Springfield",
-					state: "IL",
-					zipcode: "62701",
-				},
-				{
-					street_line: "123 Main St",
-					secondary: "Apt 2",
-					city: "Springfield",
-					state: "IL",
-					zipcode: "62701",
-				},
-			];
-
 			const state: AbstractStateObject = {
-				addressSuggestionResults: primarySuggestions,
-				secondaryAddressSuggestionResults: secondarySuggestions,
+				addressSuggestionResults: [
+					basicAddressWithoutSecondary,
+					completeAddressWithSecondaryAlternate,
+				],
+				secondaryAddressSuggestionResults: [
+					completeAddressWithSecondary,
+					completeAddressWithSecondaryForNoMatch,
+				],
 				selectedSuggestionIndex: 0,
 			} as AbstractStateObject;
 
 			const result = getMergedAddressSuggestions(state);
 
 			expect(result).toHaveLength(4);
-			expect(result[0]).toEqual(primarySuggestions[0]);
-			expect(result[1]).toEqual(secondarySuggestions[0]);
-			expect(result[2]).toEqual(secondarySuggestions[1]);
-			expect(result[3]).toEqual(primarySuggestions[1]);
+			expect(result[0]).toEqual(basicAddressWithoutSecondary);
+			expect(result[1]).toEqual(completeAddressWithSecondary);
+			expect(result[2]).toEqual(completeAddressWithSecondaryForNoMatch);
+			expect(result[3]).toEqual(completeAddressWithSecondaryAlternate);
 		});
 
 		it("should handle empty secondary suggestions", () => {
-			const primarySuggestions: AddressSuggestion[] = [
-				{
-					street_line: "123 Main St",
-					city: "Springfield",
-					state: "IL",
-					zipcode: "62701",
-					secondary: "",
-				},
-			];
-
 			const state: AbstractStateObject = {
-				addressSuggestionResults: primarySuggestions,
+				addressSuggestionResults: [basicAddressWithoutSecondary],
 				secondaryAddressSuggestionResults: [],
 				selectedSuggestionIndex: 0,
 			} as AbstractStateObject;
 
 			const result = getMergedAddressSuggestions(state);
 
-			expect(result).toEqual(primarySuggestions);
+			expect(result).toEqual([basicAddressWithoutSecondary]);
 		});
 
 		it("should insert at correct index when selection is not first", () => {
-			const primarySuggestions: AddressSuggestion[] = [
-				{
-					street_line: "123 Main St",
-					city: "Springfield",
-					state: "IL",
-					zipcode: "62701",
-					secondary: "",
-				},
-				{
-					street_line: "456 Oak Ave",
-					city: "Chicago",
-					state: "IL",
-					zipcode: "60601",
-					secondary: "",
-				},
-			];
-
-			const secondarySuggestions: AddressSuggestion[] = [
-				{
-					street_line: "456 Oak Ave",
-					secondary: "Unit A",
-					city: "Chicago",
-					state: "IL",
-					zipcode: "60601",
-				},
-			];
-
 			const state: AbstractStateObject = {
-				addressSuggestionResults: primarySuggestions,
-				secondaryAddressSuggestionResults: secondarySuggestions,
+				addressSuggestionResults: [
+					basicAddressWithoutSecondary,
+					completeAddressWithSecondaryAlternate,
+				],
+				secondaryAddressSuggestionResults: [completeAddressWithSecondary],
 				selectedSuggestionIndex: 1,
 			} as AbstractStateObject;
 
 			const result = getMergedAddressSuggestions(state);
 
 			expect(result).toHaveLength(3);
-			expect(result[0]).toEqual(primarySuggestions[0]);
-			expect(result[1]).toEqual(primarySuggestions[1]);
-			expect(result[2]).toEqual(secondarySuggestions[0]);
+			expect(result[0]).toEqual(basicAddressWithoutSecondary);
+			expect(result[1]).toEqual(completeAddressWithSecondaryAlternate);
+			expect(result[2]).toEqual(completeAddressWithSecondary);
 		});
 	});
 });
