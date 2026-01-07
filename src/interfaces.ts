@@ -55,28 +55,28 @@ export interface ServicesObject {
 	autocompleteDropdownService?: ServiceHandlersObject;
 	[serviceName: string]: ServiceHandlersObject;
 }
-export interface ServiceHandler {
-	(props: ServiceHandlerProps, customProps?: any): any;
+export interface ServiceHandler<TProps extends ServiceHandlerProps = ServiceHandlerProps> {
+	(props: TProps, customProps?: any): any;
 }
 
 export interface ServiceHandlerMap {
-	[name: string]: ServiceHandler;
+	[name: string]: ServiceHandler<any>;
 }
 export interface WrappedServiceHandler {
 	(customProps?: any): any;
 }
 
-export interface ServiceHandlerProps {
-	state: AbstractStateObject;
+export interface ServiceHandlerProps<TUtils = ServiceDefinitionUtils, TState = AbstractStateObject> {
+	state: TState;
 	setState: { (name: string, newState: unknown): void };
 	services: ServicesObject;
-	utils: { [name: string]: (...props: unknown[]) => unknown };
+	utils: TUtils;
 }
 
-export interface ServiceDefinition {
-	initialState: AbstractStateObject;
+export interface ServiceDefinition<TUtils = ServiceDefinitionUtils, TState = AbstractStateObject> {
+	initialState: TState;
 	serviceHandlers: ServiceHandlerMap;
-	utils?: ServiceDefinitionUtils;
+	utils?: TUtils;
 }
 
 export interface ServiceDefinitionUtils {
@@ -84,7 +84,7 @@ export interface ServiceDefinitionUtils {
 }
 
 export interface ServiceDefinitionMap {
-	[name: string]: ServiceDefinition;
+	[name: string]: ServiceDefinition<any, any>;
 }
 
 export interface UiSuggestionItem {

@@ -86,17 +86,14 @@ const utils = {
 	configureSearchInputForAutocomplete,
 };
 
-export const autocompleteDropdownService: ServiceDefinition = {
+export const autocompleteDropdownService: ServiceDefinition<typeof utils, typeof initialState> = {
 	initialState,
 	serviceHandlers,
 	utils,
 } as const;
 
-interface AutocompleteDropdownServiceHandlerProps extends ServiceHandlerProps {
-	utils: typeof utils;
-	state: typeof initialState;
-}
+type AutocompleteDropdownServiceHandlerProps = ServiceHandlerProps<typeof utils, typeof initialState>;
 
-export interface AutocompleteDropdownServiceHandler extends ServiceHandler {
+export interface AutocompleteDropdownServiceHandler extends ServiceHandler<AutocompleteDropdownServiceHandlerProps> {
 	(props: AutocompleteDropdownServiceHandlerProps, customProps?: any): any;
 }

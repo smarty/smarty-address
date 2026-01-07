@@ -30,17 +30,14 @@ const utils = {
 	getMatchingResult,
 } as const;
 
-export const apiService: ServiceDefinition = {
+export const apiService: ServiceDefinition<typeof utils, typeof initialState> = {
 	initialState,
 	serviceHandlers,
 	utils,
 } as const;
 
-interface ApiServiceHandlerProps extends ServiceHandlerProps {
-	utils: typeof utils;
-	state: typeof initialState;
-}
+type ApiServiceHandlerProps = ServiceHandlerProps<typeof utils, typeof initialState>;
 
-export interface ApiServiceHandler extends ServiceHandler {
+export interface ApiServiceHandler extends ServiceHandler<ApiServiceHandlerProps> {
 	(props: ApiServiceHandlerProps, customProps?: any): any;
 }
