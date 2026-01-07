@@ -179,12 +179,16 @@ export const getRgbaFromCssColor = (cssColor: CSSStyleDeclaration) => {
 	// TODO: Make sure this solution works cross-browser
 	const context = canvas.getContext("2d", { willReadFrequently: true });
 
+	if (!context) {
+		return { red: 0, green: 0, blue: 0, alpha: 1 };
+	}
+
 	context.globalCompositeOperation = "copy";
 	context.fillStyle = cssColor as any;
 	context.fillRect(0, 0, 1, 1);
 
 	const [red, green, blue, aByte] = context.getImageData(0, 0, 1, 1).data;
-	const alpha = Math.round((aByte / 255) * 1000) / 1000;
+	const alpha = Math.round(((aByte ?? 255) / 255) * 1000) / 1000;
 
 	return { red, green, blue, alpha };
 };

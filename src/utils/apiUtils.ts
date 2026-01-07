@@ -24,7 +24,7 @@ export const getMatchingResult = (
 	const matchingResult = primarySuggestions.find((suggestion) => {
 		return (
 			suggestion.street_line.trim() === selectedAddress.street_line.trim() &&
-			suggestion.secondary.includes(selectedAddress.secondary.trim())
+			suggestion.secondary?.includes(selectedAddress.secondary?.trim() ?? "")
 		);
 	});
 
@@ -34,7 +34,7 @@ export const getMatchingResult = (
 export const getAutocompleteApiResults = async (
 	apiConfig: ApiConfig,
 	searchString: string,
-	selectedAddress: AddressSuggestion = null,
+	selectedAddress: AddressSuggestion | null = null,
 	fetchFn: typeof fetch = fetch,
 ) => {
 	try {
@@ -74,7 +74,7 @@ export const getApiError = (statusCode: number, errorsResponse: { errors: ApiErr
 	const firstError = errorsResponse.errors[0];
 
 	const matchedError = knownAutocompleteErrors.find((knownError) => {
-		const errorIdMatches = !knownError.errorId || knownError.errorId === firstError.id;
+		const errorIdMatches = !knownError.errorId || knownError.errorId === firstError?.id;
 		return knownError.statusCode === statusCode && errorIdMatches;
 	});
 

@@ -69,7 +69,13 @@ export const convertDecimalToPercentage = (decimal: number) => {
 
 export const getHslFromColorString = (colorString: CSSStyleDeclaration) => {
 	const rgbaColor = getRgbaFromCssColor(colorString);
-	return rgbToHsl(rgbaColor);
+	const validRgba: RgbaColor = {
+		red: rgbaColor.red ?? 0,
+		green: rgbaColor.green ?? 0,
+		blue: rgbaColor.blue ?? 0,
+		alpha: rgbaColor.alpha ?? 1,
+	};
+	return rgbToHsl(validRgba);
 };
 
 export const convertStylesObjectToCssBlock = (stylesObject: StylesObject) => {
