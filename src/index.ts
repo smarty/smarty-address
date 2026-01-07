@@ -10,7 +10,6 @@ import { US_AUTOCOMPLETE_PRO_API_URL } from "./constants";
 // TODO: Update tsconfig.json
 // TODO: Add ability to destroy an instance of SmartyAddress (and remove all associated elements from DOM)
 // TODO: Make styles dynamically configurable (e.g. what if I want to change the theme dynamically after the page has loaded?)
-// TODO: Add testing
 // TODO: Update code to use international names for address fields, variable names, etc. (e.g. postal code instead of zipcode)
 // TODO: Add "backoff" for autocomplete results (add config option to make this customizable)
 // TODO: Add config option for "min characters" before api request is sent
