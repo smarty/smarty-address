@@ -12,6 +12,7 @@ import {
 	getElementStyles,
 } from "./domUtils";
 import { AddressSuggestion } from "../interfaces";
+import { completeAddressWithSecondary } from "./addressSuggestions.fixtures";
 
 describe("domUtils", () => {
 	describe("createDomElement", () => {
@@ -61,14 +62,6 @@ describe("domUtils", () => {
 	});
 
 	describe("getStreetLineFormValue", () => {
-		const address: AddressSuggestion = {
-			street_line: "123 Main St",
-			secondary: "Apt 4B",
-			city: "Springfield",
-			state: "IL",
-			zipcode: "62701",
-		} as AddressSuggestion;
-
 		it("should return only street_line when all input elements exist", () => {
 			const inputs = {
 				secondaryInputElement: document.createElement("input"),
@@ -77,7 +70,7 @@ describe("domUtils", () => {
 				zipcodeInputElement: document.createElement("input"),
 			};
 
-			const result = getStreetLineFormValue(inputs, address);
+			const result = getStreetLineFormValue(inputs, completeAddressWithSecondary);
 
 			expect(result).toBe("123 Main St");
 		});
@@ -90,9 +83,9 @@ describe("domUtils", () => {
 				zipcodeInputElement: document.createElement("input"),
 			};
 
-			const result = getStreetLineFormValue(inputs, address);
+			const result = getStreetLineFormValue(inputs, completeAddressWithSecondary);
 
-			expect(result).toBe("123 Main St, Apt 4B");
+			expect(result).toBe("123 Main St, Apt 1");
 		});
 
 		it("should not include secondary when it is empty", () => {
@@ -103,7 +96,7 @@ describe("domUtils", () => {
 				zipcodeInputElement: document.createElement("input"),
 			};
 
-			const addressWithoutSecondary = { ...address, secondary: "" };
+			const addressWithoutSecondary = { ...completeAddressWithSecondary, secondary: "" };
 			const result = getStreetLineFormValue(inputs, addressWithoutSecondary);
 
 			expect(result).toBe("123 Main St");
@@ -117,9 +110,9 @@ describe("domUtils", () => {
 				zipcodeInputElement: null,
 			};
 
-			const result = getStreetLineFormValue(inputs, address);
+			const result = getStreetLineFormValue(inputs, completeAddressWithSecondary);
 
-			expect(result).toBe("123 Main St, Apt 4B, Springfield, IL, 62701");
+			expect(result).toBe("123 Main St, Apt 1, Springfield, IL, 62701");
 		});
 
 		it("should include only street_line and city/state/zip when no input elements and no secondary", () => {
@@ -130,7 +123,7 @@ describe("domUtils", () => {
 				zipcodeInputElement: null,
 			};
 
-			const addressWithoutSecondary = { ...address, secondary: "" };
+			const addressWithoutSecondary = { ...completeAddressWithSecondary, secondary: "" };
 			const result = getStreetLineFormValue(inputs, addressWithoutSecondary);
 
 			expect(result).toBe("123 Main St, Springfield, IL, 62701");
@@ -145,7 +138,7 @@ describe("domUtils", () => {
 			};
 
 			const addressWithMissingValues = {
-				...address,
+				...completeAddressWithSecondary,
 				secondary: "",
 				state: "",
 			};
