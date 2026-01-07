@@ -32,9 +32,9 @@ export const createSuggestionElement = (suggestion: AddressSuggestion) => {
 	const entriesElementClasses = ["smartyAddress__suggestionEntries"];
 	const suggestionElementClasses = ["smartyAddress__suggestion"];
 
-	const entriesChildren = entries > 1 ? [{ text: `${entries} entries` }] : undefined;
+	const entriesChildren: ElementConfig[] | undefined = entries > 1 ? [{ text: `${entries} entries` }] : undefined;
 
-	const elementsMap = [
+	const elementsMap: ElementConfig[] = [
 		{
 			name: "suggestionElement",
 			elementType: "li",
@@ -260,7 +260,7 @@ interface ElementConfig {
 	elementType?: string;
 	className?: string[];
 	attributes?: Record<string, string>;
-	children?: ElementConfig[];
+	children?: ElementConfig[] | undefined;
 }
 
 const buildElementsFromMap = (fullElementsMap: ElementConfig[]): Record<string, HTMLElement | Text> => {
@@ -298,7 +298,7 @@ const buildElementsFromMap = (fullElementsMap: ElementConfig[]): Record<string, 
 
 export const buildAutocompleteDomElements = (
 	instanceClassname: string,
-): Record<string, HTMLElement> => {
+): Record<string, HTMLElement | Text> => {
 	const darkLogoElementClasses = ["smartyAddress__smartyLogoDark"];
 	const lightLogoElementClasses = ["smartyAddress__smartyLogoLight"];
 	const suggestionsElementClasses = ["smartyAddress__suggestionsElement"];

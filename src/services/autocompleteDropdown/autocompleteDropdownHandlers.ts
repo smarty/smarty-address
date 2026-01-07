@@ -1,4 +1,4 @@
-import { UiSuggestionItem } from "../../interfaces";
+import { AddressSuggestion, UiSuggestionItem } from "../../interfaces";
 import { AutocompleteDropdownServiceHandler } from "./AutocompleteDropdownService";
 
 export const watchSearchInputForChanges: AutocompleteDropdownServiceHandler = ({
@@ -189,7 +189,7 @@ export const handleSearchInputOnChange: AutocompleteDropdownServiceHandler = (
 		selectedSuggestionIndex > -1 ? "fetchSecondaryAddressSuggestions" : "fetchAddressSuggestions";
 
 	if (searchInputValue.length) {
-		services.apiService[apiMethod]({
+		services.apiService?.[apiMethod]?.({
 			searchString: searchInputValue,
 			selectedAddress: selectedAddress?.address,
 		});
@@ -205,14 +205,21 @@ export const setupDom: AutocompleteDropdownServiceHandler = (
 	const elements = utils.buildAutocompleteDomElements(instanceClassname);
 	const { customStylesElement, dropdownWrapperElement } = elements;
 
-	document.body.appendChild(dropdownWrapperElement);
-	document.getElementsByTagName("head")[0].appendChild(customStylesElement);
+	if (dropdownWrapperElement) {
+		document.body.appendChild(dropdownWrapperElement);
+	}
+	const head = document.getElementsByTagName("head")[0];
+	if (head && customStylesElement) {
+		head.appendChild(customStylesElement);
+	}
 
 	Object.keys(elements).forEach((elementKey) => {
 		setState(elementKey, elements[elementKey]);
 	});
 
-	utils.updateThemeClass(state.theme, [], dropdownWrapperElement);
+	if (dropdownWrapperElement instanceof HTMLElement) {
+		utils.updateThemeClass(state.theme, [], dropdownWrapperElement);
+	}
 	services.autocompleteDropdownService?.watchSearchInputForChanges?.();
 
 	const dynamicStylingHandler = () =>
