@@ -11,7 +11,7 @@ export const watchSearchInputForChanges: AutocompleteDropdownServiceHandler = ({
 
 	searchInputElement.addEventListener(
 		"input",
-		services.autocompleteDropdownService.handleSearchInputOnChange,
+		services.autocompleteDropdownService?.handleSearchInputOnChange,
 	);
 
 	// TODO: Re-enable this later, but make sure selecting secondaries still works
@@ -22,7 +22,7 @@ export const watchSearchInputForChanges: AutocompleteDropdownServiceHandler = ({
 
 	searchInputElement.addEventListener(
 		"keydown",
-		services.autocompleteDropdownService.handleAutocompleteKeydown,
+		services.autocompleteDropdownService?.handleAutocompleteKeydown,
 	);
 };
 
@@ -34,18 +34,18 @@ export const handleAutocompleteKeydown: AutocompleteDropdownServiceHandler = (
 	if (state.dropdownIsOpen) {
 		const handledKeys = {
 			ArrowDown: () => {
-				services.autocompleteDropdownService.highlightNewAddress(1);
+				services.autocompleteDropdownService?.highlightNewAddress(1);
 			},
 			ArrowUp: () => {
-				services.autocompleteDropdownService.highlightNewAddress(-1);
+				services.autocompleteDropdownService?.highlightNewAddress(-1);
 			},
 			Enter: () => {
-				services.autocompleteDropdownService.handleSelectDropdownItem(
+				services.autocompleteDropdownService?.handleSelectDropdownItem(
 					state.highlightedSuggestionIndex,
 				);
 			},
 			Escape: () => {
-				services.autocompleteDropdownService.closeDropdown();
+				services.autocompleteDropdownService?.closeDropdown();
 			},
 		};
 
@@ -94,8 +94,8 @@ export const handleSelectDropdownItem: AutocompleteDropdownServiceHandler = (
 		});
 		searchInputElement.focus();
 	} else {
-		services.addressFormUiService.populateFormWithNewAddress(selectedAddress.address);
-		services.autocompleteDropdownService.closeDropdown();
+		services.addressFormUiService?.populateFormWithNewAddress(selectedAddress.address);
+		services.autocompleteDropdownService?.closeDropdown();
 	}
 };
 
@@ -105,7 +105,7 @@ export const formatAddressSuggestions: AutocompleteDropdownServiceHandler = (
 ) => {
 	const suggestionItems = suggestions.map((address, addressIndex): UiSuggestionItem => {
 		const suggestionOnClickHandler = () => {
-			services.autocompleteDropdownService.handleSelectDropdownItem(
+			services.autocompleteDropdownService?.handleSelectDropdownItem(
 				addressIndex + state.selectedSuggestionIndex + 1,
 			);
 		};
@@ -127,11 +127,11 @@ export const formatAddressSuggestions: AutocompleteDropdownServiceHandler = (
 	if (suggestionItems.length) {
 		setState(
 			"highlightedSuggestionIndex",
-			services.autocompleteDropdownService.highlightNewAddress(0),
+			services.autocompleteDropdownService?.highlightNewAddress(0),
 		);
 	}
 
-	services.autocompleteDropdownService.openDropdown();
+	services.autocompleteDropdownService?.openDropdown();
 };
 
 export const formatSecondaryAddressSuggestions: AutocompleteDropdownServiceHandler = (
@@ -140,7 +140,7 @@ export const formatSecondaryAddressSuggestions: AutocompleteDropdownServiceHandl
 ) => {
 	const suggestionItems = suggestions.map((address, addressIndex): UiSuggestionItem => {
 		const suggestionOnClickHandler = () => {
-			services.autocompleteDropdownService.handleSelectDropdownItem(
+			services.autocompleteDropdownService?.handleSelectDropdownItem(
 				addressIndex + state.selectedSuggestionIndex + 1,
 			);
 		};
@@ -163,11 +163,11 @@ export const formatSecondaryAddressSuggestions: AutocompleteDropdownServiceHandl
 	if (suggestionItems.length) {
 		setState(
 			"highlightedSuggestionIndex",
-			services.autocompleteDropdownService.highlightNewAddress(0),
+			services.autocompleteDropdownService?.highlightNewAddress(0),
 		);
 	}
 
-	services.autocompleteDropdownService.openDropdown();
+	services.autocompleteDropdownService?.openDropdown();
 };
 
 export const handleSearchInputOnChange: AutocompleteDropdownServiceHandler = (
@@ -213,7 +213,7 @@ export const setupDom: AutocompleteDropdownServiceHandler = (
 	});
 
 	utils.updateThemeClass(state.theme, [], dropdownWrapperElement);
-	services.autocompleteDropdownService.watchSearchInputForChanges();
+	services.autocompleteDropdownService?.watchSearchInputForChanges();
 
 	const dynamicStylingHandler = () =>
 		utils.updateDynamicStyles(
@@ -236,14 +236,14 @@ export const init: AutocompleteDropdownServiceHandler = ({ state, setState, util
 };
 
 export const handleAutocompleteError: AutocompleteDropdownServiceHandler = ({ services }) => {
-	services.autocompleteDropdownService.closeDropdown();
+	services.autocompleteDropdownService?.closeDropdown();
 };
 
 export const handleAutocompleteSecondaryError: AutocompleteDropdownServiceHandler = ({
 	services,
 }) => {
 	// TODO: Implement better error handling here
-	services.autocompleteDropdownService.closeDropdown();
+	services.autocompleteDropdownService?.closeDropdown();
 };
 
 export const closeDropdown: AutocompleteDropdownServiceHandler = ({ state, utils }) => {

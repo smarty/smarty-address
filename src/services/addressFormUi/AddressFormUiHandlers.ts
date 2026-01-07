@@ -9,7 +9,7 @@ export const init: addressFormUiServiceHandler = ({ setState, services }, config
 	setState("stateSelector", config?.stateSelector);
 	setState("zipcodeSelector", config?.zipcodeSelector);
 
-	services.addressFormUiService.findInputElements();
+	services.addressFormUiService?.findInputElements();
 };
 
 export const findInputElements: addressFormUiServiceHandler = ({
@@ -39,7 +39,7 @@ export const findInputElements: addressFormUiServiceHandler = ({
 	setState("stateInputElement", findDomElement(stateSelector));
 	setState("zipcodeInputElement", findDomElement(zipcodeSelector));
 
-	services.autocompleteDropdownService.setupDom({
+	services.autocompleteDropdownService?.setupDom({
 		searchInputElement: state.searchInputElement,
 		streetLineInputElement: state.streetLineInputElement,
 		secondaryInputElement: state.secondaryInputElement,

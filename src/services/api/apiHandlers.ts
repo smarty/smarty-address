@@ -16,11 +16,12 @@ export const fetchAddressSuggestions: ApiServiceHandler = async (
 	{ searchString }: { searchString: string },
 ) => {
 	try {
-		const apiConfig = services.apiService.getApiConfig();
+		const apiConfig = services.apiService?.getApiConfig?.();
 		const suggestions = await utils.getAutocompleteApiResults(apiConfig, searchString);
-		services.autocompleteDropdownService.formatAddressSuggestions(suggestions);
+		services.autocompleteDropdownService?.formatAddressSuggestions(suggestions);
 	} catch (error) {
-		services.autocompleteDropdownService.handleAutocompleteError({ errorName: error.message });
+		const errorMessage = error instanceof Error ? error.message : String(error);
+		services.autocompleteDropdownService?.handleAutocompleteError({ errorName: errorMessage });
 	}
 };
 
@@ -29,17 +30,18 @@ export const fetchSecondaryAddressSuggestions: ApiServiceHandler = async (
 	{ searchString, selectedAddress },
 ) => {
 	try {
-		const apiConfig = services.apiService.getApiConfig();
+		const apiConfig = services.apiService?.getApiConfig?.();
 		const primarySuggestions = await utils.getAutocompleteApiResults(apiConfig, searchString);
 		const newSelectedAddress = utils.getMatchingResult(primarySuggestions, selectedAddress);
 		const suggestions = newSelectedAddress
 			? await utils.getAutocompleteApiResults(apiConfig, searchString, newSelectedAddress)
 			: [];
 
-		services.autocompleteDropdownService.formatSecondaryAddressSuggestions(suggestions);
+		services.autocompleteDropdownService?.formatSecondaryAddressSuggestions(suggestions);
 	} catch (error) {
-		services.autocompleteDropdownService.handleAutocompleteSecondaryError({
-			errorName: error.message,
+		const errorMessage = error instanceof Error ? error.message : String(error);
+		services.autocompleteDropdownService?.handleAutocompleteSecondaryError({
+			errorName: errorMessage,
 		});
 	}
 };
