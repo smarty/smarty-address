@@ -106,9 +106,12 @@ export const updateDropdownContents = (
 	);
 };
 
-export const getElementStyles = (element: HTMLElement, property: string): CSSStyleDeclaration => {
-	const styles: CSSStyleDeclaration = window.getComputedStyle(element);
-
+export const getElementStyles = (
+	element: HTMLElement,
+	property: string,
+	getComputedStyleFn = window.getComputedStyle,
+): CSSStyleDeclaration => {
+	const styles = getComputedStyleFn(element);
 	return styles[property] ?? "rgba(0, 0, 0, 0)";
 };
 
