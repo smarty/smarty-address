@@ -25,7 +25,7 @@ export const createDomElement = (
 	return element;
 };
 
-export const createSuggestionElement = (suggestion) => {
+export const createSuggestionElement = (suggestion: AddressSuggestion) => {
 	const { entries = 0 } = suggestion;
 	const addressElementClasses = ["smartyAddress__autocompleteAddress"];
 	const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
@@ -66,7 +66,7 @@ export const createSuggestionElement = (suggestion) => {
 	return buildElementsFromMap(elementsMap);
 };
 
-export const createSecondarySuggestionElement = (suggestion) => {
+export const createSecondarySuggestionElement = (suggestion: AddressSuggestion) => {
 	const addressElementClasses = ["smartyAddress__autocompleteAddress"];
 	const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
 	const secondarySuggestionElementClasses = ["smartyAddress__secondarySuggestion"];
@@ -112,7 +112,7 @@ export const getElementStyles = (
 	getComputedStyleFn = window.getComputedStyle,
 ): CSSStyleDeclaration => {
 	const styles = getComputedStyleFn(element);
-	return styles[property] ?? "rgba(0, 0, 0, 0)";
+	return (styles as any)[property] ?? "rgba(0, 0, 0, 0)";
 };
 
 export const scrollToHighlightedSuggestion = (
@@ -132,7 +132,12 @@ export const scrollToHighlightedSuggestion = (
 };
 
 export const getStreetLineFormValue = (
-	{ secondaryInputElement, cityInputElement, stateInputElement, zipcodeInputElement },
+	{ secondaryInputElement, cityInputElement, stateInputElement, zipcodeInputElement }: {
+		secondaryInputElement: HTMLInputElement | null;
+		cityInputElement: HTMLInputElement | null;
+		stateInputElement: HTMLInputElement | null;
+		zipcodeInputElement: HTMLInputElement | null;
+	},
 	address: AddressSuggestion,
 ) => {
 	const streetLineValues = [address.street_line];
@@ -249,9 +254,17 @@ export const updateDynamicStyles = (
 	stylesElement.innerHTML = `${colorsStyleBlock} ${positionStyleBlock}`;
 };
 
-// TODO: Fill in the types here
-const buildElementsFromMap = (fullElementsMap) => {
-	const elements = {};
+interface ElementConfig {
+	name?: string;
+	text?: string;
+	elementType?: string;
+	className?: string[];
+	attributes?: Record<string, string>;
+	children?: ElementConfig[];
+}
+
+const buildElementsFromMap = (fullElementsMap: ElementConfig[]): Record<string, HTMLElement | Text> => {
+	const elements: Record<string, HTMLElement | Text> = {};
 
 	const buildElement = ({
 		name,
@@ -260,13 +273,16 @@ const buildElementsFromMap = (fullElementsMap) => {
 		className = [],
 		attributes = {},
 		children = [],
-	}) => {
+	}: ElementConfig): HTMLElement | Text => {
 		const element = text
 			? document.createTextNode(text)
-			: createDomElement(elementType, className, children.map(buildElement));
-		Object.entries(attributes).forEach(([attr, value]) => {
-			element.setAttribute(attr, value);
-		});
+			: createDomElement(elementType!, className, children.map(buildElement));
+
+		if (element instanceof HTMLElement) {
+			Object.entries(attributes).forEach(([attr, value]) => {
+				element.setAttribute(attr, value);
+			});
+		}
 
 		if (name) {
 			elements[name] = element;
