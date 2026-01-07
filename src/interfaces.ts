@@ -80,7 +80,7 @@ export interface ServiceDefinition<TUtils = ServiceDefinitionUtils, TState = Abs
 }
 
 export interface ServiceDefinitionUtils {
-	[name: string]: (...args: unknown[]) => unknown;
+	[name: string]: (...args: any[]) => any;
 }
 
 export interface ServiceDefinitionMap {
