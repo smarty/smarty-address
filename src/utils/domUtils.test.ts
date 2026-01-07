@@ -11,7 +11,6 @@ import {
 	findDomElement,
 	getElementStyles,
 } from "./domUtils";
-import { AddressSuggestion } from "../interfaces";
 import { completeAddressWithSecondary } from "./addressSuggestions.fixtures";
 
 describe("domUtils", () => {
