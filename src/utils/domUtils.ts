@@ -7,8 +7,8 @@ import {
 } from "./uiUtils";
 import { getSmartyLogo } from "./getSmartyLogo";
 
-export const findDomElement = (selector?: string): HTMLElement | null => {
-	return selector ? document.querySelector(selector) : null;
+export const findDomElement = (selector?: string, doc: Document = document): HTMLElement | null => {
+	return selector ? doc.querySelector(selector) : null;
 };
 
 export const createDomElement = (
