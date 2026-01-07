@@ -9,7 +9,7 @@ export const init: addressFormUiServiceHandler = ({ setState, services }, config
 	setState("stateSelector", config?.stateSelector);
 	setState("zipcodeSelector", config?.zipcodeSelector);
 
-	services.addressFormUiService?.findInputElements();
+	services.addressFormUiService?.findInputElements?.();
 };
 
 export const findInputElements: addressFormUiServiceHandler = ({
@@ -39,7 +39,7 @@ export const findInputElements: addressFormUiServiceHandler = ({
 	setState("stateInputElement", findDomElement(stateSelector));
 	setState("zipcodeInputElement", findDomElement(zipcodeSelector));
 
-	services.autocompleteDropdownService?.setupDom({
+	services.autocompleteDropdownService?.setupDom?.({
 		searchInputElement: state.searchInputElement,
 		streetLineInputElement: state.streetLineInputElement,
 		secondaryInputElement: state.secondaryInputElement,
@@ -55,10 +55,12 @@ export const populateFormWithNewAddress: addressFormUiServiceHandler = (
 ) => {
 	// TODO: If elements aren't inputs, specify textContent instead of value
 	// TODO: Handle if elements (e.g. state input) are <select> elements
+	if (!state.streetLineInputElement) return;
+
 	state.streetLineInputElement.value = utils.getStreetLineFormValue(state, selectedAddress);
 
 	if (state.secondaryInputElement) {
-		state.secondaryInputElement.value = selectedAddress.secondary;
+		state.secondaryInputElement.value = selectedAddress.secondary ?? "";
 	}
 	if (state.cityInputElement) {
 		state.cityInputElement.value = selectedAddress.city;

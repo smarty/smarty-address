@@ -9,10 +9,10 @@ export const watchSearchInputForChanges: AutocompleteDropdownServiceHandler = ({
 	const searchInputElement = state.searchInputElement;
 	utils.configureSearchInputForAutocomplete(searchInputElement);
 
-	searchInputElement.addEventListener(
-		"input",
-		services.autocompleteDropdownService?.handleSearchInputOnChange,
-	);
+	const handleSearchInput = services.autocompleteDropdownService?.handleSearchInputOnChange;
+	if (handleSearchInput) {
+		searchInputElement.addEventListener("input", handleSearchInput);
+	}
 
 	// TODO: Re-enable this later, but make sure selecting secondaries still works
 	// searchInputElement.addEventListener(
@@ -20,10 +20,10 @@ export const watchSearchInputForChanges: AutocompleteDropdownServiceHandler = ({
 	// 	services.autocompleteDropdownService.closeDropdown,
 	// );
 
-	searchInputElement.addEventListener(
-		"keydown",
-		services.autocompleteDropdownService?.handleAutocompleteKeydown,
-	);
+	const handleKeydown = services.autocompleteDropdownService?.handleAutocompleteKeydown;
+	if (handleKeydown) {
+		searchInputElement.addEventListener("keydown", handleKeydown);
+	}
 };
 
 export const handleAutocompleteKeydown: AutocompleteDropdownServiceHandler = (
@@ -32,20 +32,20 @@ export const handleAutocompleteKeydown: AutocompleteDropdownServiceHandler = (
 ) => {
 	const pressedKey = event.key;
 	if (state.dropdownIsOpen) {
-		const handledKeys = {
+		const handledKeys: Record<string, () => void> = {
 			ArrowDown: () => {
-				services.autocompleteDropdownService?.highlightNewAddress(1);
+				services.autocompleteDropdownService?.highlightNewAddress?.(1);
 			},
 			ArrowUp: () => {
-				services.autocompleteDropdownService?.highlightNewAddress(-1);
+				services.autocompleteDropdownService?.highlightNewAddress?.(-1);
 			},
 			Enter: () => {
-				services.autocompleteDropdownService?.handleSelectDropdownItem(
+				services.autocompleteDropdownService?.handleSelectDropdownItem?.(
 					state.highlightedSuggestionIndex,
 				);
 			},
 			Escape: () => {
-				services.autocompleteDropdownService?.closeDropdown();
+				services.autocompleteDropdownService?.closeDropdown?.();
 			},
 		};
 
