@@ -33,6 +33,7 @@ import {
 	updateDynamicStyles,
 	updateThemeClass,
 	configureSearchInputForAutocomplete,
+	findDomElement,
 } from "../../utils/domUtils";
 import { getInstanceClassName, getMergedAddressSuggestions } from "../../utils/uiUtils";
 
@@ -84,6 +85,7 @@ const utils = {
 	createSecondarySuggestionElement,
 	createSuggestionElement,
 	configureSearchInputForAutocomplete,
+	findDomElement,
 };
 
 export const autocompleteDropdownService: ServiceDefinition<typeof utils, typeof initialState> = {

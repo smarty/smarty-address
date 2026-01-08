@@ -12,12 +12,7 @@ export const init: addressFormUiServiceHandler = ({ setState, services }, config
 	services.addressFormUiService?.findInputElements?.();
 };
 
-export const findInputElements: addressFormUiServiceHandler = ({
-	state,
-	setState,
-	services,
-	utils,
-}) => {
+export const findInputElements: addressFormUiServiceHandler = ({ state, setState, utils }) => {
 	const {
 		searchInputSelector,
 		streetSelector,
@@ -38,15 +33,6 @@ export const findInputElements: addressFormUiServiceHandler = ({
 	setState("cityInputElement", findDomElement(citySelector));
 	setState("stateInputElement", findDomElement(stateSelector));
 	setState("zipcodeInputElement", findDomElement(zipcodeSelector));
-
-	services.autocompleteDropdownService?.setupDom?.({
-		searchInputElement: state.searchInputElement,
-		streetLineInputElement: state.streetLineInputElement,
-		secondaryInputElement: state.secondaryInputElement,
-		cityInputElement: state.cityInputElement,
-		stateInputElement: state.stateInputElement,
-		zipcodeInputElement: state.zipcodeInputElement,
-	});
 };
 
 export const populateFormWithNewAddress: addressFormUiServiceHandler = (
