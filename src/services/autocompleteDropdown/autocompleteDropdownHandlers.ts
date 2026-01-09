@@ -202,7 +202,7 @@ export const handleSearchInputOnChange: AutocompleteDropdownServiceHandler = (
 	}
 };
 
-export const setupDom: AutocompleteDropdownServiceHandler = ({
+export const setupDom: AutocompleteDropdownServiceHandler = async ({
 	state,
 	setState,
 	services,
@@ -227,7 +227,23 @@ export const setupDom: AutocompleteDropdownServiceHandler = ({
 	if (dropdownWrapperElement instanceof HTMLElement) {
 		utils.updateThemeClass(state.theme, [], dropdownWrapperElement);
 	}
-	const searchInputElement = utils.findDomElement(state.searchInputSelector) as HTMLInputElement;
+
+	let searchInputElement: HTMLInputElement | null = null;
+	const maxAttempts = 5;
+	const delayMs = 100;
+
+	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+		searchInputElement = utils.findDomElement(state.searchInputSelector) as HTMLInputElement;
+
+		if (searchInputElement) {
+			break;
+		}
+
+		if (attempt < maxAttempts) {
+			await new Promise((resolve) => setTimeout(resolve, delayMs));
+		}
+	}
+
 	if (searchInputElement) {
 		services.autocompleteDropdownService?.watchSearchInputForChanges?.();
 
@@ -239,6 +255,10 @@ export const setupDom: AutocompleteDropdownServiceHandler = ({
 			);
 
 		utils.configureDynamicStyling(dynamicStylingHandler);
+	} else {
+		console.error(
+			`SmartyAddress: Failed to find search input element with selector "${state.searchInputSelector}"`,
+		);
 	}
 };
 
