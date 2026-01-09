@@ -11,6 +11,28 @@ export const findDomElement = (selector?: string | null, doc: Document = documen
 	return selector ? doc.querySelector(selector) : null;
 };
 
+export const findDomElementWithRetry = async (
+	selector: string,
+	findDomElementFn: typeof findDomElement,
+	maxAttempts: number = 5,
+	delayMs: number = 100,
+): Promise<HTMLElement | null> => {
+	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+		const element = findDomElementFn(selector);
+
+		if (element) {
+			return element;
+		}
+
+		if (attempt < maxAttempts) {
+			await new Promise(resolve => setTimeout(resolve, delayMs));
+		}
+	}
+
+	console.error(`Failed to find element with selector "${selector}" after ${maxAttempts} attempts`);
+	return null;
+};
+
 export const createDomElement = (
 	tagName: string,
 	classList: string[] = [],
