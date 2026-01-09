@@ -39,7 +39,7 @@ import { getInstanceClassName, getMergedAddressSuggestions } from "../../utils/u
 
 const initialState: AbstractStateObject = {
 	theme: null,
-	searchInputElement: null,
+	searchInputSelector: null,
 
 	dropdownWrapperElement: null,
 	dropdownElement: null,

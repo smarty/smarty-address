@@ -1,20 +1,17 @@
 import { addressFormUiServiceHandler } from "./AddressFormUiService";
 // TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
-export const init: addressFormUiServiceHandler = ({ setState, services }, config) => {
+export const init: addressFormUiServiceHandler = ({ setState }, config) => {
 	setState("searchInputSelector", config?.searchInputSelector);
 	setState("streetSelector", config?.streetSelector);
 	setState("secondarySelector", config?.secondarySelector);
 	setState("citySelector", config?.citySelector);
 	setState("stateSelector", config?.stateSelector);
 	setState("zipcodeSelector", config?.zipcodeSelector);
-
-	services.addressFormUiService?.findInputElements?.();
 };
 
-export const findInputElements: addressFormUiServiceHandler = ({ state, setState, utils }) => {
+export const findInputElements: addressFormUiServiceHandler = ({ state, utils }) => {
 	const {
-		searchInputSelector,
 		streetSelector,
 		secondarySelector,
 		citySelector,
@@ -23,38 +20,42 @@ export const findInputElements: addressFormUiServiceHandler = ({ state, setState
 	} = state;
 	const { findDomElement } = utils;
 
-	// TODO: Consider finding the DOM elements each time they're needed (instead of caching them)
-	setState("streetLineInputElement", findDomElement(streetSelector));
-	setState(
-		"searchInputElement",
-		findDomElement(searchInputSelector) ?? state.streetLineInputElement,
-	);
-	setState("secondaryInputElement", findDomElement(secondarySelector));
-	setState("cityInputElement", findDomElement(citySelector));
-	setState("stateInputElement", findDomElement(stateSelector));
-	setState("zipcodeInputElement", findDomElement(zipcodeSelector));
+	const streetLineInputElement = findDomElement(streetSelector);
+	const secondaryInputElement = findDomElement(secondarySelector);
+	const cityInputElement = findDomElement(citySelector);
+	const stateInputElement = findDomElement(stateSelector);
+	const zipcodeInputElement = findDomElement(zipcodeSelector);
+
+	return {
+		streetLineInputElement,
+		secondaryInputElement,
+		cityInputElement,
+		stateInputElement,
+		zipcodeInputElement,
+	};
 };
 
 export const populateFormWithNewAddress: addressFormUiServiceHandler = (
-	{ state, utils },
+	{ utils, services },
 	selectedAddress,
 ) => {
 	// TODO: If elements aren't inputs, specify textContent instead of value
 	// TODO: Handle if elements (e.g. state input) are <select> elements
-	if (!state.streetLineInputElement) return;
+	const elements = services.addressFormUiService?.findInputElements?.();
+	if (!elements?.streetLineInputElement) return;
 
-	state.streetLineInputElement.value = utils.getStreetLineFormValue(state, selectedAddress);
+	elements.streetLineInputElement.value = utils.getStreetLineFormValue(elements, selectedAddress);
 
-	if (state.secondaryInputElement) {
-		state.secondaryInputElement.value = selectedAddress.secondary ?? "";
+	if (elements.secondaryInputElement) {
+		elements.secondaryInputElement.value = selectedAddress.secondary ?? "";
 	}
-	if (state.cityInputElement) {
-		state.cityInputElement.value = selectedAddress.city;
+	if (elements.cityInputElement) {
+		elements.cityInputElement.value = selectedAddress.city;
 	}
-	if (state.stateInputElement) {
-		state.stateInputElement.value = selectedAddress.state;
+	if (elements.stateInputElement) {
+		elements.stateInputElement.value = selectedAddress.state;
 	}
-	if (state.zipcodeInputElement) {
-		state.zipcodeInputElement.value = selectedAddress.zipcode;
+	if (elements.zipcodeInputElement) {
+		elements.zipcodeInputElement.value = selectedAddress.zipcode;
 	}
 };

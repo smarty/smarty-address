@@ -9,13 +9,6 @@ const initialState = {
 	citySelector: null as string | null,
 	stateSelector: null as string | null,
 	zipcodeSelector: null as string | null,
-
-	searchInputElement: null as HTMLInputElement | null,
-	streetLineInputElement: null as HTMLInputElement | null,
-	secondaryInputElement: null as HTMLInputElement | null,
-	cityInputElement: null as HTMLInputElement | null,
-	stateInputElement: null as HTMLInputElement | null,
-	zipcodeInputElement: null as HTMLInputElement | null,
 };
 
 const serviceHandlers = {

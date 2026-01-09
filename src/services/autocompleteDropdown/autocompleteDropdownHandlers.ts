@@ -6,7 +6,9 @@ export const watchSearchInputForChanges: AutocompleteDropdownServiceHandler = ({
 	services,
 	utils,
 }) => {
-	const searchInputElement = state.searchInputElement;
+	const searchInputElement = utils.findDomElement(state.searchInputSelector) as HTMLInputElement;
+	if (!searchInputElement) return;
+
 	utils.configureSearchInputForAutocomplete(searchInputElement);
 
 	const handleSearchInput = services.autocompleteDropdownService?.handleSearchInputOnChange;
@@ -81,10 +83,10 @@ export const handleSelectDropdownItem: AutocompleteDropdownServiceHandler = (
 	const mergedAddressSuggestions = utils.getMergedAddressSuggestions(state);
 	const selectedAddress = mergedAddressSuggestions[addressIndex];
 	const { street_line, secondary = "", entries = 0 } = selectedAddress.address;
-	const searchInputElement = state.searchInputElement;
+	const searchInputElement = utils.findDomElement(state.searchInputSelector) as HTMLInputElement;
 	setState("selectedSuggestionIndex", addressIndex);
 
-	if (entries > 1) {
+	if (entries > 1 && searchInputElement) {
 		const newSearchTerm = `${street_line} ${secondary}`;
 		setState("selectedAddressSearchTerm", newSearchTerm);
 		searchInputElement.value = newSearchTerm;
@@ -225,13 +227,14 @@ export const setupDom: AutocompleteDropdownServiceHandler = ({
 	if (dropdownWrapperElement instanceof HTMLElement) {
 		utils.updateThemeClass(state.theme, [], dropdownWrapperElement);
 	}
-	if (state.searchInputElement) {
+	const searchInputElement = utils.findDomElement(state.searchInputSelector) as HTMLInputElement;
+	if (searchInputElement) {
 		services.autocompleteDropdownService?.watchSearchInputForChanges?.();
 
 		const dynamicStylingHandler = () =>
 			utils.updateDynamicStyles(
 				customStylesElement as HTMLStyleElement,
-				state.searchInputElement,
+				searchInputElement,
 				state.instanceId,
 			);
 
@@ -251,10 +254,7 @@ export const init: AutocompleteDropdownServiceHandler = (
 		utils.updateThemeClass(newTheme, previousTheme, state.dropdownWrapperElement);
 	}
 
-	const searchInputElement = utils.findDomElement(
-		config.searchInputSelector ?? config.streetSelector,
-	);
-	setState("searchInputElement", searchInputElement);
+	setState("searchInputSelector", config.searchInputSelector ?? config.streetSelector);
 
 	services.autocompleteDropdownService?.setupDom?.();
 };
@@ -271,13 +271,19 @@ export const handleAutocompleteSecondaryError: AutocompleteDropdownServiceHandle
 };
 
 export const closeDropdown: AutocompleteDropdownServiceHandler = ({ state, utils }) => {
-	state.searchInputElement.setAttribute("aria-expanded", "false");
+	const searchInputElement = utils.findDomElement(state.searchInputSelector);
+	if (searchInputElement) {
+		searchInputElement.setAttribute("aria-expanded", "false");
+	}
 	state.dropdownIsOpen = false;
 	utils.hideElement(state.dropdownElement);
 };
 
 export const openDropdown: AutocompleteDropdownServiceHandler = ({ state, utils }) => {
-	state.searchInputElement.setAttribute("aria-expanded", "true");
+	const searchInputElement = utils.findDomElement(state.searchInputSelector);
+	if (searchInputElement) {
+		searchInputElement.setAttribute("aria-expanded", "true");
+	}
 	state.dropdownIsOpen = true;
 	utils.showElement(state.dropdownElement);
 };
