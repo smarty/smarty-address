@@ -1,10 +1,13 @@
 import { ApiServiceHandler } from "./ApiService";
-import { ApiConfig } from "../../interfaces";
+import { ApiConfig, SmartyAddressConfig } from "../../interfaces";
 // TODO: Add support for additional input fields (e.g. max_results, include_only_zip_codes, etc.). These would likely be set as "config" values
 
-export const init: ApiServiceHandler = async ({ setState }, config) => {
-	setState("apiKey", config.embeddedKey);
-	setState("autocompleteApiUrl", config.autocompleteApiUrl);
+export const init: ApiServiceHandler = async (
+	{ setState },
+	{ embeddedKey, autocompleteApiUrl }: SmartyAddressConfig,
+) => {
+	setState("apiKey", embeddedKey);
+	setState("autocompleteApiUrl", autocompleteApiUrl);
 };
 
 export const getApiConfig: ApiServiceHandler = ({ state }): ApiConfig => {
