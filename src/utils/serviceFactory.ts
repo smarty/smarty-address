@@ -14,7 +14,6 @@ export const initService = (
 	const wrappedServiceHandlers: ServiceHandlersObject = {};
 
 	const setState = (name: string, newState: unknown) => {
-		// TODO: Make state updates more robust (or just directly modify value in the service handlers)
 		state[name] = newState;
 	};
 	const defaultProps = { state, setState, utils, services: instanceServices };

@@ -11,13 +11,7 @@ export const init: addressFormUiServiceHandler = ({ setState }, config) => {
 };
 
 export const findInputElements: addressFormUiServiceHandler = ({ state, utils }) => {
-	const {
-		streetSelector,
-		secondarySelector,
-		citySelector,
-		stateSelector,
-		zipcodeSelector,
-	} = state;
+	const { streetSelector, secondarySelector, citySelector, stateSelector, zipcodeSelector } = state;
 	const { findDomElement } = utils;
 
 	const streetLineInputElement = findDomElement(streetSelector);
@@ -39,8 +33,9 @@ export const populateFormWithNewAddress: addressFormUiServiceHandler = (
 	{ utils, services },
 	selectedAddress,
 ) => {
-	// TODO: If elements aren't inputs, specify textContent instead of value
+	// TODO: If elements aren't inputs (e.g. <div>, <p>, etc.), specify textContent instead of value
 	// TODO: Handle if elements (e.g. state input) are <select> elements
+	// TODO: Handle if elements are textareas
 	const elements = services.addressFormUiService?.findInputElements?.();
 	if (!elements?.streetLineInputElement) return;
 

@@ -20,7 +20,6 @@ export const colorStyles = {
 		"--smartyAddress__largeShadow2": "0 20px 40px 0 rgba(21, 27, 35, 0.06)",
 	},
 	".smartyAddress__color_light": {
-		// TODO: update theme with the correct colors
 		"--smartyAddress__textBasePrimaryColor": "#333",
 		"--smartyAddress__textBaseSecondaryColor": "#777",
 		"--smartyAddress__textAccentColor": "#0066ff",
