@@ -17,21 +17,15 @@ export const findDomElement = (
 export const findDomElementWithRetry = async (
 	selector: string,
 	findDomElementFn: typeof findDomElement,
-	maxAttempts: number = 5,
+	maxAttempts: number = 50,
 	delayMs: number = 100,
 ): Promise<HTMLElement | null> => {
-	for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-		const element = findDomElementFn(selector);
+	const retryAfterDelay = async () => {
+		await new Promise((resolve) => setTimeout(resolve, delayMs));
+		return findDomElementWithRetry(selector, findDomElementFn, maxAttempts - 1, delayMs);
+	};
 
-		if (element) {
-			return element;
-		}
-
-		if (attempt < maxAttempts) {
-			await new Promise((resolve) => setTimeout(resolve, delayMs));
-		}
-	}
-	return null;
+	return findDomElementFn(selector) ?? (maxAttempts > 1 ? await retryAfterDelay() : null);
 };
 
 export const createDomElement = (
