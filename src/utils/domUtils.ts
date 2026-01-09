@@ -7,7 +7,10 @@ import {
 } from "./uiUtils";
 import { getSmartyLogo } from "./getSmartyLogo";
 
-export const findDomElement = (selector?: string | null, doc: Document = document): HTMLElement | null => {
+export const findDomElement = (
+	selector?: string | null,
+	doc: Document = document,
+): HTMLElement | null => {
 	return selector ? doc.querySelector(selector) : null;
 };
 
@@ -25,11 +28,9 @@ export const findDomElementWithRetry = async (
 		}
 
 		if (attempt < maxAttempts) {
-			await new Promise(resolve => setTimeout(resolve, delayMs));
+			await new Promise((resolve) => setTimeout(resolve, delayMs));
 		}
 	}
-
-	console.error(`Failed to find element with selector "${selector}" after ${maxAttempts} attempts`);
 	return null;
 };
 
@@ -54,7 +55,8 @@ export const createSuggestionElement = (suggestion: AddressSuggestion) => {
 	const entriesElementClasses = ["smartyAddress__suggestionEntries"];
 	const suggestionElementClasses = ["smartyAddress__suggestion"];
 
-	const entriesChildren: ElementConfig[] | undefined = entries > 1 ? [{ text: `${entries} entries` }] : undefined;
+	const entriesChildren: ElementConfig[] | undefined =
+		entries > 1 ? [{ text: `${entries} entries` }] : undefined;
 
 	const elementsMap: ElementConfig[] = [
 		{
@@ -154,7 +156,12 @@ export const scrollToHighlightedSuggestion = (
 };
 
 export const getStreetLineFormValue = (
-	{ secondaryInputElement, cityInputElement, stateInputElement, zipcodeInputElement }: {
+	{
+		secondaryInputElement,
+		cityInputElement,
+		stateInputElement,
+		zipcodeInputElement,
+	}: {
 		secondaryInputElement: HTMLInputElement | null;
 		cityInputElement: HTMLInputElement | null;
 		stateInputElement: HTMLInputElement | null;
@@ -285,7 +292,9 @@ interface ElementConfig {
 	children?: ElementConfig[] | undefined;
 }
 
-const buildElementsFromMap = (fullElementsMap: ElementConfig[]): Record<string, HTMLElement | Text> => {
+const buildElementsFromMap = (
+	fullElementsMap: ElementConfig[],
+): Record<string, HTMLElement | Text> => {
 	const elements: Record<string, HTMLElement | Text> = {};
 
 	const buildElement = ({

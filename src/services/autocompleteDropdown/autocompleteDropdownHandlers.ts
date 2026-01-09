@@ -228,10 +228,10 @@ export const setupDom: AutocompleteDropdownServiceHandler = async ({
 		utils.updateThemeClass(state.theme, [], dropdownWrapperElement);
 	}
 
-	const searchInputElement = await utils.findDomElementWithRetry(
+	const searchInputElement = (await utils.findDomElementWithRetry(
 		state.searchInputSelector,
 		utils.findDomElement,
-	) as HTMLInputElement | null;
+	)) as HTMLInputElement | null;
 
 	if (searchInputElement) {
 		services.autocompleteDropdownService?.watchSearchInputForChanges?.();
@@ -244,6 +244,10 @@ export const setupDom: AutocompleteDropdownServiceHandler = async ({
 			);
 
 		utils.configureDynamicStyling(dynamicStylingHandler);
+	} else {
+		console.error(
+			`Failed to find search input element with selector "${state.searchInputSelector}".`,
+		);
 	}
 };
 
