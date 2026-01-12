@@ -42,14 +42,28 @@ export const createDomElement = (
 	return element;
 };
 
-export const setInputValue = (element: HTMLInputElement, value: string) => {
-	const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-		window.HTMLInputElement.prototype,
-		"value",
-	)?.set;
+export const setInputValue = (element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, value: string) => {
+	let nativeValueSetter;
 
-	if (nativeInputValueSetter) {
-		nativeInputValueSetter.call(element, value);
+	if (element instanceof HTMLInputElement) {
+		nativeValueSetter = Object.getOwnPropertyDescriptor(
+			window.HTMLInputElement.prototype,
+			"value",
+		)?.set;
+	} else if (element instanceof HTMLTextAreaElement) {
+		nativeValueSetter = Object.getOwnPropertyDescriptor(
+			window.HTMLTextAreaElement.prototype,
+			"value",
+		)?.set;
+	} else if (element instanceof HTMLSelectElement) {
+		nativeValueSetter = Object.getOwnPropertyDescriptor(
+			window.HTMLSelectElement.prototype,
+			"value",
+		)?.set;
+	}
+
+	if (nativeValueSetter) {
+		nativeValueSetter.call(element, value);
 	} else {
 		element.value = value;
 	}
