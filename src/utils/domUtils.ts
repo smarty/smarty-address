@@ -42,6 +42,21 @@ export const createDomElement = (
 	return element;
 };
 
+export const setInputValue = (element: HTMLInputElement, value: string) => {
+	const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+		window.HTMLInputElement.prototype,
+		"value",
+	)?.set;
+
+	if (nativeInputValueSetter) {
+		nativeInputValueSetter.call(element, value);
+	} else {
+		element.value = value;
+	}
+
+	element.dispatchEvent(new Event("change", { bubbles: true }));
+};
+
 export const createSuggestionElement = (suggestion: AddressSuggestion) => {
 	const { entries = 0 } = suggestion;
 	const addressElementClasses = ["smartyAddress__autocompleteAddress"];

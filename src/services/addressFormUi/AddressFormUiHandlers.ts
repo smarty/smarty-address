@@ -1,5 +1,4 @@
 import { addressFormUiServiceHandler } from "./AddressFormUiService";
-// TODO: Make sure input element updates trigger event bubbling (e.g. for React, and other frameworks)
 
 export const init: addressFormUiServiceHandler = ({ setState }, config) => {
 	setState("searchInputSelector", config?.searchInputSelector);
@@ -17,7 +16,7 @@ export const populateFormWithNewAddress: addressFormUiServiceHandler = (
 	// TODO: If elements aren't inputs (e.g. <div>, <p>, etc.), specify textContent instead of value
 	// TODO: Handle if elements (e.g. state input) are <select> elements
 	// TODO: Handle if elements are textareas
-	const { findDomElement } = utils;
+	const { findDomElement, setInputValue } = utils;
 
 	const elements = {
 		streetLineInputElement: findDomElement(state.streetSelector),
@@ -29,18 +28,21 @@ export const populateFormWithNewAddress: addressFormUiServiceHandler = (
 
 	if (!elements?.streetLineInputElement) return;
 
-	elements.streetLineInputElement.value = utils.getStreetLineFormValue(elements, selectedAddress);
+	setInputValue(
+		elements.streetLineInputElement,
+		utils.getStreetLineFormValue(elements, selectedAddress),
+	);
 
 	if (elements.secondaryInputElement) {
-		elements.secondaryInputElement.value = selectedAddress.secondary ?? "";
+		setInputValue(elements.secondaryInputElement, selectedAddress.secondary ?? "");
 	}
 	if (elements.cityInputElement) {
-		elements.cityInputElement.value = selectedAddress.city;
+		setInputValue(elements.cityInputElement, selectedAddress.city);
 	}
 	if (elements.stateInputElement) {
-		elements.stateInputElement.value = selectedAddress.state;
+		setInputValue(elements.stateInputElement, selectedAddress.state);
 	}
 	if (elements.zipcodeInputElement) {
-		elements.zipcodeInputElement.value = selectedAddress.zipcode;
+		setInputValue(elements.zipcodeInputElement, selectedAddress.zipcode);
 	}
 };
