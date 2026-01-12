@@ -1,6 +1,11 @@
 import { ServiceDefinition, ServiceHandler, ServiceHandlerProps } from "../../interfaces";
 import { populateFormWithNewAddress, init } from "./AddressFormUiHandlers";
-import { findDomElement, getStreetLineFormValue, setInputValue } from "../../utils/domUtils";
+import {
+	findDomElement,
+	getStreetLineFormValue,
+	setInputValue,
+	getStateValueForInput,
+} from "../../utils/domUtils";
 
 const initialState = {
 	searchInputSelector: null as string | null,
@@ -20,6 +25,7 @@ const utils = {
 	findDomElement,
 	getStreetLineFormValue,
 	setInputValue,
+	getStateValueForInput,
 };
 
 export const addressFormUiService: ServiceDefinition<typeof utils, typeof initialState> = {
