@@ -42,7 +42,7 @@ export const createDomElement = (
 	return element;
 };
 
-export const setInputValue = (element: HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement, value: string) => {
+export const setInputValue = (element: HTMLElement, value: string) => {
 	let nativeValueSetter;
 
 	if (element instanceof HTMLInputElement) {
@@ -64,11 +64,13 @@ export const setInputValue = (element: HTMLInputElement | HTMLTextAreaElement | 
 
 	if (nativeValueSetter) {
 		nativeValueSetter.call(element, value);
+		element.dispatchEvent(new Event("change", { bubbles: true }));
+	} else if ("value" in element) {
+		(element as HTMLInputElement).value = value;
+		element.dispatchEvent(new Event("change", { bubbles: true }));
 	} else {
-		element.value = value;
+		element.textContent = value;
 	}
-
-	element.dispatchEvent(new Event("change", { bubbles: true }));
 };
 
 export const createSuggestionElement = (suggestion: AddressSuggestion) => {
