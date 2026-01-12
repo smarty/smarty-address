@@ -1,5 +1,5 @@
 import { ServiceDefinition, ServiceHandler, ServiceHandlerProps } from "../../interfaces";
-import { findInputElements, populateFormWithNewAddress, init } from "./AddressFormUiHandlers";
+import { populateFormWithNewAddress, init } from "./AddressFormUiHandlers";
 import { findDomElement, getStreetLineFormValue } from "../../utils/domUtils";
 
 const initialState = {
@@ -13,7 +13,6 @@ const initialState = {
 
 const serviceHandlers = {
 	init,
-	findInputElements,
 	populateFormWithNewAddress,
 };
 

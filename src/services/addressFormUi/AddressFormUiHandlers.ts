@@ -10,33 +10,23 @@ export const init: addressFormUiServiceHandler = ({ setState }, config) => {
 	setState("zipcodeSelector", config?.zipcodeSelector);
 };
 
-export const findInputElements: addressFormUiServiceHandler = ({ state, utils }) => {
-	const { streetSelector, secondarySelector, citySelector, stateSelector, zipcodeSelector } = state;
-	const { findDomElement } = utils;
-
-	const streetLineInputElement = findDomElement(streetSelector);
-	const secondaryInputElement = findDomElement(secondarySelector);
-	const cityInputElement = findDomElement(citySelector);
-	const stateInputElement = findDomElement(stateSelector);
-	const zipcodeInputElement = findDomElement(zipcodeSelector);
-
-	return {
-		streetLineInputElement,
-		secondaryInputElement,
-		cityInputElement,
-		stateInputElement,
-		zipcodeInputElement,
-	};
-};
-
 export const populateFormWithNewAddress: addressFormUiServiceHandler = (
-	{ utils, services },
+	{ utils, state },
 	selectedAddress,
 ) => {
 	// TODO: If elements aren't inputs (e.g. <div>, <p>, etc.), specify textContent instead of value
 	// TODO: Handle if elements (e.g. state input) are <select> elements
 	// TODO: Handle if elements are textareas
-	const elements = services.addressFormUiService?.findInputElements?.();
+	const { findDomElement } = utils;
+
+	const elements = {
+		streetLineInputElement: findDomElement(state.streetSelector),
+		secondaryInputElement: findDomElement(state.secondarySelector),
+		cityInputElement: findDomElement(state.citySelector),
+		stateInputElement: findDomElement(state.stateSelector),
+		zipcodeInputElement: findDomElement(state.zipcodeSelector),
+	};
+
 	if (!elements?.streetLineInputElement) return;
 
 	elements.streetLineInputElement.value = utils.getStreetLineFormValue(elements, selectedAddress);
