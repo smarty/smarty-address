@@ -17,10 +17,10 @@ export const populateFormWithNewAddress: addressFormUiServiceHandler = (
 
 	const elements = {
 		streetLineInputElement: findDomElement(state.streetSelector),
-		secondaryInputElement: findDomElement(state.secondarySelector),
-		cityInputElement: findDomElement(state.citySelector),
-		stateInputElement: findDomElement(state.stateSelector),
-		zipcodeInputElement: findDomElement(state.zipcodeSelector),
+		secondaryInputElement: findDomElement(state.secondarySelector) as HTMLInputElement | null,
+		cityInputElement: findDomElement(state.citySelector) as HTMLInputElement | null,
+		stateInputElement: findDomElement(state.stateSelector) as HTMLInputElement | null,
+		zipcodeInputElement: findDomElement(state.zipcodeSelector) as HTMLInputElement | null,
 	};
 
 	if (!elements?.streetLineInputElement) return;

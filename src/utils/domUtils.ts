@@ -130,7 +130,7 @@ export const getStateValueForInput = (element: HTMLElement, stateValue: string):
 	}
 
 	const fullStateName = Object.keys(STATE_ABBREVIATIONS).find(
-		(key) => STATE_ABBREVIATIONS[key].toLowerCase() === normalizedStateValue,
+		(key) => STATE_ABBREVIATIONS[key]?.toLowerCase() === normalizedStateValue,
 	);
 	if (fullStateName) {
 		const fullNameMatch = options.find(
