@@ -279,12 +279,14 @@ export const handleAutocompleteSecondaryError: AutocompleteDropdownServiceHandle
 	services.autocompleteDropdownService?.closeDropdown?.();
 };
 
-export const closeDropdown: AutocompleteDropdownServiceHandler = ({ state, utils }) => {
+export const closeDropdown: AutocompleteDropdownServiceHandler = ({ state, setState, utils }) => {
 	const searchInputElement = utils.findDomElement(state.searchInputSelector);
 	if (searchInputElement) {
 		searchInputElement.setAttribute("aria-expanded", "false");
 	}
 	state.dropdownIsOpen = false;
+	setState("selectedAddressSearchTerm", "");
+	setState("selectedSuggestionIndex", -1);
 	utils.hideElement(state.dropdownElement);
 };
 
