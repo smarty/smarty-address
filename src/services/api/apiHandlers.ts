@@ -4,14 +4,35 @@ import { ApiConfig, SmartyAddressConfig } from "../../interfaces";
 
 export const init: ApiServiceHandler = async (
 	{ setState },
-	{ embeddedKey, autocompleteApiUrl }: SmartyAddressConfig,
+	{
+		embeddedKey,
+		autocompleteApiUrl,
+		max_results,
+		include_only_cities,
+		include_only_states,
+		include_only_zip_codes,
+		exclude_states,
+	}: SmartyAddressConfig,
 ) => {
 	setState("apiKey", embeddedKey);
 	setState("autocompleteApiUrl", autocompleteApiUrl);
+	if (max_results !== undefined) setState("max_results", max_results);
+	if (include_only_cities !== undefined) setState("include_only_cities", include_only_cities);
+	if (include_only_states !== undefined) setState("include_only_states", include_only_states);
+	if (include_only_zip_codes !== undefined) setState("include_only_zip_codes", include_only_zip_codes);
+	if (exclude_states !== undefined) setState("exclude_states", exclude_states);
 };
 
 export const getApiConfig: ApiServiceHandler = ({ state }): ApiConfig => {
-	return { apiKey: state.apiKey, autocompleteApiUrl: state.autocompleteApiUrl };
+	return {
+		apiKey: state.apiKey,
+		autocompleteApiUrl: state.autocompleteApiUrl,
+		max_results: state.max_results,
+		include_only_cities: state.include_only_cities,
+		include_only_states: state.include_only_states,
+		include_only_zip_codes: state.include_only_zip_codes,
+		exclude_states: state.exclude_states,
+	};
 };
 
 export const fetchAddressSuggestions: ApiServiceHandler = async (

@@ -13,11 +13,21 @@ export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 	citySelector?: string;
 	stateSelector?: string;
 	zipcodeSelector?: string;
+	max_results?: number;
+	include_only_cities?: string[];
+	include_only_states?: string[];
+	include_only_zip_codes?: string[];
+	exclude_states?: string[];
 }
 
 export interface ApiConfig {
 	apiKey: string;
 	autocompleteApiUrl: string;
+	max_results?: number;
+	include_only_cities?: string[];
+	include_only_states?: string[];
+	include_only_zip_codes?: string[];
+	exclude_states?: string[];
 }
 
 export interface AddressSuggestion {

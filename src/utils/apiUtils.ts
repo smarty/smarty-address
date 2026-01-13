@@ -38,12 +38,28 @@ export const getAutocompleteApiResults = async (
 	fetchFn: typeof fetch = fetch,
 ) => {
 	try {
-		const requestData = {
+		const requestData: Record<string, string> = {
 			"auth-id": apiConfig.apiKey,
 			"user-agent": USER_AGENT,
 			search: searchString,
 			selected: selectedAddress ? formatSelectedAddress(selectedAddress) : "",
 		};
+
+		if (apiConfig.max_results !== undefined) {
+			requestData.max_results = String(apiConfig.max_results);
+		}
+		if (apiConfig.include_only_cities !== undefined) {
+			requestData.include_only_cities = apiConfig.include_only_cities.join(",");
+		}
+		if (apiConfig.include_only_states !== undefined) {
+			requestData.include_only_states = apiConfig.include_only_states.join(",");
+		}
+		if (apiConfig.include_only_zip_codes !== undefined) {
+			requestData.include_only_zip_codes = apiConfig.include_only_zip_codes.join(",");
+		}
+		if (apiConfig.exclude_states !== undefined) {
+			requestData.exclude_states = apiConfig.exclude_states.join(",");
+		}
 
 		const params = new URLSearchParams(requestData);
 		const response = await fetchFn(`${apiConfig.autocompleteApiUrl}?${params}`);
