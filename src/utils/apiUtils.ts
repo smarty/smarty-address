@@ -4,6 +4,20 @@ import { APP_VERSION } from "../constants";
 // TODO: Dynamically update the version to match `package.json`
 const USER_AGENT = `name:smarty-address-plugin,version:${APP_VERSION}`;
 
+const API_PARAM_MAP: Record<string, string> = {
+	maxResults: "max_results",
+	includeOnlyCities: "include_only_cities",
+	includeOnlyStates: "include_only_states",
+	includeOnlyZipCodes: "include_only_zip_codes",
+	excludeStates: "exclude_states",
+	preferCities: "prefer_cities",
+	preferStates: "prefer_states",
+	preferZipCodes: "prefer_zip_codes",
+	preferRatio: "prefer_ratio",
+	preferGeolocation: "prefer_geolocation",
+	source: "source",
+};
+
 const formatSelectedAddress = ({
 	street_line,
 	secondary,
@@ -45,25 +59,25 @@ export const getAutocompleteApiResults = async (
 			selected: selectedAddress ? formatSelectedAddress(selectedAddress) : "",
 		};
 
-		const optionalParams = [
-			"max_results",
-			"include_only_cities",
-			"include_only_states",
-			"include_only_zip_codes",
-			"exclude_states",
-			"prefer_cities",
-			"prefer_states",
-			"prefer_zip_codes",
-			"prefer_ratio",
-			"prefer_geolocation",
+		const optionalParams: Array<keyof typeof API_PARAM_MAP> = [
+			"maxResults",
+			"includeOnlyCities",
+			"includeOnlyStates",
+			"includeOnlyZipCodes",
+			"excludeStates",
+			"preferCities",
+			"preferStates",
+			"preferZipCodes",
+			"preferRatio",
+			"preferGeolocation",
 			"source",
-		] as const;
+		];
 
 		optionalParams.forEach((param) => {
 			const value = apiConfig[param];
-			const formattedValue = Array.isArray(value) ? value.join(",") : String(value);
 			if (value !== undefined) {
-				requestData[param] = formattedValue;
+				const apiParamName = API_PARAM_MAP[param];
+				requestData[apiParamName] = Array.isArray(value) ? value.join(",") : String(value);
 			}
 		});
 

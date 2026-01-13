@@ -10,16 +10,16 @@ export const init: ApiServiceHandler = async (
 	setState("autocompleteApiUrl", config.autocompleteApiUrl);
 
 	const optionalParams = [
-		"max_results",
-		"include_only_cities",
-		"include_only_states",
-		"include_only_zip_codes",
-		"exclude_states",
-		"prefer_cities",
-		"prefer_states",
-		"prefer_zip_codes",
-		"prefer_ratio",
-		"prefer_geolocation",
+		"maxResults",
+		"includeOnlyCities",
+		"includeOnlyStates",
+		"includeOnlyZipCodes",
+		"excludeStates",
+		"preferCities",
+		"preferStates",
+		"preferZipCodes",
+		"preferRatio",
+		"preferGeolocation",
 		"source",
 	] as const;
 
@@ -34,16 +34,16 @@ export const getApiConfig: ApiServiceHandler = ({ state }): ApiConfig => {
 	return {
 		apiKey: state.apiKey,
 		autocompleteApiUrl: state.autocompleteApiUrl,
-		max_results: state.max_results,
-		include_only_cities: state.include_only_cities,
-		include_only_states: state.include_only_states,
-		include_only_zip_codes: state.include_only_zip_codes,
-		exclude_states: state.exclude_states,
-		prefer_cities: state.prefer_cities,
-		prefer_states: state.prefer_states,
-		prefer_zip_codes: state.prefer_zip_codes,
-		prefer_ratio: state.prefer_ratio,
-		prefer_geolocation: state.prefer_geolocation,
+		maxResults: state.maxResults,
+		includeOnlyCities: state.includeOnlyCities,
+		includeOnlyStates: state.includeOnlyStates,
+		includeOnlyZipCodes: state.includeOnlyZipCodes,
+		excludeStates: state.excludeStates,
+		preferCities: state.preferCities,
+		preferStates: state.preferStates,
+		preferZipCodes: state.preferZipCodes,
+		preferRatio: state.preferRatio,
+		preferGeolocation: state.preferGeolocation,
 		source: state.source,
 	};
 };

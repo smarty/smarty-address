@@ -13,32 +13,32 @@ export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 	citySelector?: string;
 	stateSelector?: string;
 	zipcodeSelector?: string;
-	max_results?: number;
-	include_only_cities?: string[];
-	include_only_states?: string[];
-	include_only_zip_codes?: string[];
-	exclude_states?: string[];
-	prefer_cities?: string[];
-	prefer_states?: string[];
-	prefer_zip_codes?: string[];
-	prefer_ratio?: number;
-	prefer_geolocation?: string;
+	maxResults?: number;
+	includeOnlyCities?: string[];
+	includeOnlyStates?: string[];
+	includeOnlyZipCodes?: string[];
+	excludeStates?: string[];
+	preferCities?: string[];
+	preferStates?: string[];
+	preferZipCodes?: string[];
+	preferRatio?: number;
+	preferGeolocation?: string;
 	source?: "postal" | "all";
 }
 
 export interface ApiConfig {
 	apiKey: string;
 	autocompleteApiUrl: string;
-	max_results?: number;
-	include_only_cities?: string[];
-	include_only_states?: string[];
-	include_only_zip_codes?: string[];
-	exclude_states?: string[];
-	prefer_cities?: string[];
-	prefer_states?: string[];
-	prefer_zip_codes?: string[];
-	prefer_ratio?: number;
-	prefer_geolocation?: string;
+	maxResults?: number;
+	includeOnlyCities?: string[];
+	includeOnlyStates?: string[];
+	includeOnlyZipCodes?: string[];
+	excludeStates?: string[];
+	preferCities?: string[];
+	preferStates?: string[];
+	preferZipCodes?: string[];
+	preferRatio?: number;
+	preferGeolocation?: string;
 	source?: "postal" | "all";
 }
 
