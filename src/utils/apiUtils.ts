@@ -45,20 +45,21 @@ export const getAutocompleteApiResults = async (
 			selected: selectedAddress ? formatSelectedAddress(selectedAddress) : "",
 		};
 
+		const arrayParams = [
+			"include_only_cities",
+			"include_only_states",
+			"include_only_zip_codes",
+			"exclude_states",
+		] as const;
+
+		arrayParams.forEach((param) => {
+			if (apiConfig[param] !== undefined) {
+				requestData[param] = apiConfig[param]!.join(",");
+			}
+		});
+
 		if (apiConfig.max_results !== undefined) {
 			requestData.max_results = String(apiConfig.max_results);
-		}
-		if (apiConfig.include_only_cities !== undefined) {
-			requestData.include_only_cities = apiConfig.include_only_cities.join(",");
-		}
-		if (apiConfig.include_only_states !== undefined) {
-			requestData.include_only_states = apiConfig.include_only_states.join(",");
-		}
-		if (apiConfig.include_only_zip_codes !== undefined) {
-			requestData.include_only_zip_codes = apiConfig.include_only_zip_codes.join(",");
-		}
-		if (apiConfig.exclude_states !== undefined) {
-			requestData.exclude_states = apiConfig.exclude_states.join(",");
 		}
 
 		const params = new URLSearchParams(requestData);

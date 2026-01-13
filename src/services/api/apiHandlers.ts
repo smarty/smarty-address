@@ -4,23 +4,24 @@ import { ApiConfig, SmartyAddressConfig } from "../../interfaces";
 
 export const init: ApiServiceHandler = async (
 	{ setState },
-	{
-		embeddedKey,
-		autocompleteApiUrl,
-		max_results,
-		include_only_cities,
-		include_only_states,
-		include_only_zip_codes,
-		exclude_states,
-	}: SmartyAddressConfig,
+	config: SmartyAddressConfig,
 ) => {
-	setState("apiKey", embeddedKey);
-	setState("autocompleteApiUrl", autocompleteApiUrl);
-	if (max_results !== undefined) setState("max_results", max_results);
-	if (include_only_cities !== undefined) setState("include_only_cities", include_only_cities);
-	if (include_only_states !== undefined) setState("include_only_states", include_only_states);
-	if (include_only_zip_codes !== undefined) setState("include_only_zip_codes", include_only_zip_codes);
-	if (exclude_states !== undefined) setState("exclude_states", exclude_states);
+	setState("apiKey", config.embeddedKey);
+	setState("autocompleteApiUrl", config.autocompleteApiUrl);
+
+	const optionalParams = [
+		"max_results",
+		"include_only_cities",
+		"include_only_states",
+		"include_only_zip_codes",
+		"exclude_states",
+	] as const;
+
+	optionalParams.forEach((param) => {
+		if (config[param] !== undefined) {
+			setState(param, config[param]);
+		}
+	});
 };
 
 export const getApiConfig: ApiServiceHandler = ({ state }): ApiConfig => {
