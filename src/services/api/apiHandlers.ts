@@ -15,6 +15,12 @@ export const init: ApiServiceHandler = async (
 		"include_only_states",
 		"include_only_zip_codes",
 		"exclude_states",
+		"prefer_cities",
+		"prefer_states",
+		"prefer_zip_codes",
+		"prefer_ratio",
+		"prefer_geolocation",
+		"source",
 	] as const;
 
 	optionalParams.forEach((param) => {
@@ -33,6 +39,12 @@ export const getApiConfig: ApiServiceHandler = ({ state }): ApiConfig => {
 		include_only_states: state.include_only_states,
 		include_only_zip_codes: state.include_only_zip_codes,
 		exclude_states: state.exclude_states,
+		prefer_cities: state.prefer_cities,
+		prefer_states: state.prefer_states,
+		prefer_zip_codes: state.prefer_zip_codes,
+		prefer_ratio: state.prefer_ratio,
+		prefer_geolocation: state.prefer_geolocation,
+		source: state.source,
 	};
 };
 

@@ -18,6 +18,12 @@ export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 	include_only_states?: string[];
 	include_only_zip_codes?: string[];
 	exclude_states?: string[];
+	prefer_cities?: string[];
+	prefer_states?: string[];
+	prefer_zip_codes?: string[];
+	prefer_ratio?: number;
+	prefer_geolocation?: string;
+	source?: "postal" | "all";
 }
 
 export interface ApiConfig {
@@ -28,6 +34,12 @@ export interface ApiConfig {
 	include_only_states?: string[];
 	include_only_zip_codes?: string[];
 	exclude_states?: string[];
+	prefer_cities?: string[];
+	prefer_states?: string[];
+	prefer_zip_codes?: string[];
+	prefer_ratio?: number;
+	prefer_geolocation?: string;
+	source?: "postal" | "all";
 }
 
 export interface AddressSuggestion {

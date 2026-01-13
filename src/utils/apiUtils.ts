@@ -45,22 +45,27 @@ export const getAutocompleteApiResults = async (
 			selected: selectedAddress ? formatSelectedAddress(selectedAddress) : "",
 		};
 
-		const arrayParams = [
+		const optionalParams = [
+			"max_results",
 			"include_only_cities",
 			"include_only_states",
 			"include_only_zip_codes",
 			"exclude_states",
+			"prefer_cities",
+			"prefer_states",
+			"prefer_zip_codes",
+			"prefer_ratio",
+			"prefer_geolocation",
+			"source",
 		] as const;
 
-		arrayParams.forEach((param) => {
-			if (apiConfig[param] !== undefined) {
-				requestData[param] = apiConfig[param]!.join(",");
+		optionalParams.forEach((param) => {
+			const value = apiConfig[param];
+			const formattedValue = Array.isArray(value) ? value.join(",") : String(value);
+			if (value !== undefined) {
+				requestData[param] = formattedValue;
 			}
 		});
-
-		if (apiConfig.max_results !== undefined) {
-			requestData.max_results = String(apiConfig.max_results);
-		}
 
 		const params = new URLSearchParams(requestData);
 		const response = await fetchFn(`${apiConfig.autocompleteApiUrl}?${params}`);
