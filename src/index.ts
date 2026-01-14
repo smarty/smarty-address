@@ -16,7 +16,8 @@ import { US_AUTOCOMPLETE_PRO_API_URL } from "./constants";
 
 export default class SmartyAddress {
 	static defaultConfig: DefaultSmartyAddressConfig = {
-		theme: themes.default as string[],
+		embeddedKey: "",
+		theme: themes.default,
 		services: {
 			autocompleteDropdownService,
 			addressFormUiService,

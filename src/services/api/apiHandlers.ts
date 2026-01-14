@@ -21,7 +21,7 @@ export const getApiConfig: ApiServiceHandler = ({ state }): ApiConfig => {
 
 	API_PARAM_KEYS.forEach((param) => {
 		if (state[param] !== undefined) {
-			config[param] = state[param];
+			(config as any)[param] = state[param];
 		}
 	});
 
