@@ -1,5 +1,5 @@
 export interface ApiConfig {
-	apiKey: string;
+	embeddedKey: string;
 	autocompleteApiUrl: string;
 	maxResults?: number;
 	includeOnlyCities?: string[];
@@ -14,7 +14,7 @@ export interface ApiConfig {
 	source?: "postal" | "all";
 }
 
-export interface DefaultSmartyAddressConfig extends Omit<ApiConfig, "apiKey"> {
+export interface DefaultSmartyAddressConfig extends ApiConfig {
 	services: ServiceDefinitionMap;
 	theme: string[];
 }

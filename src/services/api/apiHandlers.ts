@@ -3,7 +3,7 @@ import { ApiConfig, SmartyAddressConfig } from "../../interfaces";
 import { API_PARAM_KEYS } from "../../utils/apiUtils";
 
 export const init: ApiServiceHandler = async ({ setState }, config: SmartyAddressConfig) => {
-	setState("apiKey", config.embeddedKey);
+	setState("embeddedKey", config.embeddedKey);
 	setState("autocompleteApiUrl", config.autocompleteApiUrl);
 
 	API_PARAM_KEYS.forEach((param) => {
@@ -15,7 +15,7 @@ export const init: ApiServiceHandler = async ({ setState }, config: SmartyAddres
 
 export const getApiConfig: ApiServiceHandler = ({ state }): ApiConfig => {
 	const config: ApiConfig = {
-		apiKey: state.apiKey,
+		embeddedKey: state.embeddedKey,
 		autocompleteApiUrl: state.autocompleteApiUrl,
 	};
 

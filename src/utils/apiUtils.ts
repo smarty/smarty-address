@@ -56,7 +56,7 @@ export const getAutocompleteApiResults = async (
 ) => {
 	try {
 		const requestData: Record<string, string> = {
-			"auth-id": apiConfig.apiKey,
+			"auth-id": apiConfig.embeddedKey,
 			"user-agent": USER_AGENT,
 			search: searchString,
 			selected: selectedAddress ? formatSelectedAddress(selectedAddress) : "",
