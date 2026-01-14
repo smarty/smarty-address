@@ -64,6 +64,10 @@ export const themeStyles = {
 		"overflow-x": "var(--smartyAddress__suggestionOverflowX)",
 	},
 
+	".smartyAddress__matchedText": {
+		color: "var(--smartyAddress__textBaseSecondaryColor)",
+	},
+
 	".smartyAddress__suggestionEntries": {
 		// TODO: Figure out fallback colors (or we could just make sure we never run into that scenario)
 		color: "var(--smartyAddress__textAccentColor, #0066ff)",

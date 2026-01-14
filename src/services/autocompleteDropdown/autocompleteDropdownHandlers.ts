@@ -103,7 +103,7 @@ export const handleSelectDropdownItem: AutocompleteDropdownServiceHandler = (
 
 export const formatAddressSuggestions: AutocompleteDropdownServiceHandler = (
 	{ state, setState, services, utils },
-	suggestions,
+	{ suggestions, searchString }: { suggestions: AddressSuggestion[]; searchString: string },
 ) => {
 	const suggestionItems = suggestions.map(
 		(address: AddressSuggestion, addressIndex: number): UiSuggestionItem => {
@@ -113,7 +113,7 @@ export const formatAddressSuggestions: AutocompleteDropdownServiceHandler = (
 				);
 			};
 
-			const suggestionListElements = utils.createSuggestionElement(address);
+			const suggestionListElements = utils.createSuggestionElement(address, searchString);
 			const suggestionElement = suggestionListElements["suggestionElement"] as HTMLElement;
 			suggestionElement.addEventListener("click", suggestionOnClickHandler);
 
@@ -140,7 +140,7 @@ export const formatAddressSuggestions: AutocompleteDropdownServiceHandler = (
 
 export const formatSecondaryAddressSuggestions: AutocompleteDropdownServiceHandler = (
 	{ state, setState, services, utils },
-	suggestions,
+	{ suggestions, searchString }: { suggestions: AddressSuggestion[]; searchString: string },
 ) => {
 	const suggestionItems = suggestions.map(
 		(address: AddressSuggestion, addressIndex: number): UiSuggestionItem => {
@@ -150,7 +150,7 @@ export const formatSecondaryAddressSuggestions: AutocompleteDropdownServiceHandl
 				);
 			};
 
-			const suggestionListElements = utils.createSecondarySuggestionElement(address);
+			const suggestionListElements = utils.createSecondarySuggestionElement(address, searchString);
 			const suggestionElement = suggestionListElements["secondarySuggestionElement"] as HTMLElement;
 			suggestionElement.addEventListener("click", suggestionOnClickHandler);
 

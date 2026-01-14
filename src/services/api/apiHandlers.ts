@@ -35,7 +35,7 @@ export const fetchAddressSuggestions: ApiServiceHandler = async (
 	try {
 		const apiConfig = services.apiService?.getApiConfig?.();
 		const suggestions = await utils.getAutocompleteApiResults(apiConfig, searchString);
-		services.autocompleteDropdownService?.formatAddressSuggestions?.(suggestions);
+		services.autocompleteDropdownService?.formatAddressSuggestions?.({ suggestions, searchString });
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : String(error);
 		services.autocompleteDropdownService?.handleAutocompleteError?.({ errorName: errorMessage });
@@ -54,7 +54,10 @@ export const fetchSecondaryAddressSuggestions: ApiServiceHandler = async (
 			? await utils.getAutocompleteApiResults(apiConfig, searchString, newSelectedAddress)
 			: [];
 
-		services.autocompleteDropdownService?.formatSecondaryAddressSuggestions?.(suggestions);
+		services.autocompleteDropdownService?.formatSecondaryAddressSuggestions?.({
+			suggestions,
+			searchString,
+		});
 	} catch (error) {
 		const errorMessage = error instanceof Error ? error.message : String(error);
 		services.autocompleteDropdownService?.handleAutocompleteSecondaryError?.({

@@ -4,6 +4,7 @@ import {
 	getFormattedAddressSuggestion,
 	getHslFromColorString,
 	getInstanceClassName,
+	createHighlightedTextElements,
 } from "./uiUtils";
 import { getSmartyLogo } from "./getSmartyLogo";
 
@@ -175,7 +176,10 @@ export const setInputValue = (element: HTMLElement, value: string) => {
 	}
 };
 
-export const createSuggestionElement = (suggestion: AddressSuggestion) => {
+export const createSuggestionElement = (
+	suggestion: AddressSuggestion,
+	searchString: string = "",
+) => {
 	const { entries = 0 } = suggestion;
 	const addressElementClasses = ["smartyAddress__autocompleteAddress"];
 	const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
@@ -184,6 +188,14 @@ export const createSuggestionElement = (suggestion: AddressSuggestion) => {
 
 	const entriesChildren: ElementConfig[] | undefined =
 		entries > 1 ? [{ text: `${entries} entries` }] : undefined;
+
+	const formattedAddress = getFormattedAddressSuggestion(suggestion);
+	const highlightedParts = createHighlightedTextElements(formattedAddress, searchString);
+	const addressChildren: ElementConfig[] = highlightedParts.map((part) => ({
+		elementType: "span",
+		className: part.isMatch ? ["smartyAddress__matchedText"] : [],
+		children: [{ text: part.text }],
+	}));
 
 	const elementsMap: ElementConfig[] = [
 		{
@@ -200,7 +212,7 @@ export const createSuggestionElement = (suggestion: AddressSuggestion) => {
 							name: "addressElement",
 							elementType: "div",
 							className: addressElementClasses,
-							children: [{ text: getFormattedAddressSuggestion(suggestion) }],
+							children: addressChildren,
 						},
 						{
 							name: "entriesElement",
@@ -217,10 +229,21 @@ export const createSuggestionElement = (suggestion: AddressSuggestion) => {
 	return buildElementsFromMap(elementsMap);
 };
 
-export const createSecondarySuggestionElement = (suggestion: AddressSuggestion) => {
+export const createSecondarySuggestionElement = (
+	suggestion: AddressSuggestion,
+	searchString: string = "",
+) => {
 	const addressElementClasses = ["smartyAddress__autocompleteAddress"];
 	const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
 	const secondarySuggestionElementClasses = ["smartyAddress__secondarySuggestion"];
+
+	const formattedAddress = getFormattedAddressSuggestion(suggestion, true);
+	const highlightedParts = createHighlightedTextElements(formattedAddress, searchString);
+	const addressChildren: ElementConfig[] = highlightedParts.map((part) => ({
+		elementType: "span",
+		className: part.isMatch ? ["smartyAddress__matchedText"] : [],
+		children: [{ text: part.text }],
+	}));
 
 	const elementsMap = [
 		{
@@ -237,7 +260,7 @@ export const createSecondarySuggestionElement = (suggestion: AddressSuggestion) 
 							name: "addressElement",
 							elementType: "div",
 							className: addressElementClasses,
-							children: [{ text: getFormattedAddressSuggestion(suggestion, true) }],
+							children: addressChildren,
 						},
 					],
 				},
