@@ -7,7 +7,7 @@ export const colorStyles = {
 		"--smartyAddress__textAccentColor": "#6699ff",
 
 		"--smartyAddress__surfaceBasePrimaryColor": "#111",
-		"--smartyAddress__surfaceBaseSecondaryColor": "#333",
+		"--smartyAddress__surfaceBaseSecondaryColor": "#383e48",
 		"--smartyAddress__surfaceBaseTertiaryColor": "#666",
 		"--smartyAddress__surfaceBasePrimaryInverseColor": "#eee",
 
@@ -26,7 +26,7 @@ export const colorStyles = {
 		"--smartyAddress__textAccentColor": "#0066ff",
 
 		"--smartyAddress__surfaceBasePrimaryColor": "#fcfcfc",
-		"--smartyAddress__surfaceBaseSecondaryColor": "#f3f3f3",
+		"--smartyAddress__surfaceBaseSecondaryColor": "#ebebeb",
 		"--smartyAddress__surfaceBaseTertiaryColor": "#eeeeee",
 		"--smartyAddress__surfaceBasePrimaryInverseColor": "#333",
 
