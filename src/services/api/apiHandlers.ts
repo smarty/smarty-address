@@ -1,29 +1,12 @@
 import { ApiServiceHandler } from "./ApiService";
 import { ApiConfig, SmartyAddressConfig } from "../../interfaces";
-// TODO: Add support for additional input fields (e.g. max_results, include_only_zip_codes, etc.). These would likely be set as "config" values
+import { API_PARAM_KEYS } from "../../utils/apiUtils";
 
-export const init: ApiServiceHandler = async (
-	{ setState },
-	config: SmartyAddressConfig,
-) => {
+export const init: ApiServiceHandler = async ({ setState }, config: SmartyAddressConfig) => {
 	setState("apiKey", config.embeddedKey);
 	setState("autocompleteApiUrl", config.autocompleteApiUrl);
 
-	const optionalParams = [
-		"maxResults",
-		"includeOnlyCities",
-		"includeOnlyStates",
-		"includeOnlyZipCodes",
-		"excludeStates",
-		"preferCities",
-		"preferStates",
-		"preferZipCodes",
-		"preferRatio",
-		"preferGeolocation",
-		"source",
-	] as const;
-
-	optionalParams.forEach((param) => {
+	API_PARAM_KEYS.forEach((param) => {
 		if (config[param] !== undefined) {
 			setState(param, config[param]);
 		}
@@ -31,21 +14,18 @@ export const init: ApiServiceHandler = async (
 };
 
 export const getApiConfig: ApiServiceHandler = ({ state }): ApiConfig => {
-	return {
+	const config: ApiConfig = {
 		apiKey: state.apiKey,
 		autocompleteApiUrl: state.autocompleteApiUrl,
-		maxResults: state.maxResults,
-		includeOnlyCities: state.includeOnlyCities,
-		includeOnlyStates: state.includeOnlyStates,
-		includeOnlyZipCodes: state.includeOnlyZipCodes,
-		excludeStates: state.excludeStates,
-		preferCities: state.preferCities,
-		preferStates: state.preferStates,
-		preferZipCodes: state.preferZipCodes,
-		preferRatio: state.preferRatio,
-		preferGeolocation: state.preferGeolocation,
-		source: state.source,
 	};
+
+	API_PARAM_KEYS.forEach((param) => {
+		if (state[param] !== undefined) {
+			config[param] = state[param];
+		}
+	});
+
+	return config;
 };
 
 export const fetchAddressSuggestions: ApiServiceHandler = async (

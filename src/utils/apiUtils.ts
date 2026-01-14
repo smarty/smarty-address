@@ -4,7 +4,7 @@ import { APP_VERSION } from "../constants";
 // TODO: Dynamically update the version to match `package.json`
 const USER_AGENT = `name:smarty-address-plugin,version:${APP_VERSION}`;
 
-const API_PARAM_MAP: Record<string, string> = {
+export const API_PARAM_MAP = {
 	maxResults: "max_results",
 	includeOnlyCities: "include_only_cities",
 	includeOnlyStates: "include_only_states",
@@ -16,7 +16,10 @@ const API_PARAM_MAP: Record<string, string> = {
 	preferRatio: "prefer_ratio",
 	preferGeolocation: "prefer_geolocation",
 	source: "source",
-};
+} as const;
+
+export type ApiParamKey = keyof typeof API_PARAM_MAP;
+export const API_PARAM_KEYS = Object.keys(API_PARAM_MAP) as ApiParamKey[];
 
 const formatSelectedAddress = ({
 	street_line,
@@ -59,21 +62,7 @@ export const getAutocompleteApiResults = async (
 			selected: selectedAddress ? formatSelectedAddress(selectedAddress) : "",
 		};
 
-		const optionalParams: Array<keyof typeof API_PARAM_MAP> = [
-			"maxResults",
-			"includeOnlyCities",
-			"includeOnlyStates",
-			"includeOnlyZipCodes",
-			"excludeStates",
-			"preferCities",
-			"preferStates",
-			"preferZipCodes",
-			"preferRatio",
-			"preferGeolocation",
-			"source",
-		];
-
-		optionalParams.forEach((param) => {
+		API_PARAM_KEYS.forEach((param) => {
 			const value = apiConfig[param];
 			if (value !== undefined) {
 				const apiParamName = API_PARAM_MAP[param];
