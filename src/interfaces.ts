@@ -1,31 +1,3 @@
-export interface DefaultSmartyAddressConfig {
-	services: ServiceDefinitionMap;
-	theme: string[];
-	autocompleteApiUrl: string;
-}
-
-export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
-	// TODO: Talk to Jeffrey and Adam about correct naming of fields/properties
-	embeddedKey: string;
-	searchInputSelector: string;
-	streetLineSelector?: string;
-	secondarySelector?: string;
-	citySelector?: string;
-	stateSelector?: string;
-	zipcodeSelector?: string;
-	maxResults?: number;
-	includeOnlyCities?: string[];
-	includeOnlyStates?: string[];
-	includeOnlyZipCodes?: string[];
-	excludeStates?: string[];
-	preferCities?: string[];
-	preferStates?: string[];
-	preferZipCodes?: string[];
-	preferRatio?: number;
-	preferGeolocation?: string;
-	source?: "postal" | "all";
-}
-
 export interface ApiConfig {
 	apiKey: string;
 	autocompleteApiUrl: string;
@@ -40,6 +12,22 @@ export interface ApiConfig {
 	preferRatio?: number;
 	preferGeolocation?: string;
 	source?: "postal" | "all";
+}
+
+export interface DefaultSmartyAddressConfig extends Omit<ApiConfig, "apiKey"> {
+	services: ServiceDefinitionMap;
+	theme: string[];
+}
+
+export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
+	// TODO: Talk to Jeffrey and Adam about correct naming of fields/properties
+	embeddedKey: string;
+	searchInputSelector: string;
+	streetLineSelector?: string;
+	secondarySelector?: string;
+	citySelector?: string;
+	stateSelector?: string;
+	zipcodeSelector?: string;
 }
 
 export interface AddressSuggestion {
