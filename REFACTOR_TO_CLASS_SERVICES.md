@@ -15,7 +15,13 @@
 
 ---
 
-## Step 1: Create Base Service Class
+## Refactor Steps (Incremental Approach)
+
+**Strategy:** Convert services one at a time with validation after each step, rather than "big bang" integration at the end.
+
+---
+
+## Step 1: Create Base Service Class and Update Interfaces
 
 **File:** `src/services/BaseService.ts` (new file)
 
@@ -41,9 +47,67 @@ export abstract class BaseService {
 - Handles cross-service communication via `services` property
 - Allows circular references without constructor issues
 
+### Also Update Interfaces
+
+**File:** `src/interfaces.ts`
+
+**Remove these interfaces:**
+```typescript
+export interface ServiceHandler<TProps extends ServiceHandlerProps = ServiceHandlerProps> { ... }
+export interface ServiceHandlerMap { ... }
+export interface WrappedServiceHandler { ... }
+export interface ServiceHandlerProps<TUtils = ServiceDefinitionUtils, TState = AbstractStateObject> { ... }
+export interface ServiceDefinition<TUtils = ServiceDefinitionUtils, TState = AbstractStateObject> { ... }
+export interface ServiceDefinitionUtils { ... }
+export interface ServiceDefinitionMap { ... }
+export interface ServicesObject { ... }
+export interface ServiceHandlersObject { ... }
+```
+
+**Add these interfaces:**
+```typescript
+import { ApiService } from './services/api/ApiService';
+import { AutocompleteDropdownService } from './services/autocompleteDropdown/AutocompleteDropdownService';
+import { AddressFormUiService } from './services/addressFormUi/AddressFormUiService';
+
+export interface ServiceClassOverrides {
+  ApiService?: typeof ApiService;
+  AutocompleteDropdownService?: typeof AutocompleteDropdownService;
+  AddressFormUiService?: typeof AddressFormUiService;
+}
+```
+
+**Update config interfaces:**
+```typescript
+export interface DefaultSmartyAddressConfig extends ApiConfig {
+  theme: string[];
+}
+
+export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
+  embeddedKey: string;
+  searchInputSelector: string;
+  streetLineSelector?: string;
+  secondarySelector?: string;
+  citySelector?: string;
+  stateSelector?: string;
+  zipcodeSelector?: string;
+
+  // Allow service class overrides
+  services?: ServiceClassOverrides;
+
+  // Lifecycle hooks (add in Step 5)
+  onAddressSelected?: (address: AddressSuggestion) => void;
+  onSuggestionsReceived?: (suggestions: AddressSuggestion[]) => AddressSuggestion[];
+  onDropdownOpen?: () => void;
+  onDropdownClose?: () => void;
+}
+```
+
+**Why do this now:** Setting up interfaces early prevents TypeScript errors as we convert each service.
+
 ---
 
-## Step 2: Convert ApiService to Class
+## Step 2: Convert ApiService to Class + Test
 
 **File:** `src/services/api/ApiService.ts`
 
@@ -125,9 +189,25 @@ export class ApiService extends BaseService {
 **Delete these files:**
 - `src/services/api/apiHandlers.ts`
 
+### Validate This Step
+
+Create a minimal test to verify the class works:
+
+```typescript
+// Quick validation script or test
+const service = new ApiService();
+service.init({ embeddedKey: 'test', autocompleteApiUrl: 'https://test.com' });
+const config = service.getApiConfig();
+console.log('ApiService validated:', config.embeddedKey === 'test');
+```
+
+Run `npm run build` to catch any TypeScript errors.
+
+**Why validate now:** Catch issues early before they compound with other service conversions.
+
 ---
 
-## Step 3: Convert AutocompleteDropdownService to Class
+## Step 3: Convert AutocompleteDropdownService to Class + Test
 
 **File:** `src/services/autocompleteDropdown/AutocompleteDropdownService.ts`
 
@@ -298,9 +378,20 @@ export class AutocompleteDropdownService extends BaseService {
 **Delete these files:**
 - `src/services/autocompleteDropdown/autocompleteDropdownHandlers.ts`
 
+### Validate This Step
+
+Create a minimal test:
+
+```typescript
+const service = new AutocompleteDropdownService(1);
+console.log('AutocompleteDropdownService validated:', service instanceof BaseService);
+```
+
+Run `npm run build` to catch any TypeScript errors.
+
 ---
 
-## Step 4: Convert AddressFormUiService to Class
+## Step 4: Convert AddressFormUiService to Class + Test
 
 **File:** `src/services/addressFormUi/AddressFormUiService.ts`
 
@@ -309,9 +400,20 @@ Follow same pattern as ApiService - straightforward conversion since this servic
 **Delete these files:**
 - `src/services/addressFormUi/AddressFormUiHandlers.ts`
 
+### Validate This Step
+
+Create a minimal test:
+
+```typescript
+const service = new AddressFormUiService();
+console.log('AddressFormUiService validated:', service instanceof BaseService);
+```
+
+Run `npm run build` to catch any TypeScript errors.
+
 ---
 
-## Step 5: Update SmartyAddress Main Class
+## Step 5: Wire Services Together in Main Class
 
 **File:** `src/index.ts`
 
@@ -406,69 +508,22 @@ export default class SmartyAddress {
 4. Call `init()` on each service
 5. Expose service classes on static `services` property for user overrides
 
----
+### Validate This Step
 
-## Step 6: Update Config Interface
+Test the full integration:
 
-**File:** `src/interfaces.ts`
-
-**Remove these interfaces:**
-```typescript
-export interface ServiceHandler<TProps extends ServiceHandlerProps = ServiceHandlerProps> { ... }
-export interface ServiceHandlerMap { ... }
-export interface WrappedServiceHandler { ... }
-export interface ServiceHandlerProps<TUtils = ServiceDefinitionUtils, TState = AbstractStateObject> { ... }
-export interface ServiceDefinition<TUtils = ServiceDefinitionUtils, TState = AbstractStateObject> { ... }
-export interface ServiceDefinitionUtils { ... }
-export interface ServiceDefinitionMap { ... }
-export interface ServicesObject { ... }
-export interface ServiceHandlersObject { ... }
+```bash
+npm run build
+# Open index.html in browser and test basic address autocomplete
 ```
 
-**Add these interfaces:**
-```typescript
-import { ApiService } from './services/api/ApiService';
-import { AutocompleteDropdownService } from './services/autocompleteDropdown/AutocompleteDropdownService';
-import { AddressFormUiService } from './services/addressFormUi/AddressFormUiService';
-
-export interface ServiceClassOverrides {
-  ApiService?: typeof ApiService;
-  AutocompleteDropdownService?: typeof AutocompleteDropdownService;
-  AddressFormUiService?: typeof AddressFormUiService;
-}
-```
-
-**Update config interfaces:**
-```typescript
-export interface DefaultSmartyAddressConfig extends ApiConfig {
-  theme: string[];
-}
-
-export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
-  embeddedKey: string;
-  searchInputSelector: string;
-  streetLineSelector?: string;
-  secondarySelector?: string;
-  citySelector?: string;
-  stateSelector?: string;
-  zipcodeSelector?: string;
-
-  // Allow service class overrides
-  services?: ServiceClassOverrides;
-
-  // Lifecycle hooks (add in Step 7)
-  onAddressSelected?: (address: AddressSuggestion) => void;
-  onSuggestionsReceived?: (suggestions: AddressSuggestion[]) => AddressSuggestion[];
-  onDropdownOpen?: () => void;
-  onDropdownClose?: () => void;
-}
-```
+**Why validate now:** This is the critical integration point - verify all services work together.
 
 ---
 
-## Step 7: Add Lifecycle Hook Support
+## Step 6: Add Lifecycle Hook Support
 
-Add callback hooks to service methods for common customization needs.
+Add callback hooks to service methods for common customization needs. (Note: Hook interfaces were already added to config in Step 1.)
 
 **File:** `src/services/autocompleteDropdown/AutocompleteDropdownService.ts`
 
@@ -539,18 +594,39 @@ export class AutocompleteDropdownService extends BaseService {
 
 **Why:** Provides simple hooks for 80% of use cases without requiring subclassing.
 
+### Validate This Step
+
+Test lifecycle hooks in `index.html`:
+
+```typescript
+const plugin = new SmartyAddress({
+  embeddedKey: "...",
+  streetSelector: "#street",
+  onAddressSelected: (address) => console.log('Hook called:', address)
+});
+```
+
+Verify hook is called when selecting an address.
+
 ---
 
-## Step 8: Delete Old Service Factory
+## Step 7: Delete Old Service Factory
 
 **Delete these files:**
 - `src/utils/serviceFactory.ts`
 
 **Why:** No longer needed - services are instantiated directly.
 
+### Validate This Step
+
+```bash
+npm run build
+# Verify no import errors or references to serviceFactory
+```
+
 ---
 
-## Step 9: Update Tests
+## Step 8: Update Tests
 
 Update any test files that import or use the old service pattern.
 
@@ -558,32 +634,24 @@ Update any test files that import or use the old service pattern.
 - Old: `const wrappedHandler = initService('apiService', apiService, 1)`
 - New: `const service = new ApiService()`
 
----
+### Validate This Step
 
-## Step 10: Update Documentation
-
-**File:** `README.md` or create `CUSTOMIZATION.md`
-
-Add examples of:
-
-1. **Basic usage** (unchanged)
-2. **Using lifecycle hooks:**
-```typescript
-const plugin = new SmartyAddress({
-  embeddedKey: "...",
-  streetSelector: "#street",
-  onAddressSelected: (address) => {
-    console.log('Selected:', address);
-    analytics.track('address_selected', address);
-  },
-  onSuggestionsReceived: (suggestions) => {
-    // Filter out restricted cities
-    return suggestions.filter(s => s.city !== "Restricted City");
-  }
-});
+```bash
+npm test
+# All tests should pass
 ```
 
-3. **Overriding a service:**
+---
+
+## Step 9: Final Validation & Documentation
+
+### Complete End-to-End Testing
+
+Test all scenarios in `index.html`:
+
+1. **Basic usage** - Verify autocomplete works
+2. **Lifecycle hooks** - Test `onAddressSelected`, `onSuggestionsReceived`, etc.
+3. **Custom service override:**
 ```typescript
 class CustomApiService extends SmartyAddress.services.ApiService {
   async fetchAddressSuggestions(searchString: string) {
@@ -601,25 +669,62 @@ const plugin = new SmartyAddress({
 });
 ```
 
+### Update Documentation
+
+Add examples to `README.md` or create `CUSTOMIZATION.md`:
+
+1. **Basic usage** (unchanged)
+2. **Using lifecycle hooks** - Show `onAddressSelected`, `onSuggestionsReceived` examples
+3. **Overriding a service** - Show subclassing pattern
+
+### Final Checks
+
+```bash
+npm test        # All tests pass
+npm run build   # Builds successfully
+# Manual testing in index.html completed
+```
+
 ---
 
 ## Migration Checklist
 
-- [ ] Step 1: Create BaseService class
-- [ ] Step 2: Convert ApiService to class, delete apiHandlers.ts
-- [ ] Step 3: Convert AutocompleteDropdownService to class, delete handlers file
-- [ ] Step 4: Convert AddressFormUiService to class, delete handlers file
-- [ ] Step 5: Update SmartyAddress main class to instantiate services
-- [ ] Step 6: Update interfaces.ts, remove old service interfaces
-- [ ] Step 7: Add lifecycle hook support to services
-- [ ] Step 8: Delete serviceFactory.ts
-- [ ] Step 9: Update tests
-- [ ] Step 10: Update documentation
-- [ ] Run `npm test` - all tests pass
-- [ ] Run `npm run build` - builds successfully
-- [ ] Test in `index.html` - basic usage still works
-- [ ] Test custom service override in `index.html`
-- [ ] Test lifecycle hooks in `index.html`
+- [ ] Step 1: Create BaseService class + update interfaces
+  - [ ] Create `src/services/BaseService.ts`
+  - [ ] Update `src/interfaces.ts` with new interfaces
+  - [ ] Run `npm run build` to verify
+- [ ] Step 2: Convert ApiService to class + test
+  - [ ] Convert `src/services/api/ApiService.ts`
+  - [ ] Delete `src/services/api/apiHandlers.ts`
+  - [ ] Create validation test and verify
+  - [ ] Run `npm run build`
+- [ ] Step 3: Convert AutocompleteDropdownService to class + test
+  - [ ] Convert `src/services/autocompleteDropdown/AutocompleteDropdownService.ts`
+  - [ ] Delete `src/services/autocompleteDropdown/autocompleteDropdownHandlers.ts`
+  - [ ] Create validation test and verify
+  - [ ] Run `npm run build`
+- [ ] Step 4: Convert AddressFormUiService to class + test
+  - [ ] Convert `src/services/addressFormUi/AddressFormUiService.ts`
+  - [ ] Delete `src/services/addressFormUi/AddressFormUiHandlers.ts`
+  - [ ] Create validation test and verify
+  - [ ] Run `npm run build`
+- [ ] Step 5: Wire services together in main class
+  - [ ] Update `src/index.ts`
+  - [ ] Run `npm run build`
+  - [ ] Test basic usage in `index.html`
+- [ ] Step 6: Add lifecycle hook support
+  - [ ] Update AutocompleteDropdownService with hooks
+  - [ ] Test hooks in `index.html`
+- [ ] Step 7: Delete old service factory
+  - [ ] Delete `src/utils/serviceFactory.ts`
+  - [ ] Run `npm run build`
+- [ ] Step 8: Update tests
+  - [ ] Update test files to use new class pattern
+  - [ ] Run `npm test`
+- [ ] Step 9: Final validation & documentation
+  - [ ] Complete end-to-end testing
+  - [ ] Update documentation with examples
+  - [ ] Final `npm test` and `npm run build`
 
 ---
 
