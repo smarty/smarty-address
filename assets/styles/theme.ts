@@ -69,7 +69,6 @@ export const themeStyles = {
 	},
 
 	".smartyAddress__suggestionEntries": {
-		// TODO: Figure out fallback colors (or we could just make sure we never run into that scenario)
 		color: "var(--smartyAddress__textAccentColor, #0066ff)",
 		"white-space": "var(--smartyAddress__suggestionWhitespace)",
 	},

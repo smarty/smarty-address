@@ -401,6 +401,8 @@ export const updateDynamicStyles = (
 	const tertiarySurfaceColor = `hsl(${hue} ${saturation}% ${tertiaryLightness}%)`;
 	const hoverMixColor = isLightMode ? "#000" : "#fff";
 
+	const accentColor = isLightMode ? "#0066ff" : "#6699ff";
+
 	// TODO: Need to define all the missing vars here (see colors.ts)
 	const dynamicColorStyles = {
 		"--smartyAddress__textBasePrimaryColor": inputTextColor,
@@ -409,6 +411,7 @@ export const updateDynamicStyles = (
 		"--smartyAddress__surfaceBaseTertiaryColor": tertiarySurfaceColor,
 		"--smartyAddress__surfaceInverseExtremeColor": hoverMixColor,
 		"--smartyAddress__surfaceBasePrimaryInverseColor": inputTextColor,
+		"--smartyAddress__textAccentColor": accentColor,
 		"--smartyAddress__logoDarkDisplay": useBlueLogo ? "block" : "none",
 		"--smartyAddress__logoLightDisplay": useBlueLogo ? "none" : "block",
 		// TODO: What to do about shadows for sites in dark mode
