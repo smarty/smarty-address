@@ -64,13 +64,22 @@ export class AutocompleteDropdownService extends BaseService {
 		const selectedAddress = mergedAddressSuggestions[currentSelectedIndex];
 
 		if (searchInputValue.length) {
-			if (currentSelectedIndex > -1) {
+			if (currentSelectedIndex > -1 && selectedAddress) {
 				this.services.apiService?.fetchSecondaryAddressSuggestions(
 					searchInputValue,
-					selectedAddress?.address,
+					selectedAddress.address,
+					{
+						onSuccess: (suggestions, searchString) =>
+							this.formatSecondaryAddressSuggestions(suggestions, searchString),
+						onError: (errorMessage) => this.handleAutocompleteSecondaryError(errorMessage),
+					},
 				);
 			} else {
-				this.services.apiService?.fetchAddressSuggestions(searchInputValue);
+				this.services.apiService?.fetchAddressSuggestions(searchInputValue, {
+					onSuccess: (suggestions, searchString) =>
+						this.formatAddressSuggestions(suggestions, searchString),
+					onError: (errorMessage) => this.handleAutocompleteError(errorMessage),
+				});
 			}
 		}
 	}
@@ -118,6 +127,11 @@ export class AutocompleteDropdownService extends BaseService {
 			this.services.apiService?.fetchSecondaryAddressSuggestions(
 				newSearchTerm,
 				selectedAddress.address,
+				{
+					onSuccess: (suggestions, searchString) =>
+						this.formatSecondaryAddressSuggestions(suggestions, searchString),
+					onError: (errorMessage) => this.handleAutocompleteSecondaryError(errorMessage),
+				},
 			);
 			searchInputElement.focus();
 		} else {

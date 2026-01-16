@@ -23,18 +23,12 @@ This utility file is too large. Split by concern:
 - domStyles.ts - Styling and CSS utilities
 - domAccessibility.ts - ARIA and accessibility helpers
 
-4. Decouple ApiService ↔ AutocompleteDropdownService
-
-These have bidirectional dependencies - ApiService calls methods on AutocompleteDropdownService directly. Consider using:
-- Callbacks passed to API methods, or
-- An event emitter pattern
-
-5. Add State Machine for Dropdown
+4. Add State Machine for Dropdown
 
 Replace scattered state variables (dropdownIsOpen, highlightedSuggestionIndex, selectedSuggestionIndex) with a proper state machine pattern for clearer state transitions.
 
 Low Priority
 
-6. Configuration Validation
+5. Configuration Validation
 
 Add early validation for required fields like embeddedKey at init time, rather than failing later at API call time.

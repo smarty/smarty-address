@@ -87,3 +87,8 @@ export interface HslColor {
 	lightness: number;
 	alpha: number;
 }
+
+export interface FetchSuggestionsCallbacks {
+	onSuccess: (suggestions: AddressSuggestion[], searchString: string) => void;
+	onError: (errorMessage: string) => void;
+}

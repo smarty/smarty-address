@@ -1,5 +1,10 @@
 import { BaseService } from "../BaseService";
-import { ApiConfig, SmartyAddressConfig } from "../../interfaces";
+import {
+	AddressSuggestion,
+	ApiConfig,
+	FetchSuggestionsCallbacks,
+	SmartyAddressConfig,
+} from "../../interfaces";
 import { getAutocompleteApiResults, getMatchingResult, API_PARAM_KEYS } from "../../utils/apiUtils";
 
 export class ApiService extends BaseService {
@@ -26,18 +31,25 @@ export class ApiService extends BaseService {
 		} as ApiConfig;
 	}
 
-	async fetchAddressSuggestions(searchString: string) {
+	async fetchAddressSuggestions(
+		searchString: string,
+		callbacks: FetchSuggestionsCallbacks,
+	): Promise<void> {
 		try {
 			const apiConfig = this.getApiConfig();
 			const suggestions = await getAutocompleteApiResults(apiConfig, searchString);
-			this.services.autocompleteDropdownService?.formatAddressSuggestions(suggestions, searchString);
+			callbacks.onSuccess(suggestions, searchString);
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : String(error);
-			this.services.autocompleteDropdownService?.handleAutocompleteError(errorMessage);
+			callbacks.onError(errorMessage);
 		}
 	}
 
-	async fetchSecondaryAddressSuggestions(searchString: string, selectedAddress: any) {
+	async fetchSecondaryAddressSuggestions(
+		searchString: string,
+		selectedAddress: AddressSuggestion,
+		callbacks: FetchSuggestionsCallbacks,
+	): Promise<void> {
 		try {
 			const apiConfig = this.getApiConfig();
 			const primarySuggestions = await getAutocompleteApiResults(apiConfig, searchString);
@@ -46,13 +58,10 @@ export class ApiService extends BaseService {
 				? await getAutocompleteApiResults(apiConfig, searchString, newSelectedAddress)
 				: [];
 
-			this.services.autocompleteDropdownService?.formatSecondaryAddressSuggestions(
-				suggestions,
-				searchString,
-			);
+			callbacks.onSuccess(suggestions, searchString);
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : String(error);
-			this.services.autocompleteDropdownService?.handleAutocompleteSecondaryError(errorMessage);
+			callbacks.onError(errorMessage);
 		}
 	}
 }
