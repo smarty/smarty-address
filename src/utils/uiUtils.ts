@@ -1,9 +1,9 @@
 import {
-	AbstractStateObject,
 	AddressSuggestion,
 	HslColor,
 	RgbaColor,
 	StylesObject,
+	UiSuggestionItem,
 } from "../interfaces";
 import { getRgbaFromCssColor } from "./domUtils";
 
@@ -123,7 +123,13 @@ export const convertStylesObjectToCssBlock = (stylesObject: StylesObject) => {
 	return selectorsBlock.join("");
 };
 
-export const getMergedAddressSuggestions = (state: AbstractStateObject) => {
+interface SuggestionState {
+	addressSuggestionResults: UiSuggestionItem[];
+	secondaryAddressSuggestionResults: UiSuggestionItem[];
+	selectedSuggestionIndex: number;
+}
+
+export const getMergedAddressSuggestions = (state: SuggestionState): UiSuggestionItem[] => {
 	const { addressSuggestionResults, secondaryAddressSuggestionResults, selectedSuggestionIndex } =
 		state;
 

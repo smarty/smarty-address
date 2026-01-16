@@ -1,61 +1,70 @@
 import { DefaultSmartyAddressConfig, SmartyAddressConfig } from "./interfaces";
-import { apiService } from "./services/api/ApiService";
-import { autocompleteDropdownService } from "./services/autocompleteDropdown/AutocompleteDropdownService";
-import { addressFormUiService } from "./services/addressFormUi/AddressFormUiService";
-import { initService } from "./utils/serviceFactory";
+import { ApiService } from "./services/api/ApiService";
+import { AutocompleteDropdownService } from "./services/autocompleteDropdown/AutocompleteDropdownService";
+import { AddressFormUiService } from "./services/addressFormUi/AddressFormUiService";
 import { themes } from "./themes";
 import { defineStyles } from "./utils/appUtils";
 import { US_AUTOCOMPLETE_PRO_API_URL } from "./constants";
-// TODO: Update readme
-// TODO: Add ability to destroy an instance of SmartyAddress (and remove all associated elements from DOM)
-// TODO: Make styles dynamically configurable (e.g. what if I want to change the theme dynamically after the page has loaded?)
-// TODO: Update code to use international names for address fields, variable names, etc. (e.g. postal code instead of zipcode)
-// TODO: Add "backoff" for autocomplete results (add config option to make this customizable)
-// TODO: Add config option for "min characters" before api request is sent
-// TODO: Log autocomplete api calls for copy/paste scenarios (maybe just compare the length of the string to the previous search instead of watching the paste event). This can use the user-agent param in the query string.
 
 export default class SmartyAddress {
 	static defaultConfig: DefaultSmartyAddressConfig = {
 		embeddedKey: "",
 		theme: themes.default,
-		services: {
-			autocompleteDropdownService,
-			addressFormUiService,
-			apiService,
-		},
 		autocompleteApiUrl: US_AUTOCOMPLETE_PRO_API_URL,
 	};
+
 	static {
 		defineStyles();
 	}
+
 	static themes = themes;
-	static services = SmartyAddress.defaultConfig.services;
+
+	static services = {
+		ApiService,
+		AutocompleteDropdownService,
+		AddressFormUiService,
+	};
 
 	private static instances: SmartyAddress[] = [];
-	private instanceId;
+	private instanceId: number;
 
-	// TODO: update "config" type/interface to be more specific
-	// TODO: Verify config is valid before setting up services
+	private apiService: ApiService;
+	private autocompleteDropdownService: AutocompleteDropdownService;
+	private addressFormUiService: AddressFormUiService;
+
 	constructor(config: SmartyAddressConfig) {
 		SmartyAddress.instances.push(this);
 		this.instanceId = SmartyAddress.instances.length;
+
+		const ApiServiceClass = config.services?.ApiService || ApiService;
+		const DropdownServiceClass = config.services?.AutocompleteDropdownService || AutocompleteDropdownService;
+		const FormServiceClass = config.services?.AddressFormUiService || AddressFormUiService;
+
+		this.apiService = new ApiServiceClass();
+		this.autocompleteDropdownService = new DropdownServiceClass(this.instanceId);
+		this.addressFormUiService = new FormServiceClass();
+
+		const services = {
+			apiService: this.apiService,
+			autocompleteDropdownService: this.autocompleteDropdownService,
+			addressFormUiService: this.addressFormUiService,
+		};
+
+		this.apiService.setServices(services);
+		this.autocompleteDropdownService.setServices(services);
+		this.addressFormUiService.setServices(services);
+
 		this.init(config);
 	}
 
 	init = async (config: SmartyAddressConfig) => {
-		config = {
+		const mergedConfig = {
 			...SmartyAddress.defaultConfig,
 			...config,
 		};
-		this.setupServices(config);
-	};
 
-	setupServices = (config: SmartyAddressConfig) => {
-		Object.entries(config.services).forEach(([name, serviceDefinition]) => {
-			const serviceHandlers = initService(name, serviceDefinition, this.instanceId);
-			if (serviceHandlers.init) {
-				serviceHandlers.init(config);
-			}
-		});
+		this.apiService.init(mergedConfig);
+		this.autocompleteDropdownService.init(mergedConfig);
+		this.addressFormUiService.init(mergedConfig);
 	};
 }

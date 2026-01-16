@@ -1,5 +1,5 @@
-import { ServiceDefinition, ServiceHandler, ServiceHandlerProps } from "../../interfaces";
-import { populateFormWithNewAddress, init } from "./AddressFormUiHandlers";
+import { BaseService } from "../BaseService";
+import { AddressSuggestion, SmartyAddressConfig } from "../../interfaces";
 import {
 	findDomElement,
 	getStreetLineFormValue,
@@ -7,35 +7,48 @@ import {
 	getStateValueForInput,
 } from "../../utils/domUtils";
 
-const initialState = {
-	searchInputSelector: null as string | null,
-	streetSelector: null as string | null,
-	secondarySelector: null as string | null,
-	citySelector: null as string | null,
-	stateSelector: null as string | null,
-	zipcodeSelector: null as string | null,
-};
+export class AddressFormUiService extends BaseService {
+	private streetLineSelector: string | null = null;
+	private secondarySelector: string | null = null;
+	private citySelector: string | null = null;
+	private stateSelector: string | null = null;
+	private zipcodeSelector: string | null = null;
 
-const serviceHandlers = {
-	init,
-	populateFormWithNewAddress,
-};
+	init(config: SmartyAddressConfig) {
+		this.streetLineSelector = config?.streetLineSelector ?? null;
+		this.secondarySelector = config?.secondarySelector ?? null;
+		this.citySelector = config?.citySelector ?? null;
+		this.stateSelector = config?.stateSelector ?? null;
+		this.zipcodeSelector = config?.zipcodeSelector ?? null;
+	}
 
-const utils = {
-	findDomElement,
-	getStreetLineFormValue,
-	setInputValue,
-	getStateValueForInput,
-};
+	populateFormWithNewAddress(selectedAddress: AddressSuggestion) {
+		const elements = {
+			streetLineInputElement: findDomElement(this.streetLineSelector),
+			secondaryInputElement: findDomElement(this.secondarySelector) as HTMLInputElement | null,
+			cityInputElement: findDomElement(this.citySelector) as HTMLInputElement | null,
+			stateInputElement: findDomElement(this.stateSelector) as HTMLInputElement | null,
+			zipcodeInputElement: findDomElement(this.zipcodeSelector) as HTMLInputElement | null,
+		};
 
-export const addressFormUiService: ServiceDefinition<typeof utils, typeof initialState> = {
-	initialState,
-	serviceHandlers,
-	utils,
-};
+		if (!elements?.streetLineInputElement) return;
 
-type addressFormUiServiceHandlerProps = ServiceHandlerProps<typeof utils, typeof initialState>;
+		setInputValue(elements.streetLineInputElement, getStreetLineFormValue(elements, selectedAddress));
 
-export interface addressFormUiServiceHandler extends ServiceHandler<addressFormUiServiceHandlerProps> {
-	(props: addressFormUiServiceHandlerProps, customProps?: any): any;
+		if (elements.secondaryInputElement) {
+			setInputValue(elements.secondaryInputElement, selectedAddress.secondary ?? "");
+		}
+		if (elements.cityInputElement) {
+			setInputValue(elements.cityInputElement, selectedAddress.city);
+		}
+		if (elements.stateInputElement) {
+			setInputValue(
+				elements.stateInputElement,
+				getStateValueForInput(elements.stateInputElement, selectedAddress.state),
+			);
+		}
+		if (elements.zipcodeInputElement) {
+			setInputValue(elements.zipcodeInputElement, selectedAddress.zipcode);
+		}
+	}
 }

@@ -55,7 +55,7 @@ describe("apiUtils", () => {
 
 	describe("getAutocompleteApiResults", () => {
 		const mockApiConfig: ApiConfig = {
-			apiKey: "test-api-key",
+			embeddedKey: "test-api-key",
 			autocompleteApiUrl: "https://api.example.com/autocomplete",
 		};
 

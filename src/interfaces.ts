@@ -1,3 +1,7 @@
+import type { ApiService } from "./services/api/ApiService";
+import type { AutocompleteDropdownService } from "./services/autocompleteDropdown/AutocompleteDropdownService";
+import type { AddressFormUiService } from "./services/addressFormUi/AddressFormUiService";
+
 export interface ApiConfig {
 	embeddedKey: string;
 	autocompleteApiUrl: string;
@@ -14,13 +18,17 @@ export interface ApiConfig {
 	source?: "postal" | "all";
 }
 
+export interface ServiceClassOverrides {
+	ApiService?: typeof ApiService;
+	AutocompleteDropdownService?: typeof AutocompleteDropdownService;
+	AddressFormUiService?: typeof AddressFormUiService;
+}
+
 export interface DefaultSmartyAddressConfig extends ApiConfig {
-	services: ServiceDefinitionMap;
 	theme: string[];
 }
 
 export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
-	// TODO: Talk to Jeffrey and Adam about correct naming of fields/properties
 	embeddedKey: string;
 	searchInputSelector: string;
 	streetLineSelector?: string;
@@ -28,6 +36,11 @@ export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 	citySelector?: string;
 	stateSelector?: string;
 	zipcodeSelector?: string;
+	services?: ServiceClassOverrides;
+	onAddressSelected?: (address: AddressSuggestion) => void;
+	onSuggestionsReceived?: (suggestions: AddressSuggestion[]) => AddressSuggestion[];
+	onDropdownOpen?: () => void;
+	onDropdownClose?: () => void;
 }
 
 export interface AddressSuggestion {
@@ -50,51 +63,6 @@ export interface StylesObject {
 export interface ApiErrorResponse {
 	id: number;
 	message: string;
-}
-
-export interface AbstractStateObject {
-	[index: string]: any;
-}
-
-export interface ServiceHandlersObject {
-	[name: string]: WrappedServiceHandler;
-}
-export interface ServicesObject {
-	apiService?: ServiceHandlersObject;
-	addressFormUiService?: ServiceHandlersObject;
-	autocompleteDropdownService?: ServiceHandlersObject;
-	[serviceName: string]: ServiceHandlersObject;
-}
-export interface ServiceHandler<TProps extends ServiceHandlerProps = ServiceHandlerProps> {
-	(props: TProps, customProps?: any): any;
-}
-
-export interface ServiceHandlerMap {
-	[name: string]: ServiceHandler<any>;
-}
-export interface WrappedServiceHandler {
-	(customProps?: any): any;
-}
-
-export interface ServiceHandlerProps<TUtils = ServiceDefinitionUtils, TState = AbstractStateObject> {
-	state: TState;
-	setState: { (name: string, newState: unknown): void };
-	services: ServicesObject;
-	utils: TUtils;
-}
-
-export interface ServiceDefinition<TUtils = ServiceDefinitionUtils, TState = AbstractStateObject> {
-	initialState: TState;
-	serviceHandlers: ServiceHandlerMap;
-	utils?: TUtils;
-}
-
-export interface ServiceDefinitionUtils {
-	[name: string]: (...args: any[]) => any;
-}
-
-export interface ServiceDefinitionMap {
-	[name: string]: ServiceDefinition<any, any>;
 }
 
 export interface UiSuggestionItem {
