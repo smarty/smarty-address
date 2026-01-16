@@ -66,7 +66,7 @@ export const getAutocompleteApiResults = async (
 			const value = apiConfig[param];
 			if (value !== undefined) {
 				const apiParamName = API_PARAM_MAP[param];
-				requestData[apiParamName] = Array.isArray(value) ? value.join(",") : String(value);
+				requestData[apiParamName] = Array.isArray(value) ? value.join(";") : String(value);
 			}
 		});
 
