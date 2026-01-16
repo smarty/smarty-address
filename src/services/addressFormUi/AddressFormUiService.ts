@@ -8,14 +8,14 @@ import {
 } from "../../utils/domUtils";
 
 export class AddressFormUiService extends BaseService {
-	private streetLineSelector: string | null = null;
+	private streetSelector: string | null = null;
 	private secondarySelector: string | null = null;
 	private citySelector: string | null = null;
 	private stateSelector: string | null = null;
 	private zipcodeSelector: string | null = null;
 
 	init(config: SmartyAddressConfig) {
-		this.streetLineSelector = config?.streetLineSelector ?? null;
+		this.streetSelector = config?.streetSelector ?? null;
 		this.secondarySelector = config?.secondarySelector ?? null;
 		this.citySelector = config?.citySelector ?? null;
 		this.stateSelector = config?.stateSelector ?? null;
@@ -24,7 +24,7 @@ export class AddressFormUiService extends BaseService {
 
 	populateFormWithNewAddress(selectedAddress: AddressSuggestion) {
 		const elements = {
-			streetLineInputElement: findDomElement(this.streetLineSelector),
+			streetLineInputElement: findDomElement(this.streetSelector),
 			secondaryInputElement: findDomElement(this.secondarySelector) as HTMLInputElement | null,
 			cityInputElement: findDomElement(this.citySelector) as HTMLInputElement | null,
 			stateInputElement: findDomElement(this.stateSelector) as HTMLInputElement | null,

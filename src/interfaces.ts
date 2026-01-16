@@ -31,7 +31,7 @@ export interface DefaultSmartyAddressConfig extends ApiConfig {
 export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 	embeddedKey: string;
 	searchInputSelector: string;
-	streetLineSelector?: string;
+	streetSelector?: string;
 	secondarySelector?: string;
 	citySelector?: string;
 	stateSelector?: string;

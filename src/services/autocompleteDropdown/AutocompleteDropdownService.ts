@@ -50,7 +50,7 @@ export class AutocompleteDropdownService extends BaseService {
 			updateThemeClass(newTheme, previousTheme, this.dropdownWrapperElement);
 		}
 
-		this.searchInputSelector = config.searchInputSelector ?? config.streetLineSelector ?? "";
+		this.searchInputSelector = config.searchInputSelector ?? config.streetSelector ?? "";
 
 		this.setupDom();
 	}
