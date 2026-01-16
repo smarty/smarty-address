@@ -92,7 +92,7 @@ export class AutocompleteDropdownService extends BaseService {
 					this.instanceId,
 				);
 
-			configureDynamicStyling(dynamicStylingHandler);
+			configureDynamicStyling(dynamicStylingHandler, searchInputElement);
 		} else {
 			console.error(
 				`Failed to find search input element with selector "${this.searchInputSelector}".`,

@@ -541,13 +541,30 @@ export const configureSearchInputForAutocomplete = (searchInputElement: HTMLInpu
 	searchInputElement.setAttribute("aria-expanded", "true");
 };
 
-export const configureDynamicStyling = (dynamicStylingHandler: Function) => {
-	// TODO: Do we need to separate "color" and "position" functionality?
-	// TODO: Do we need to setup polling or a mutation observer so we can also recalculate these values when sizes/positions/colors change for other reasons besides scroll/resize?
-
+export const configureDynamicStyling = (
+	dynamicStylingHandler: Function,
+	searchInputElement: HTMLElement,
+) => {
 	dynamicStylingHandler();
-	window.addEventListener("scroll", () => dynamicStylingHandler);
-	window.addEventListener("resize", () => dynamicStylingHandler);
+	window.addEventListener("scroll", () => dynamicStylingHandler());
+	window.addEventListener("resize", () => dynamicStylingHandler());
+
+	const observerCallback = () => dynamicStylingHandler();
+	const observerOptions: MutationObserverInit = {
+		attributes: true,
+		attributeFilter: ["style", "class"],
+	};
+
+	const observer = new MutationObserver(observerCallback);
+
+	let element: HTMLElement | null = searchInputElement;
+	while (element && element !== document.body) {
+		observer.observe(element, observerOptions);
+		element = element.parentElement;
+	}
+	if (document.body) {
+		observer.observe(document.body, observerOptions);
+	}
 };
 
 export const updateThemeClass = (
