@@ -179,6 +179,7 @@ export const setInputValue = (element: HTMLElement, value: string) => {
 export const createSuggestionElement = (
 	suggestion: AddressSuggestion,
 	searchString: string = "",
+	suggestionId?: string,
 ) => {
 	const { entries = 0 } = suggestion;
 	const addressElementClasses = ["smartyAddress__autocompleteAddress"];
@@ -197,12 +198,24 @@ export const createSuggestionElement = (
 		children: [{ text: part.text }],
 	}));
 
+	const entriesLabel = entries > 1 ? `, ${entries} entries available` : "";
+	const ariaLabel = `${formattedAddress}${entriesLabel}`;
+
+	const attributes: Record<string, string> = {
+		"data-address": JSON.stringify(suggestion),
+		role: "option",
+		"aria-label": ariaLabel,
+	};
+	if (suggestionId) {
+		attributes.id = suggestionId;
+	}
+
 	const elementsMap: ElementConfig[] = [
 		{
 			name: "suggestionElement",
 			elementType: "li",
 			className: suggestionElementClasses,
-			attributes: { "data-address": JSON.stringify(suggestion) },
+			attributes,
 			children: [
 				{
 					elementType: "div",
@@ -232,12 +245,14 @@ export const createSuggestionElement = (
 export const createSecondarySuggestionElement = (
 	suggestion: AddressSuggestion,
 	searchString: string = "",
+	suggestionId?: string,
 ) => {
 	const addressElementClasses = ["smartyAddress__autocompleteAddress"];
 	const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
 	const secondarySuggestionElementClasses = ["smartyAddress__secondarySuggestion"];
 
 	const formattedAddress = getFormattedAddressSuggestion(suggestion, true);
+	const fullAddress = getFormattedAddressSuggestion(suggestion, false);
 	const highlightedParts = createHighlightedTextElements(formattedAddress, searchString);
 	const addressChildren: ElementConfig[] = highlightedParts.map((part) => ({
 		elementType: "span",
@@ -245,12 +260,21 @@ export const createSecondarySuggestionElement = (
 		children: [{ text: part.text }],
 	}));
 
+	const attributes: Record<string, string> = {
+		"data-address": JSON.stringify(suggestion),
+		role: "option",
+		"aria-label": fullAddress,
+	};
+	if (suggestionId) {
+		attributes.id = suggestionId;
+	}
+
 	const elementsMap = [
 		{
 			name: "secondarySuggestionElement",
 			elementType: "li",
 			className: secondarySuggestionElementClasses,
-			attributes: { "data-address": JSON.stringify(suggestion) },
+			attributes,
 			children: [
 				{
 					elementType: "div",
@@ -492,6 +516,7 @@ export const buildAutocompleteDomElements = (
 		"smartyAddress__suggestionsWrapperElement",
 		instanceClassname,
 	];
+	const announcementElementClasses = ["smartyAddress__srOnly"];
 
 	const elementsMap = [
 		{ name: "customStylesElement", elementType: "style" },
@@ -501,27 +526,48 @@ export const buildAutocompleteDomElements = (
 			className: dropdownWrapperElementClasses,
 			children: [
 				{
+					name: "announcementElement",
+					elementType: "div",
+					className: announcementElementClasses,
+					attributes: {
+						"aria-live": "polite",
+						"aria-atomic": "true",
+					},
+				},
+				{
 					name: "dropdownElement",
 					elementType: "div",
 					className: dropdownElementInitialClasses,
-					attributes: { role: "listbox" },
+					attributes: {
+						role: "listbox",
+						"aria-label": "Address suggestions",
+					},
 					children: [
 						{ name: "suggestionsElement", elementType: "ul", className: suggestionsElementClasses },
 						{
 							name: "poweredBySmartyElement",
 							elementType: "div",
 							className: poweredByElementClasses,
+							attributes: { "aria-hidden": "true" },
 							children: [
 								{ text: "Powered by" },
 								{
 									elementType: "img",
 									className: darkLogoElementClasses,
-									attributes: { src: getSmartyLogo("#0066FF") },
+									attributes: {
+										src: getSmartyLogo("#0066FF"),
+										alt: "",
+										"aria-hidden": "true",
+									},
 								},
 								{
 									elementType: "img",
 									className: lightLogoElementClasses,
-									attributes: { src: getSmartyLogo("#FFFFFF") },
+									attributes: {
+										src: getSmartyLogo("#FFFFFF"),
+										alt: "",
+										"aria-hidden": "true",
+									},
 								},
 							],
 						},
@@ -534,11 +580,33 @@ export const buildAutocompleteDomElements = (
 	return buildElementsFromMap(elementsMap);
 };
 
-export const configureSearchInputForAutocomplete = (searchInputElement: HTMLInputElement) => {
+export const configureSearchInputForAutocomplete = (
+	searchInputElement: HTMLInputElement,
+	dropdownId?: string,
+) => {
 	searchInputElement.setAttribute("autocomplete", "smarty");
 	searchInputElement.setAttribute("aria-autocomplete", "list");
 	searchInputElement.setAttribute("role", "combobox");
-	searchInputElement.setAttribute("aria-expanded", "true");
+	searchInputElement.setAttribute("aria-expanded", "false");
+	if (dropdownId) {
+		searchInputElement.setAttribute("aria-owns", dropdownId);
+		searchInputElement.setAttribute("aria-controls", dropdownId);
+	}
+};
+
+export const getSuggestionId = (instanceId: number, index: number): string => {
+	return `smartyAddress__suggestion_${instanceId}_${index}`;
+};
+
+export const updateAriaActivedescendant = (
+	searchInputElement: HTMLInputElement,
+	suggestionId: string | null,
+) => {
+	if (suggestionId) {
+		searchInputElement.setAttribute("aria-activedescendant", suggestionId);
+	} else {
+		searchInputElement.removeAttribute("aria-activedescendant");
+	}
 };
 
 export const configureDynamicStyling = (

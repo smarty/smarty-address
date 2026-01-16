@@ -14,6 +14,8 @@ import {
 	configureSearchInputForAutocomplete,
 	findDomElement,
 	findDomElementWithRetry,
+	getSuggestionId,
+	updateAriaActivedescendant,
 } from "../../utils/domUtils";
 import { getInstanceClassName, getMergedAddressSuggestions } from "../../utils/uiUtils";
 
@@ -27,6 +29,7 @@ export class AutocompleteDropdownService extends BaseService {
 	private dropdownElement: HTMLElement | null = null;
 	private suggestionsElement: HTMLElement | null = null;
 	private customStylesElement: HTMLStyleElement | null = null;
+	private announcementElement: HTMLElement | null = null;
 
 	private selectedAddressSearchTerm: string = "";
 	private dropdownIsOpen: boolean = false;
@@ -72,6 +75,11 @@ export class AutocompleteDropdownService extends BaseService {
 		this.dropdownWrapperElement = elements.dropdownWrapperElement as HTMLElement;
 		this.dropdownElement = elements.dropdownElement as HTMLElement;
 		this.suggestionsElement = elements.suggestionsElement as HTMLElement;
+		this.announcementElement = elements.announcementElement as HTMLElement;
+
+		if (this.dropdownElement) {
+			this.dropdownElement.id = this.getDropdownId();
+		}
 
 		if (dropdownWrapperElement instanceof HTMLElement) {
 			updateThemeClass(this.theme, [], dropdownWrapperElement);
@@ -104,10 +112,20 @@ export class AutocompleteDropdownService extends BaseService {
 		const searchInputElement = findDomElement(this.searchInputSelector) as HTMLInputElement;
 		if (!searchInputElement) return;
 
-		configureSearchInputForAutocomplete(searchInputElement);
+		configureSearchInputForAutocomplete(searchInputElement, this.getDropdownId());
 
 		searchInputElement.addEventListener("input", (e) => this.handleSearchInputOnChange(e));
 		searchInputElement.addEventListener("keydown", (e) => this.handleAutocompleteKeydown(e));
+	}
+
+	private getDropdownId(): string {
+		return `smartyAddress__dropdown_${this.instanceId}`;
+	}
+
+	private announce(message: string) {
+		if (this.announcementElement) {
+			this.announcementElement.textContent = message;
+		}
 	}
 
 	handleAutocompleteKeydown(event: KeyboardEvent) {
@@ -163,6 +181,12 @@ export class AutocompleteDropdownService extends BaseService {
 		}
 		this.highlightedSuggestionIndex = newIndex;
 
+		const searchInputElement = findDomElement(this.searchInputSelector) as HTMLInputElement;
+		if (searchInputElement && items[newIndex]) {
+			const suggestionId = items[newIndex].suggestionElement.id;
+			updateAriaActivedescendant(searchInputElement, suggestionId);
+		}
+
 		return newIndex;
 	}
 
@@ -206,7 +230,8 @@ export class AutocompleteDropdownService extends BaseService {
 					this.handleSelectDropdownItem(addressIndex + this.selectedSuggestionIndex + 1);
 				};
 
-				const suggestionListElements = createSuggestionElement(address, searchString);
+				const suggestionId = getSuggestionId(this.instanceId, addressIndex);
+				const suggestionListElements = createSuggestionElement(address, searchString, suggestionId);
 				const suggestionElement = suggestionListElements["suggestionElement"] as HTMLElement;
 				suggestionElement.addEventListener("click", suggestionOnClickHandler);
 
@@ -228,17 +253,27 @@ export class AutocompleteDropdownService extends BaseService {
 			this.highlightedSuggestionIndex = newIndex;
 		}
 
+		const count = suggestionItems.length;
+		const plural = count === 1 ? "" : "es";
+		this.announce(`${count} address${plural} found. Use arrow keys to navigate.`);
+
 		this.openDropdown();
 	}
 
 	formatSecondaryAddressSuggestions(suggestions: AddressSuggestion[], searchString: string) {
+		const baseIndex = this.addressSuggestionResults.length;
 		const suggestionItems = suggestions.map(
 			(address: AddressSuggestion, addressIndex: number): UiSuggestionItem => {
 				const suggestionOnClickHandler = () => {
 					this.handleSelectDropdownItem(addressIndex + this.selectedSuggestionIndex + 1);
 				};
 
-				const suggestionListElements = createSecondarySuggestionElement(address, searchString);
+				const suggestionId = getSuggestionId(this.instanceId, baseIndex + addressIndex);
+				const suggestionListElements = createSecondarySuggestionElement(
+					address,
+					searchString,
+					suggestionId,
+				);
 				const suggestionElement = suggestionListElements["secondarySuggestionElement"] as HTMLElement;
 				suggestionElement.addEventListener("click", suggestionOnClickHandler);
 
@@ -260,6 +295,10 @@ export class AutocompleteDropdownService extends BaseService {
 			const newIndex = this.highlightNewAddress(0);
 			this.highlightedSuggestionIndex = newIndex;
 		}
+
+		const count = suggestionItems.length;
+		const plural = count === 1 ? "y" : "ies";
+		this.announce(`${count} unit entr${plural} found. Use arrow keys to navigate.`);
 
 		this.openDropdown();
 	}
@@ -287,9 +326,10 @@ export class AutocompleteDropdownService extends BaseService {
 	}
 
 	closeDropdown() {
-		const searchInputElement = findDomElement(this.searchInputSelector);
+		const searchInputElement = findDomElement(this.searchInputSelector) as HTMLInputElement;
 		if (searchInputElement) {
 			searchInputElement.setAttribute("aria-expanded", "false");
+			updateAriaActivedescendant(searchInputElement, null);
 		}
 		this.dropdownIsOpen = false;
 		this.selectedAddressSearchTerm = "";

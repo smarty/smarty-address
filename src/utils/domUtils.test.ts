@@ -194,7 +194,16 @@ describe("domUtils", () => {
 			expect(input.getAttribute("autocomplete")).toBe("smarty");
 			expect(input.getAttribute("aria-autocomplete")).toBe("list");
 			expect(input.getAttribute("role")).toBe("combobox");
-			expect(input.getAttribute("aria-expanded")).toBe("true");
+			expect(input.getAttribute("aria-expanded")).toBe("false");
+		});
+
+		it("should set aria-owns and aria-controls when dropdownId is provided", () => {
+			const input = document.createElement("input") as HTMLInputElement;
+
+			configureSearchInputForAutocomplete(input, "dropdown-123");
+
+			expect(input.getAttribute("aria-owns")).toBe("dropdown-123");
+			expect(input.getAttribute("aria-controls")).toBe("dropdown-123");
 		});
 
 		it("should overwrite existing attributes", () => {
