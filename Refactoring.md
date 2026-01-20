@@ -28,7 +28,3 @@ This utility file is too large. Split by concern:
 Replace scattered state variables (dropdownIsOpen, highlightedSuggestionIndex, selectedSuggestionIndex) with a proper state machine pattern for clearer state transitions.
 
 Low Priority
-
-5. Configuration Validation
-
-Add early validation for required fields like embeddedKey at init time, rather than failing later at API call time.
