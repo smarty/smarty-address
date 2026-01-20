@@ -23,8 +23,3 @@ This utility file is too large. Split by concern:
 - domStyles.ts - Styling and CSS utilities
 - domAccessibility.ts - ARIA and accessibility helpers
 
-4. Add State Machine for Dropdown
-
-Replace scattered state variables (dropdownIsOpen, highlightedSuggestionIndex, selectedSuggestionIndex) with a proper state machine pattern for clearer state transitions.
-
-Low Priority
