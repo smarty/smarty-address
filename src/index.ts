@@ -6,6 +6,7 @@ import { DropdownStateService } from "./services/autocompleteDropdown/DropdownSt
 import { DropdownDomService } from "./services/autocompleteDropdown/DropdownDomService";
 import { themes } from "./themes";
 import { defineStyles } from "./utils/appUtils";
+import { validateConfig } from "./utils/configValidation";
 import { US_AUTOCOMPLETE_PRO_API_URL } from "./constants";
 
 export default class SmartyAddress {
@@ -77,6 +78,8 @@ export default class SmartyAddress {
 			...SmartyAddress.defaultConfig,
 			...config,
 		};
+
+		validateConfig(mergedConfig);
 
 		this.apiService.init(mergedConfig);
 		this.dropdownDomService.init(mergedConfig);
