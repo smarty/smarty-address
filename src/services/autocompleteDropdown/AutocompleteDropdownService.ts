@@ -222,8 +222,9 @@ export class AutocompleteDropdownService extends BaseService {
 		this.services.dropdownDomService?.updateDropdownContents(combinedSuggestionList);
 
 		if (suggestionItems.length) {
-			const newIndex = this.highlightNewAddress(0);
-			this.services.dropdownStateService?.setHighlightedIndex(newIndex);
+			const selectedIndex = this.services.dropdownStateService?.getSelectedIndex() ?? -1;
+			this.services.dropdownStateService?.setHighlightedIndex(selectedIndex + 1);
+			this.highlightNewAddress(0);
 		}
 
 		const count = suggestionItems.length;
