@@ -240,7 +240,6 @@ class StyleService extends BaseService {
 | Test coverage gaps after consolidation | Review test coverage before and after |
 | Circular dependencies | Plan import graph carefully, use interfaces |
 
-## Open Questions
+## Future work (not part of this refactor)
 
-1. Should DropdownService be split into DropdownService + DropdownStateService for testability?
-2. Should we keep the `utils/` directory for truly generic utilities?
+1. Split DropdownService into DropdownService + DropdownStateService for testability
