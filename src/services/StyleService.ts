@@ -8,6 +8,20 @@ import {
 } from "../interfaces";
 
 export class StyleService extends BaseService {
+	static convertStylesObjectToCssBlock(stylesObject: StylesObject): string {
+		const selectorsBlock = Object.entries(stylesObject).map(([selector, selectorStyles]) => {
+			const stylesBlock = Object.entries(selectorStyles)
+				.map(([key, value]) => {
+					return `${key}: ${value};`;
+				})
+				.join("\n\t");
+
+			return `\n${selector} {\n\t${stylesBlock}\n}`;
+		});
+
+		return selectorsBlock.join("");
+	}
+
 	getFormattedAddressSuggestion(
 		suggestion: AddressSuggestion,
 		isSecondary: boolean = false,
@@ -137,20 +151,6 @@ export class StyleService extends BaseService {
 		const alpha = Math.round((aByte / 255) * 1000) / 1000;
 
 		return { red, green, blue, alpha };
-	}
-
-	convertStylesObjectToCssBlock(stylesObject: StylesObject): string {
-		const selectorsBlock = Object.entries(stylesObject).map(([selector, selectorStyles]) => {
-			const stylesBlock = Object.entries(selectorStyles)
-				.map(([key, value]) => {
-					return `${key}: ${value};`;
-				})
-				.join("\n\t");
-
-			return `\n${selector} {\n\t${stylesBlock}\n}`;
-		});
-
-		return selectorsBlock.join("");
 	}
 
 	getMergedAddressSuggestions(state: {

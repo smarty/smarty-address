@@ -3,7 +3,7 @@ import { baseStyles } from "../../assets/styles/base";
 import { colorStyles } from "../../assets/styles/colors";
 import { miscStyles } from "../../assets/styles/misc";
 import { spacingStyles } from "../../assets/styles/spacing";
-import { convertStylesObjectToCssBlock } from "./uiUtils";
+import { StyleService } from "../services/StyleService";
 
 export const defineStyles = () => {
 	const allStyles = {
@@ -13,7 +13,7 @@ export const defineStyles = () => {
 		...spacingStyles,
 		...themeStyles,
 	};
-	const cssStylesBlock = convertStylesObjectToCssBlock(allStyles);
+	const cssStylesBlock = StyleService.convertStylesObjectToCssBlock(allStyles);
 	return addStylesheetToDom(cssStylesBlock);
 };
 
