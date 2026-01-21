@@ -140,6 +140,26 @@ new SmartyAddress({
 });
 ```
 
+### Custom Themes
+
+Themes are arrays of CSS class names applied to the plugin components. Each class defines CSS variables that control the plugin's appearance (see `assets/styles/` for examples). Create a custom theme by providing your own array:
+
+```javascript
+new SmartyAddress({
+  theme: ["my-dropdown-theme", "my-color-scheme"],
+  // ...
+});
+```
+
+You can also extend a built-in theme:
+
+```javascript
+new SmartyAddress({
+  theme: [...SmartyAddress.themes.dark, "my-custom-overrides"],
+  // ...
+});
+```
+
 ## Multiple Instances
 
 Create multiple autocomplete inputs on the same page by instantiating `SmartyAddress` multiple times:
