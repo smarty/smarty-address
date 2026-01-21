@@ -177,7 +177,6 @@ class StyleService extends BaseService {
 
 1. [ ] Create `services/ApiService.ts` (new consolidated version)
    - Copy logic from both current ApiService and ApiUtilsService
-   - Keep API_PARAM_MAP and constants as exports for backwards compatibility
    - Update to use `this.services.domService` etc.
 
 2. [ ] Create `services/StyleService.ts`
@@ -233,28 +232,10 @@ class StyleService extends BaseService {
 
 12. [ ] Run full test suite and fix any issues
 
-## Backwards Compatibility
-
-For users who have extended existing services:
-
-- Export type aliases for old service names (deprecated)
-- Document migration path in changelog
-- Consider keeping old class names as aliases for one major version
-
-```typescript
-// Deprecated aliases for backwards compatibility
-/** @deprecated Use ApiService instead */
-export { ApiService as ApiUtilsService };
-/** @deprecated Use DropdownService instead */
-export { DropdownService as AutocompleteDropdownService };
-// etc.
-```
-
 ## Risks and Mitigations
 
 | Risk | Mitigation |
 |------|------------|
-| Breaking changes for users extending services | Provide deprecated aliases, document migration |
 | Large PR is hard to review | Can split into phases if needed |
 | Test coverage gaps after consolidation | Review test coverage before and after |
 | Circular dependencies | Plan import graph carefully, use interfaces |
@@ -263,4 +244,3 @@ export { DropdownService as AutocompleteDropdownService };
 
 1. Should DropdownService be split into DropdownService + DropdownStateService for testability?
 2. Should we keep the `utils/` directory for truly generic utilities?
-3. Timeline for removing deprecated aliases?
