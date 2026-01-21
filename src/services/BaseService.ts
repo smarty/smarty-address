@@ -1,22 +1,16 @@
 import type { SmartyAddressConfig } from "../interfaces";
-import type { ApiService } from "./api/ApiService";
-import type { AutocompleteDropdownService } from "./autocompleteDropdown/AutocompleteDropdownService";
-import type { AddressFormUiService } from "./addressFormUi/AddressFormUiService";
-import type { DropdownStateService } from "./autocompleteDropdown/DropdownStateService";
-import type { DropdownDomService } from "./autocompleteDropdown/DropdownDomService";
-import type { DomUtilsService } from "./utils/DomUtilsService";
-import type { FormattingService } from "./utils/FormattingService";
-import type { ApiUtilsService } from "./utils/ApiUtilsService";
+import type { ApiService } from "./ApiService";
+import type { DropdownService } from "./DropdownService";
+import type { FormService } from "./FormService";
+import type { DomService } from "./DomService";
+import type { StyleService } from "./StyleService";
 
 export interface ServiceDependencies {
 	apiService?: ApiService;
-	autocompleteDropdownService?: AutocompleteDropdownService;
-	addressFormUiService?: AddressFormUiService;
-	dropdownStateService?: DropdownStateService;
-	dropdownDomService?: DropdownDomService;
-	domUtilsService?: DomUtilsService;
-	formattingService?: FormattingService;
-	apiUtilsService?: ApiUtilsService;
+	dropdownService?: DropdownService;
+	formService?: FormService;
+	domService?: DomService;
+	styleService?: StyleService;
 }
 
 export abstract class BaseService {

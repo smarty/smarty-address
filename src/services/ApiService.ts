@@ -1,6 +1,12 @@
-import { BaseService } from "../BaseService";
-import { AddressSuggestion, ApiConfig, ApiErrorResponse } from "../../interfaces";
-import { APP_VERSION } from "../../constants";
+import { BaseService } from "./BaseService";
+import {
+	AddressSuggestion,
+	ApiConfig,
+	ApiErrorResponse,
+	FetchSuggestionsCallbacks,
+	SmartyAddressConfig,
+} from "../interfaces";
+import { APP_VERSION } from "../constants";
 
 const USER_AGENT = `name:smarty-address-plugin,version:${APP_VERSION}`;
 
@@ -20,19 +26,6 @@ export const API_PARAM_MAP = {
 
 export type ApiParamKey = keyof typeof API_PARAM_MAP;
 export const API_PARAM_KEYS = Object.keys(API_PARAM_MAP) as ApiParamKey[];
-
-const formatSelectedAddress = ({
-	street_line,
-	secondary,
-	entries,
-	city,
-	state,
-	zipcode,
-}: AddressSuggestion): string => {
-	const addressComponents = [street_line, secondary, `(${entries})`, city, state, zipcode];
-
-	return addressComponents.filter(Boolean).join(" ");
-};
 
 export const unknownError = {
 	name: "unknownError",
@@ -61,9 +54,74 @@ const knownAutocompleteErrors = [
 	},
 ];
 
-export class ApiUtilsService extends BaseService {
-	constructor() {
-		super();
+const formatSelectedAddress = ({
+	street_line,
+	secondary,
+	entries,
+	city,
+	state,
+	zipcode,
+}: AddressSuggestion): string => {
+	const addressComponents = [street_line, secondary, `(${entries})`, city, state, zipcode];
+	return addressComponents.filter(Boolean).join(" ");
+};
+
+export class ApiService extends BaseService {
+	private embeddedKey: string = "";
+	private autocompleteApiUrl: string = "";
+	private apiParams: Record<string, unknown> = {};
+
+	init(config: SmartyAddressConfig) {
+		this.embeddedKey = config.embeddedKey;
+		this.autocompleteApiUrl = config.autocompleteApiUrl;
+
+		API_PARAM_KEYS.forEach((param) => {
+			if (config[param] !== undefined) {
+				this.apiParams[param] = config[param];
+			}
+		});
+	}
+
+	getApiConfig(): ApiConfig {
+		return {
+			embeddedKey: this.embeddedKey,
+			autocompleteApiUrl: this.autocompleteApiUrl,
+			...this.apiParams,
+		} as ApiConfig;
+	}
+
+	async fetchAddressSuggestions(
+		searchString: string,
+		callbacks: FetchSuggestionsCallbacks,
+	): Promise<void> {
+		try {
+			const apiConfig = this.getApiConfig();
+			const suggestions = await this.getAutocompleteApiResults(apiConfig, searchString);
+			callbacks.onSuccess(suggestions, searchString);
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : String(error);
+			callbacks.onError(errorMessage);
+		}
+	}
+
+	async fetchSecondaryAddressSuggestions(
+		searchString: string,
+		selectedAddress: AddressSuggestion,
+		callbacks: FetchSuggestionsCallbacks,
+	): Promise<void> {
+		try {
+			const apiConfig = this.getApiConfig();
+			const primarySuggestions = await this.getAutocompleteApiResults(apiConfig, searchString);
+			const newSelectedAddress = this.getMatchingResult(primarySuggestions, selectedAddress);
+			const suggestions = newSelectedAddress
+				? await this.getAutocompleteApiResults(apiConfig, searchString, newSelectedAddress)
+				: [];
+
+			callbacks.onSuccess(suggestions, searchString);
+		} catch (error) {
+			const errorMessage = error instanceof Error ? error.message : String(error);
+			callbacks.onError(errorMessage);
+		}
 	}
 
 	async getAutocompleteApiResults(

@@ -1,17 +1,13 @@
-import { BaseService } from "../BaseService";
+import { BaseService } from "./BaseService";
 import {
 	AddressSuggestion,
 	HslColor,
 	RgbaColor,
 	StylesObject,
 	UiSuggestionItem,
-} from "../../interfaces";
+} from "../interfaces";
 
-export class FormattingService extends BaseService {
-	constructor() {
-		super();
-	}
-
+export class StyleService extends BaseService {
 	getFormattedAddressSuggestion(
 		suggestion: AddressSuggestion,
 		isSecondary: boolean = false,
@@ -65,7 +61,11 @@ export class FormattingService extends BaseService {
 		return `smartyAddress__instance_${instanceId}`;
 	}
 
-	private rgbToHsl({ red, green, blue, alpha }: RgbaColor): HslColor {
+	convertDecimalToPercentage(decimal: number): number {
+		return +(decimal * 100);
+	}
+
+	rgbToHsl({ red, green, blue, alpha }: RgbaColor): HslColor {
 		red /= 255;
 		green /= 255;
 		blue /= 255;
@@ -99,12 +99,8 @@ export class FormattingService extends BaseService {
 		return { hue, saturation, lightness, alpha };
 	}
 
-	convertDecimalToPercentage(decimal: number): number {
-		return +(decimal * 100);
-	}
-
-	getHslFromColorString(colorString: CSSStyleDeclaration): HslColor {
-		const rgbaColor = this.services.domUtilsService!.getRgbaFromCssColor(colorString);
+	getHslFromColorString(cssColor: CSSStyleDeclaration): HslColor {
+		const rgbaColor = this.getRgbaFromCssColor(cssColor);
 		const validRgba: RgbaColor = {
 			red: rgbaColor.red ?? 0,
 			green: rgbaColor.green ?? 0,
@@ -112,6 +108,35 @@ export class FormattingService extends BaseService {
 			alpha: rgbaColor.alpha ?? 1,
 		};
 		return this.rgbToHsl(validRgba);
+	}
+
+	getRgbaFromCssColor(cssColor: CSSStyleDeclaration): {
+		red: number;
+		green: number;
+		blue: number;
+		alpha: number;
+	} {
+		const canvas = document.createElement("canvas");
+		canvas.width = 1;
+		canvas.height = 1;
+		const context = canvas.getContext("2d", { willReadFrequently: true });
+
+		if (!context) {
+			return { red: 0, green: 0, blue: 0, alpha: 1 };
+		}
+
+		context.globalCompositeOperation = "copy";
+		context.fillStyle = cssColor as any;
+		context.fillRect(0, 0, 1, 1);
+
+		const imageData = context.getImageData(0, 0, 1, 1).data;
+		const red = imageData[0] ?? 0;
+		const green = imageData[1] ?? 0;
+		const blue = imageData[2] ?? 0;
+		const aByte = imageData[3] ?? 255;
+		const alpha = Math.round((aByte / 255) * 1000) / 1000;
+
+		return { red, green, blue, alpha };
 	}
 
 	convertStylesObjectToCssBlock(stylesObject: StylesObject): string {

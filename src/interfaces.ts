@@ -1,11 +1,8 @@
-import type { ApiService } from "./services/api/ApiService";
-import type { AutocompleteDropdownService } from "./services/autocompleteDropdown/AutocompleteDropdownService";
-import type { AddressFormUiService } from "./services/addressFormUi/AddressFormUiService";
-import type { DropdownStateService } from "./services/autocompleteDropdown/DropdownStateService";
-import type { DropdownDomService } from "./services/autocompleteDropdown/DropdownDomService";
-import type { DomUtilsService } from "./services/utils/DomUtilsService";
-import type { FormattingService } from "./services/utils/FormattingService";
-import type { ApiUtilsService } from "./services/utils/ApiUtilsService";
+import type { ApiService } from "./services/ApiService";
+import type { DropdownService } from "./services/DropdownService";
+import type { FormService } from "./services/FormService";
+import type { DomService } from "./services/DomService";
+import type { StyleService } from "./services/StyleService";
 
 export interface ApiConfig {
 	embeddedKey: string;
@@ -25,13 +22,10 @@ export interface ApiConfig {
 
 export interface ServiceClassOverrides {
 	ApiService?: typeof ApiService;
-	AutocompleteDropdownService?: typeof AutocompleteDropdownService;
-	AddressFormUiService?: typeof AddressFormUiService;
-	DropdownStateService?: typeof DropdownStateService;
-	DropdownDomService?: typeof DropdownDomService;
-	DomUtilsService?: typeof DomUtilsService;
-	FormattingService?: typeof FormattingService;
-	ApiUtilsService?: typeof ApiUtilsService;
+	DropdownService?: typeof DropdownService;
+	FormService?: typeof FormService;
+	DomService?: typeof DomService;
+	StyleService?: typeof StyleService;
 }
 
 export interface DefaultSmartyAddressConfig extends ApiConfig {
@@ -97,4 +91,10 @@ export interface HslColor {
 export interface FetchSuggestionsCallbacks {
 	onSuccess: (suggestions: AddressSuggestion[], searchString: string) => void;
 	onError: (errorMessage: string) => void;
+}
+
+export interface AbstractStateObject {
+	addressSuggestionResults: UiSuggestionItem[];
+	secondaryAddressSuggestionResults: UiSuggestionItem[];
+	selectedSuggestionIndex: number;
 }
