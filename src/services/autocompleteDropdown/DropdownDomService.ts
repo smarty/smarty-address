@@ -1,20 +1,5 @@
 import { BaseService } from "../BaseService";
 import { SmartyAddressConfig, UiSuggestionItem } from "../../interfaces";
-import {
-	buildAutocompleteDomElements,
-	configureDynamicStyling,
-	scrollToHighlightedSuggestion,
-	hideElement,
-	showElement,
-	updateDropdownContents,
-	updateThemeClass,
-	configureSearchInputForAutocomplete,
-	findDomElement,
-	findDomElementWithRetry,
-	updateAriaActivedescendant,
-	updateDynamicStyles,
-} from "../../utils/domUtils";
-import { getInstanceClassName } from "../../utils/uiUtils";
 
 export class DropdownDomService extends BaseService {
 	private instanceId: number;
@@ -38,7 +23,11 @@ export class DropdownDomService extends BaseService {
 		this.theme = newTheme;
 
 		if (previousTheme !== this.theme && this.dropdownWrapperElement) {
-			updateThemeClass(newTheme, previousTheme, this.dropdownWrapperElement);
+			this.services.domUtilsService!.updateThemeClass(
+				newTheme,
+				previousTheme,
+				this.dropdownWrapperElement,
+			);
 		}
 
 		this.searchInputSelector = config.searchInputSelector ?? config.streetSelector ?? "";
@@ -48,8 +37,10 @@ export class DropdownDomService extends BaseService {
 		onInput: (e: Event) => void,
 		onKeydown: (e: KeyboardEvent) => void,
 	): Promise<void> {
-		const instanceClassname = getInstanceClassName(this.instanceId);
-		const elements = buildAutocompleteDomElements(instanceClassname);
+		const instanceClassname = this.services.formattingService!.getInstanceClassName(
+			this.instanceId,
+		);
+		const elements = this.services.domUtilsService!.buildAutocompleteDomElements(instanceClassname);
 		const { customStylesElement, dropdownWrapperElement } = elements;
 
 		if (dropdownWrapperElement) {
@@ -71,25 +62,26 @@ export class DropdownDomService extends BaseService {
 		}
 
 		if (dropdownWrapperElement instanceof HTMLElement) {
-			updateThemeClass(this.theme, [], dropdownWrapperElement);
+			this.services.domUtilsService!.updateThemeClass(this.theme, [], dropdownWrapperElement);
 		}
 
-		const searchInputElement = (await findDomElementWithRetry(
+		const searchInputElement = (await this.services.domUtilsService!.findDomElementWithRetry(
 			this.searchInputSelector,
-			findDomElement,
 		)) as HTMLInputElement | null;
 
 		if (searchInputElement) {
 			this.attachEventListeners(onInput, onKeydown);
 
 			const dynamicStylingHandler = () =>
-				updateDynamicStyles(
+				this.services.domUtilsService!.updateDynamicStyles(
 					this.customStylesElement as HTMLStyleElement,
 					searchInputElement,
-					this.instanceId,
 				);
 
-			configureDynamicStyling(dynamicStylingHandler, searchInputElement);
+			this.services.domUtilsService!.configureDynamicStyling(
+				dynamicStylingHandler,
+				searchInputElement,
+			);
 		} else {
 			console.error(
 				`Failed to find search input element with selector "${this.searchInputSelector}".`,
@@ -102,7 +94,9 @@ export class DropdownDomService extends BaseService {
 	}
 
 	getSearchInputElement(): HTMLInputElement | null {
-		return findDomElement(this.searchInputSelector) as HTMLInputElement | null;
+		return this.services.domUtilsService!.findDomElement(
+			this.searchInputSelector,
+		) as HTMLInputElement | null;
 	}
 
 	getSuggestionsElement(): HTMLElement | null {
@@ -115,13 +109,13 @@ export class DropdownDomService extends BaseService {
 
 	showDropdown(): void {
 		if (this.dropdownElement) {
-			showElement(this.dropdownElement);
+			this.services.domUtilsService!.showElement(this.dropdownElement);
 		}
 	}
 
 	hideDropdown(): void {
 		if (this.dropdownElement) {
-			hideElement(this.dropdownElement);
+			this.services.domUtilsService!.hideElement(this.dropdownElement);
 		}
 	}
 
@@ -135,7 +129,10 @@ export class DropdownDomService extends BaseService {
 		const searchInputElement = this.getSearchInputElement();
 		if (!searchInputElement) return;
 
-		configureSearchInputForAutocomplete(searchInputElement, this.getDropdownId());
+		this.services.domUtilsService!.configureSearchInputForAutocomplete(
+			searchInputElement,
+			this.getDropdownId(),
+		);
 
 		searchInputElement.addEventListener("input", onInput);
 		searchInputElement.addEventListener("keydown", onKeydown);
@@ -143,19 +140,26 @@ export class DropdownDomService extends BaseService {
 
 	updateTheme(newTheme: string[], previousTheme: string[]): void {
 		if (this.dropdownWrapperElement) {
-			updateThemeClass(newTheme, previousTheme, this.dropdownWrapperElement);
+			this.services.domUtilsService!.updateThemeClass(
+				newTheme,
+				previousTheme,
+				this.dropdownWrapperElement,
+			);
 		}
 	}
 
 	updateDropdownContents(items: UiSuggestionItem[]): void {
 		if (this.suggestionsElement) {
-			updateDropdownContents(items, this.suggestionsElement);
+			this.services.domUtilsService!.updateDropdownContents(items, this.suggestionsElement);
 		}
 	}
 
 	scrollToHighlighted(element: HTMLElement): void {
 		if (this.suggestionsElement) {
-			scrollToHighlightedSuggestion(element, this.suggestionsElement);
+			this.services.domUtilsService!.scrollToHighlightedSuggestion(
+				element,
+				this.suggestionsElement,
+			);
 		}
 	}
 
@@ -169,7 +173,7 @@ export class DropdownDomService extends BaseService {
 	updateAriaActivedescendant(suggestionId: string | null): void {
 		const searchInputElement = this.getSearchInputElement();
 		if (searchInputElement) {
-			updateAriaActivedescendant(searchInputElement, suggestionId);
+			this.services.domUtilsService!.updateAriaActivedescendant(searchInputElement, suggestionId);
 		}
 	}
 }

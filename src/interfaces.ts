@@ -3,6 +3,9 @@ import type { AutocompleteDropdownService } from "./services/autocompleteDropdow
 import type { AddressFormUiService } from "./services/addressFormUi/AddressFormUiService";
 import type { DropdownStateService } from "./services/autocompleteDropdown/DropdownStateService";
 import type { DropdownDomService } from "./services/autocompleteDropdown/DropdownDomService";
+import type { DomUtilsService } from "./services/utils/DomUtilsService";
+import type { FormattingService } from "./services/utils/FormattingService";
+import type { ApiUtilsService } from "./services/utils/ApiUtilsService";
 
 export interface ApiConfig {
 	embeddedKey: string;
@@ -26,6 +29,9 @@ export interface ServiceClassOverrides {
 	AddressFormUiService?: typeof AddressFormUiService;
 	DropdownStateService?: typeof DropdownStateService;
 	DropdownDomService?: typeof DropdownDomService;
+	DomUtilsService?: typeof DomUtilsService;
+	FormattingService?: typeof FormattingService;
+	ApiUtilsService?: typeof ApiUtilsService;
 }
 
 export interface DefaultSmartyAddressConfig extends ApiConfig {

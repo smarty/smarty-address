@@ -1,11 +1,5 @@
 import { BaseService } from "../BaseService";
 import { AddressSuggestion, SmartyAddressConfig } from "../../interfaces";
-import {
-	findDomElement,
-	getStreetLineFormValue,
-	setInputValue,
-	getStateValueForInput,
-} from "../../utils/domUtils";
 
 export class AddressFormUiService extends BaseService {
 	private streetSelector: string | null = null;
@@ -24,31 +18,51 @@ export class AddressFormUiService extends BaseService {
 
 	populateFormWithNewAddress(selectedAddress: AddressSuggestion) {
 		const elements = {
-			streetLineInputElement: findDomElement(this.streetSelector),
-			secondaryInputElement: findDomElement(this.secondarySelector) as HTMLInputElement | null,
-			cityInputElement: findDomElement(this.citySelector) as HTMLInputElement | null,
-			stateInputElement: findDomElement(this.stateSelector) as HTMLInputElement | null,
-			zipcodeInputElement: findDomElement(this.zipcodeSelector) as HTMLInputElement | null,
+			streetLineInputElement: this.services.domUtilsService!.findDomElement(this.streetSelector),
+			secondaryInputElement: this.services.domUtilsService!.findDomElement(
+				this.secondarySelector,
+			) as HTMLInputElement | null,
+			cityInputElement: this.services.domUtilsService!.findDomElement(
+				this.citySelector,
+			) as HTMLInputElement | null,
+			stateInputElement: this.services.domUtilsService!.findDomElement(
+				this.stateSelector,
+			) as HTMLInputElement | null,
+			zipcodeInputElement: this.services.domUtilsService!.findDomElement(
+				this.zipcodeSelector,
+			) as HTMLInputElement | null,
 		};
 
 		if (!elements?.streetLineInputElement) return;
 
-		setInputValue(elements.streetLineInputElement, getStreetLineFormValue(elements, selectedAddress));
+		this.services.domUtilsService!.setInputValue(
+			elements.streetLineInputElement,
+			this.services.domUtilsService!.getStreetLineFormValue(elements, selectedAddress),
+		);
 
 		if (elements.secondaryInputElement) {
-			setInputValue(elements.secondaryInputElement, selectedAddress.secondary ?? "");
+			this.services.domUtilsService!.setInputValue(
+				elements.secondaryInputElement,
+				selectedAddress.secondary ?? "",
+			);
 		}
 		if (elements.cityInputElement) {
-			setInputValue(elements.cityInputElement, selectedAddress.city);
+			this.services.domUtilsService!.setInputValue(elements.cityInputElement, selectedAddress.city);
 		}
 		if (elements.stateInputElement) {
-			setInputValue(
+			this.services.domUtilsService!.setInputValue(
 				elements.stateInputElement,
-				getStateValueForInput(elements.stateInputElement, selectedAddress.state),
+				this.services.domUtilsService!.getStateValueForInput(
+					elements.stateInputElement,
+					selectedAddress.state,
+				),
 			);
 		}
 		if (elements.zipcodeInputElement) {
-			setInputValue(elements.zipcodeInputElement, selectedAddress.zipcode);
+			this.services.domUtilsService!.setInputValue(
+				elements.zipcodeInputElement,
+				selectedAddress.zipcode,
+			);
 		}
 	}
 }

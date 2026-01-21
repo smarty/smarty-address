@@ -1,6 +1,5 @@
 import { BaseService } from "../BaseService";
 import { UiSuggestionItem } from "../../interfaces";
-import { getMergedAddressSuggestions } from "../../utils/uiUtils";
 
 export class DropdownStateService extends BaseService {
 	private selectedAddressSearchTerm: string = "";
@@ -11,7 +10,7 @@ export class DropdownStateService extends BaseService {
 	private secondaryAddressSuggestionResults: UiSuggestionItem[] = [];
 
 	getMergedSuggestions(): UiSuggestionItem[] {
-		return getMergedAddressSuggestions({
+		return this.services.formattingService!.getMergedAddressSuggestions({
 			addressSuggestionResults: this.addressSuggestionResults,
 			secondaryAddressSuggestionResults: this.secondaryAddressSuggestionResults,
 			selectedSuggestionIndex: this.selectedSuggestionIndex,

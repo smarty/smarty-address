@@ -4,6 +4,9 @@ import { AutocompleteDropdownService } from "./services/autocompleteDropdown/Aut
 import { AddressFormUiService } from "./services/addressFormUi/AddressFormUiService";
 import { DropdownStateService } from "./services/autocompleteDropdown/DropdownStateService";
 import { DropdownDomService } from "./services/autocompleteDropdown/DropdownDomService";
+import { DomUtilsService } from "./services/utils/DomUtilsService";
+import { FormattingService } from "./services/utils/FormattingService";
+import { ApiUtilsService } from "./services/utils/ApiUtilsService";
 import { themes } from "./themes";
 import { defineStyles } from "./utils/appUtils";
 import { validateConfig } from "./utils/configValidation";
@@ -28,6 +31,9 @@ export default class SmartyAddress {
 		AddressFormUiService,
 		DropdownStateService,
 		DropdownDomService,
+		DomUtilsService,
+		FormattingService,
+		ApiUtilsService,
 	};
 
 	private static instances: SmartyAddress[] = [];
@@ -38,6 +44,9 @@ export default class SmartyAddress {
 	private addressFormUiService: AddressFormUiService;
 	private dropdownStateService: DropdownStateService;
 	private dropdownDomService: DropdownDomService;
+	private domUtilsService: DomUtilsService;
+	private formattingService: FormattingService;
+	private apiUtilsService: ApiUtilsService;
 
 	constructor(config: SmartyAddressConfig) {
 		SmartyAddress.instances.push(this);
@@ -49,7 +58,13 @@ export default class SmartyAddress {
 		const FormServiceClass = config.services?.AddressFormUiService || AddressFormUiService;
 		const DropdownStateServiceClass = config.services?.DropdownStateService || DropdownStateService;
 		const DropdownDomServiceClass = config.services?.DropdownDomService || DropdownDomService;
+		const DomUtilsServiceClass = config.services?.DomUtilsService || DomUtilsService;
+		const FormattingServiceClass = config.services?.FormattingService || FormattingService;
+		const ApiUtilsServiceClass = config.services?.ApiUtilsService || ApiUtilsService;
 
+		this.domUtilsService = new DomUtilsServiceClass(this.instanceId);
+		this.formattingService = new FormattingServiceClass();
+		this.apiUtilsService = new ApiUtilsServiceClass();
 		this.apiService = new ApiServiceClass();
 		this.dropdownStateService = new DropdownStateServiceClass();
 		this.dropdownDomService = new DropdownDomServiceClass(this.instanceId);
@@ -62,6 +77,9 @@ export default class SmartyAddress {
 			addressFormUiService: this.addressFormUiService,
 			dropdownStateService: this.dropdownStateService,
 			dropdownDomService: this.dropdownDomService,
+			domUtilsService: this.domUtilsService,
+			formattingService: this.formattingService,
+			apiUtilsService: this.apiUtilsService,
 		};
 
 		this.apiService.setServices(services);
@@ -69,6 +87,9 @@ export default class SmartyAddress {
 		this.addressFormUiService.setServices(services);
 		this.dropdownStateService.setServices(services);
 		this.dropdownDomService.setServices(services);
+		this.domUtilsService.setServices(services);
+		this.formattingService.setServices(services);
+		this.apiUtilsService.setServices(services);
 
 		this.init(config);
 	}

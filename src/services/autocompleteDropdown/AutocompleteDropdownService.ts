@@ -1,18 +1,11 @@
 import { BaseService } from "../BaseService";
 import { AddressSuggestion, SmartyAddressConfig, UiSuggestionItem } from "../../interfaces";
-import {
-	createSecondarySuggestionElement,
-	createSuggestionElement,
-	getSuggestionId,
-} from "../../utils/domUtils";
 
 export class AutocompleteDropdownService extends BaseService {
-	private instanceId: number;
 	private config?: SmartyAddressConfig;
 
-	constructor(instanceId: number) {
+	constructor(_instanceId: number) {
 		super();
-		this.instanceId = instanceId;
 	}
 
 	init(config: SmartyAddressConfig) {
@@ -147,7 +140,6 @@ export class AutocompleteDropdownService extends BaseService {
 		}
 
 		const selectedSuggestionIndex = this.services.dropdownStateService?.getSelectedIndex() ?? -1;
-		const instanceId = this.services.dropdownDomService?.getInstanceId() ?? this.instanceId;
 
 		const suggestionItems = filteredSuggestions.map(
 			(address: AddressSuggestion, addressIndex: number): UiSuggestionItem => {
@@ -155,8 +147,12 @@ export class AutocompleteDropdownService extends BaseService {
 					this.handleSelectDropdownItem(addressIndex + selectedSuggestionIndex + 1);
 				};
 
-				const suggestionId = getSuggestionId(instanceId, addressIndex);
-				const suggestionListElements = createSuggestionElement(address, searchString, suggestionId);
+				const suggestionId = this.services.domUtilsService!.getSuggestionId(addressIndex);
+				const suggestionListElements = this.services.domUtilsService!.createSuggestionElement(
+					address,
+					searchString,
+					suggestionId,
+				);
 				const suggestionElement = suggestionListElements["suggestionElement"] as HTMLElement;
 				suggestionElement.addEventListener("click", suggestionOnClickHandler);
 
@@ -189,7 +185,6 @@ export class AutocompleteDropdownService extends BaseService {
 		const addressSuggestionResults =
 			this.services.dropdownStateService?.getAddressSuggestions() ?? [];
 		const selectedSuggestionIndex = this.services.dropdownStateService?.getSelectedIndex() ?? -1;
-		const instanceId = this.services.dropdownDomService?.getInstanceId() ?? this.instanceId;
 		const baseIndex = addressSuggestionResults.length;
 
 		const suggestionItems = suggestions.map(
@@ -198,12 +193,15 @@ export class AutocompleteDropdownService extends BaseService {
 					this.handleSelectDropdownItem(addressIndex + selectedSuggestionIndex + 1);
 				};
 
-				const suggestionId = getSuggestionId(instanceId, baseIndex + addressIndex);
-				const suggestionListElements = createSecondarySuggestionElement(
-					address,
-					searchString,
-					suggestionId,
+				const suggestionId = this.services.domUtilsService!.getSuggestionId(
+					baseIndex + addressIndex,
 				);
+				const suggestionListElements =
+					this.services.domUtilsService!.createSecondarySuggestionElement(
+						address,
+						searchString,
+						suggestionId,
+					);
 				const suggestionElement = suggestionListElements[
 					"secondarySuggestionElement"
 				] as HTMLElement;

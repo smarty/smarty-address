@@ -5,7 +5,7 @@ import {
 	FetchSuggestionsCallbacks,
 	SmartyAddressConfig,
 } from "../../interfaces";
-import { getAutocompleteApiResults, getMatchingResult, API_PARAM_KEYS } from "../../utils/apiUtils";
+import { API_PARAM_KEYS } from "../utils/ApiUtilsService";
 
 export class ApiService extends BaseService {
 	private embeddedKey: string = "";
@@ -37,7 +37,10 @@ export class ApiService extends BaseService {
 	): Promise<void> {
 		try {
 			const apiConfig = this.getApiConfig();
-			const suggestions = await getAutocompleteApiResults(apiConfig, searchString);
+			const suggestions = await this.services.apiUtilsService!.getAutocompleteApiResults(
+				apiConfig,
+				searchString,
+			);
 			callbacks.onSuccess(suggestions, searchString);
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : String(error);
@@ -52,10 +55,20 @@ export class ApiService extends BaseService {
 	): Promise<void> {
 		try {
 			const apiConfig = this.getApiConfig();
-			const primarySuggestions = await getAutocompleteApiResults(apiConfig, searchString);
-			const newSelectedAddress = getMatchingResult(primarySuggestions, selectedAddress);
+			const primarySuggestions = await this.services.apiUtilsService!.getAutocompleteApiResults(
+				apiConfig,
+				searchString,
+			);
+			const newSelectedAddress = this.services.apiUtilsService!.getMatchingResult(
+				primarySuggestions,
+				selectedAddress,
+			);
 			const suggestions = newSelectedAddress
-				? await getAutocompleteApiResults(apiConfig, searchString, newSelectedAddress)
+				? await this.services.apiUtilsService!.getAutocompleteApiResults(
+						apiConfig,
+						searchString,
+						newSelectedAddress,
+					)
 				: [];
 
 			callbacks.onSuccess(suggestions, searchString);
