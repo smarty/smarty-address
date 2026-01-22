@@ -25,6 +25,7 @@ export class DropdownService extends BaseService {
 
 	private selectedAddressSearchTerm: string = "";
 	private dropdownIsOpen: boolean = false;
+	private isInteractingWithDropdown: boolean = false;
 	private highlightedSuggestionIndex: number = 0;
 	private selectedSuggestionIndex: number = -1;
 	private addressSuggestionResults: UiSuggestionItem[] = [];
@@ -71,6 +72,12 @@ export class DropdownService extends BaseService {
 
 		if (this.dropdownElement) {
 			this.dropdownElement.id = this.getDropdownId();
+			this.dropdownElement.addEventListener("mousedown", () => {
+				this.isInteractingWithDropdown = true;
+			});
+			document.addEventListener("mouseup", () => {
+				this.isInteractingWithDropdown = false;
+			});
 		}
 
 		if (dropdownWrapperElement instanceof HTMLElement) {
@@ -85,6 +92,7 @@ export class DropdownService extends BaseService {
 			this.attachEventListeners(
 				(e) => this.handleSearchInputOnChange(e),
 				(e) => this.handleAutocompleteKeydown(e),
+				(e) => this.handleSearchInputFocusOut(e),
 			);
 
 			const dynamicStylingHandler = () =>
@@ -98,6 +106,19 @@ export class DropdownService extends BaseService {
 			console.error(
 				`Failed to find search input element with selector "${this.searchInputSelector}".`,
 			);
+		}
+	}
+
+	handleSearchInputFocusOut(event: FocusEvent): void {
+		if (this.isInteractingWithDropdown) return;
+
+		const relatedTarget = event.relatedTarget as Node | null;
+		const searchInputElement = this.getSearchInputElement();
+		const isWithinDropdown = relatedTarget && this.dropdownElement?.contains(relatedTarget);
+		const isWithinInput = relatedTarget && searchInputElement?.contains(relatedTarget);
+
+		if (!isWithinDropdown && !isWithinInput) {
+			this.closeDropdown();
 		}
 	}
 
@@ -428,7 +449,11 @@ export class DropdownService extends BaseService {
 		}
 	}
 
-	attachEventListeners(onInput: (e: Event) => void, onKeydown: (e: KeyboardEvent) => void): void {
+	attachEventListeners(
+		onInput: (e: Event) => void,
+		onKeydown: (e: KeyboardEvent) => void,
+		onFocusOut: (e: FocusEvent) => void,
+	): void {
 		const searchInputElement = this.getSearchInputElement();
 		if (!searchInputElement) return;
 
@@ -436,6 +461,7 @@ export class DropdownService extends BaseService {
 
 		searchInputElement.addEventListener("input", onInput);
 		searchInputElement.addEventListener("keydown", onKeydown);
+		searchInputElement.addEventListener("focusout", onFocusOut);
 	}
 
 	updateTheme(newTheme: string[], previousTheme: string[]): void {

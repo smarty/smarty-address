@@ -2,7 +2,6 @@ export const colorStyles = {
 	".smartyAddress__color_dark": {
 		"--smartyAddress__textBasePrimaryColor": "#fff",
 		"--smartyAddress__textBaseSecondaryColor": "#e6e9ed",
-		// TODO: figure out how to compute the accent color
 		"--smartyAddress__textAccentColor": "#6699ff",
 
 		"--smartyAddress__surfaceBasePrimaryColor": "#111",
