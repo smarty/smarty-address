@@ -1,11 +1,7 @@
-1. Add Service-Level Tests
 
-Currently only utility functions are tested (72 tests). The three services have zero test coverage:
-- ApiService - untested
-- AutocompleteDropdownService - untested (352 lines of complex logic)
-- AddressFormUiService - untested
+Centralize CSS Class Names
+------
 
-2. Centralize CSS Class Names
 
 There's a TODO in the code for this. Class names like "smartyAddress__hidden" are scattered throughout. Create a constants file:
 export const CSS_CLASSES = {
@@ -15,11 +11,4 @@ matchedText: 'smartyAddress__matchedText',
 } as const;
 
 Medium Priority
-
-3. Split domUtils.ts (648 lines)
-
-This utility file is too large. Split by concern:
-- domElements.ts - Element creation/manipulation
-- domStyles.ts - Styling and CSS utilities
-- domAccessibility.ts - ARIA and accessibility helpers
 

@@ -1,64 +1,15 @@
 import { BaseService } from "./BaseService";
 import { AddressSuggestion } from "../interfaces";
+import { getSmartyLogo } from "../utils/getSmartyLogo";
 
-const STATE_ABBREVIATIONS: Record<string, string> = {
-	Alabama: "AL",
-	Alaska: "AK",
-	Arizona: "AZ",
-	Arkansas: "AR",
-	California: "CA",
-	Colorado: "CO",
-	Connecticut: "CT",
-	Delaware: "DE",
-	Florida: "FL",
-	Georgia: "GA",
-	Hawaii: "HI",
-	Idaho: "ID",
-	Illinois: "IL",
-	Indiana: "IN",
-	Iowa: "IA",
-	Kansas: "KS",
-	Kentucky: "KY",
-	Louisiana: "LA",
-	Maine: "ME",
-	Maryland: "MD",
-	Massachusetts: "MA",
-	Michigan: "MI",
-	Minnesota: "MN",
-	Mississippi: "MS",
-	Missouri: "MO",
-	Montana: "MT",
-	Nebraska: "NE",
-	Nevada: "NV",
-	"New Hampshire": "NH",
-	"New Jersey": "NJ",
-	"New Mexico": "NM",
-	"New York": "NY",
-	"North Carolina": "NC",
-	"North Dakota": "ND",
-	Ohio: "OH",
-	Oklahoma: "OK",
-	Oregon: "OR",
-	Pennsylvania: "PA",
-	"Rhode Island": "RI",
-	"South Carolina": "SC",
-	"South Dakota": "SD",
-	Tennessee: "TN",
-	Texas: "TX",
-	Utah: "UT",
-	Vermont: "VT",
-	Virginia: "VA",
-	Washington: "WA",
-	"West Virginia": "WV",
-	Wisconsin: "WI",
-	Wyoming: "WY",
-	"District of Columbia": "DC",
-	"Puerto Rico": "PR",
-	Guam: "GU",
-	"American Samoa": "AS",
-	"U.S. Virgin Islands": "VI",
-	"Northern Mariana Islands": "MP",
-};
+export interface ElementConfig {
+	name?: string;
+	text?: string;
+	elementType?: string;
+	className?: string[];
+	attributes?: Record<string, string>;
+	children?: ElementConfig[] | undefined;
+}
 
 export class DomService extends BaseService {
 	findDomElement(selector?: string | null, doc: Document = document): HTMLElement | null {
@@ -90,49 +41,6 @@ export class DomService extends BaseService {
 		});
 
 		return element;
-	}
-
-	getStateValueForInput(element: HTMLElement, stateValue: string): string {
-		if (!(element instanceof HTMLSelectElement)) {
-			return stateValue;
-		}
-
-		const options = Array.from(element.options);
-		const normalizedStateValue = stateValue.trim().toLowerCase();
-
-		const exactMatch = options.find((opt) => opt.value.toLowerCase() === normalizedStateValue);
-		if (exactMatch) {
-			return exactMatch.value;
-		}
-
-		const textMatch = options.find((opt) => opt.text.toLowerCase() === normalizedStateValue);
-		if (textMatch) {
-			return textMatch.value;
-		}
-
-		const stateAbbreviation = STATE_ABBREVIATIONS[stateValue];
-		if (stateAbbreviation) {
-			const abbreviationMatch = options.find(
-				(opt) => opt.value.toLowerCase() === stateAbbreviation.toLowerCase(),
-			);
-			if (abbreviationMatch) {
-				return abbreviationMatch.value;
-			}
-		}
-
-		const fullStateName = Object.keys(STATE_ABBREVIATIONS).find(
-			(key) => STATE_ABBREVIATIONS[key]?.toLowerCase() === normalizedStateValue,
-		);
-		if (fullStateName) {
-			const fullNameMatch = options.find(
-				(opt) => opt.value.toLowerCase() === fullStateName.toLowerCase(),
-			);
-			if (fullNameMatch) {
-				return fullNameMatch.value;
-			}
-		}
-
-		return stateValue;
 	}
 
 	setInputValue(element: HTMLElement, value: string): void {
@@ -217,5 +125,119 @@ export class DomService extends BaseService {
 		}
 
 		return streetLineValues.join(", ");
+	}
+
+	buildElementsFromMap(fullElementsMap: ElementConfig[]): Record<string, HTMLElement | Text> {
+		const elements: Record<string, HTMLElement | Text> = {};
+
+		const buildElement = ({
+			name,
+			text,
+			elementType,
+			className = [],
+			attributes = {},
+			children = [],
+		}: ElementConfig): HTMLElement | Text => {
+			const element = text
+				? document.createTextNode(text)
+				: this.createDomElement(elementType!, className, children.map(buildElement));
+
+			if (element instanceof HTMLElement) {
+				Object.entries(attributes).forEach(([attr, value]) => {
+					element.setAttribute(attr, value);
+				});
+			}
+
+			if (name) {
+				elements[name] = element;
+			}
+
+			return element;
+		};
+
+		fullElementsMap.map(buildElement);
+
+		return elements;
+	}
+
+	buildAutocompleteDomElements(instanceClassname: string): Record<string, HTMLElement | Text> {
+		const darkLogoElementClasses = ["smartyAddress__smartyLogoDark"];
+		const lightLogoElementClasses = ["smartyAddress__smartyLogoLight"];
+		const suggestionsElementClasses = ["smartyAddress__suggestionsElement"];
+		const poweredByElementClasses = ["smartyAddress__poweredBy"];
+		const dropdownElementInitialClasses = [
+			"smartyAddress__dropdownElement",
+			"smartyAddress__hidden",
+		];
+		const dropdownWrapperElementClasses = [
+			"smartyAddress__suggestionsWrapperElement",
+			instanceClassname,
+		];
+		const announcementElementClasses = ["smartyAddress__srOnly"];
+
+		const elementsMap: ElementConfig[] = [
+			{ name: "customStylesElement", elementType: "style" },
+			{
+				name: "dropdownWrapperElement",
+				elementType: "div",
+				className: dropdownWrapperElementClasses,
+				children: [
+					{
+						name: "announcementElement",
+						elementType: "div",
+						className: announcementElementClasses,
+						attributes: {
+							"aria-live": "polite",
+							"aria-atomic": "true",
+						},
+					},
+					{
+						name: "dropdownElement",
+						elementType: "div",
+						className: dropdownElementInitialClasses,
+						attributes: {
+							role: "listbox",
+							"aria-label": "Address suggestions",
+						},
+						children: [
+							{
+								name: "suggestionsElement",
+								elementType: "ul",
+								className: suggestionsElementClasses,
+							},
+							{
+								name: "poweredBySmartyElement",
+								elementType: "div",
+								className: poweredByElementClasses,
+								attributes: { "aria-hidden": "true" },
+								children: [
+									{ text: "Powered by" },
+									{
+										elementType: "img",
+										className: darkLogoElementClasses,
+										attributes: {
+											src: getSmartyLogo("#0066FF"),
+											alt: "",
+											"aria-hidden": "true",
+										},
+									},
+									{
+										elementType: "img",
+										className: lightLogoElementClasses,
+										attributes: {
+											src: getSmartyLogo("#FFFFFF"),
+											alt: "",
+											"aria-hidden": "true",
+										},
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		];
+
+		return this.buildElementsFromMap(elementsMap);
 	}
 }

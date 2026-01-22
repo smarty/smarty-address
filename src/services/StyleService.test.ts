@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { StyleService } from "./StyleService";
-import { AddressSuggestion, UiSuggestionItem, StylesObject } from "../interfaces";
+import { StylesObject } from "../interfaces";
 
 describe("StyleService", () => {
 	let service: StyleService;
@@ -94,36 +94,22 @@ describe("StyleService", () => {
 
 		it("should highlight match at beginning of text", () => {
 			const result = service.createHighlightedTextElements("123 Main St", "123");
-			expect(result).toEqual([
-				{ text: "123", isMatch: true },
-				{ text: " Main St" },
-			]);
+			expect(result).toEqual([{ text: "123", isMatch: true }, { text: " Main St" }]);
 		});
 
 		it("should highlight match in middle of text", () => {
 			const result = service.createHighlightedTextElements("123 Main St", "Main");
-			expect(result).toEqual([
-				{ text: "123 " },
-				{ text: "Main", isMatch: true },
-				{ text: " St" },
-			]);
+			expect(result).toEqual([{ text: "123 " }, { text: "Main", isMatch: true }, { text: " St" }]);
 		});
 
 		it("should highlight match at end of text", () => {
 			const result = service.createHighlightedTextElements("123 Main St", "St");
-			expect(result).toEqual([
-				{ text: "123 Main " },
-				{ text: "St", isMatch: true },
-			]);
+			expect(result).toEqual([{ text: "123 Main " }, { text: "St", isMatch: true }]);
 		});
 
 		it("should be case insensitive", () => {
 			const result = service.createHighlightedTextElements("123 Main St", "main");
-			expect(result).toEqual([
-				{ text: "123 " },
-				{ text: "Main", isMatch: true },
-				{ text: " St" },
-			]);
+			expect(result).toEqual([{ text: "123 " }, { text: "Main", isMatch: true }, { text: " St" }]);
 		});
 
 		it("should find match when search string has leading/trailing whitespace", () => {
@@ -222,95 +208,6 @@ describe("StyleService", () => {
 		it("should preserve alpha value", () => {
 			const result = service.rgbToHsl({ red: 255, green: 0, blue: 0, alpha: 0.5 });
 			expect(result.alpha).toBe(0.5);
-		});
-	});
-
-	describe("getMergedAddressSuggestions", () => {
-		const createMockUiSuggestionItem = (streetLine: string): UiSuggestionItem => ({
-			address: {
-				street_line: streetLine,
-				city: "Denver",
-				state: "CO",
-				zipcode: "80202",
-				country: "US",
-			},
-			suggestionElement: document.createElement("div"),
-		});
-
-		it("should insert secondary suggestions after selected index", () => {
-			const primary = [
-				createMockUiSuggestionItem("123 Main St"),
-				createMockUiSuggestionItem("456 Oak Ave"),
-				createMockUiSuggestionItem("789 Pine Rd"),
-			];
-			const secondary = [
-				createMockUiSuggestionItem("123 Main St Apt 1"),
-				createMockUiSuggestionItem("123 Main St Apt 2"),
-			];
-
-			const result = service.getMergedAddressSuggestions({
-				addressSuggestionResults: primary,
-				secondaryAddressSuggestionResults: secondary,
-				selectedSuggestionIndex: 0,
-			});
-
-			expect(result.length).toBe(5);
-			expect(result[0].address.street_line).toBe("123 Main St");
-			expect(result[1].address.street_line).toBe("123 Main St Apt 1");
-			expect(result[2].address.street_line).toBe("123 Main St Apt 2");
-			expect(result[3].address.street_line).toBe("456 Oak Ave");
-			expect(result[4].address.street_line).toBe("789 Pine Rd");
-		});
-
-		it("should handle empty secondary suggestions", () => {
-			const primary = [
-				createMockUiSuggestionItem("123 Main St"),
-				createMockUiSuggestionItem("456 Oak Ave"),
-			];
-
-			const result = service.getMergedAddressSuggestions({
-				addressSuggestionResults: primary,
-				secondaryAddressSuggestionResults: [],
-				selectedSuggestionIndex: 0,
-			});
-
-			expect(result.length).toBe(2);
-			expect(result[0].address.street_line).toBe("123 Main St");
-			expect(result[1].address.street_line).toBe("456 Oak Ave");
-		});
-
-		it("should handle empty primary suggestions", () => {
-			const secondary = [createMockUiSuggestionItem("123 Main St Apt 1")];
-
-			const result = service.getMergedAddressSuggestions({
-				addressSuggestionResults: [],
-				secondaryAddressSuggestionResults: secondary,
-				selectedSuggestionIndex: 0,
-			});
-
-			expect(result.length).toBe(1);
-			expect(result[0].address.street_line).toBe("123 Main St Apt 1");
-		});
-
-		it("should insert at middle position", () => {
-			const primary = [
-				createMockUiSuggestionItem("123 Main St"),
-				createMockUiSuggestionItem("456 Oak Ave"),
-				createMockUiSuggestionItem("789 Pine Rd"),
-			];
-			const secondary = [createMockUiSuggestionItem("456 Oak Ave Apt 1")];
-
-			const result = service.getMergedAddressSuggestions({
-				addressSuggestionResults: primary,
-				secondaryAddressSuggestionResults: secondary,
-				selectedSuggestionIndex: 1,
-			});
-
-			expect(result.length).toBe(4);
-			expect(result[0].address.street_line).toBe("123 Main St");
-			expect(result[1].address.street_line).toBe("456 Oak Ave");
-			expect(result[2].address.street_line).toBe("456 Oak Ave Apt 1");
-			expect(result[3].address.street_line).toBe("789 Pine Rd");
 		});
 	});
 });

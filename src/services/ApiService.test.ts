@@ -9,10 +9,7 @@ describe("ApiService", () => {
 	});
 
 	describe("getMatchingResult", () => {
-		const createSuggestion = (
-			streetLine: string,
-			secondary: string = "",
-		): AddressSuggestion => ({
+		const createSuggestion = (streetLine: string, secondary: string = ""): AddressSuggestion => ({
 			street_line: streetLine,
 			secondary,
 			city: "Denver",
@@ -22,10 +19,7 @@ describe("ApiService", () => {
 		});
 
 		it("should find matching result by street_line", () => {
-			const suggestions = [
-				createSuggestion("123 Main St"),
-				createSuggestion("456 Oak Ave"),
-			];
+			const suggestions = [createSuggestion("123 Main St"), createSuggestion("456 Oak Ave")];
 			const selected = createSuggestion("123 Main St");
 
 			const result = service.getMatchingResult(suggestions, selected);
@@ -33,10 +27,7 @@ describe("ApiService", () => {
 		});
 
 		it("should return undefined when no match found", () => {
-			const suggestions = [
-				createSuggestion("123 Main St"),
-				createSuggestion("456 Oak Ave"),
-			];
+			const suggestions = [createSuggestion("123 Main St"), createSuggestion("456 Oak Ave")];
 			const selected = createSuggestion("789 Pine Rd");
 
 			const result = service.getMatchingResult(suggestions, selected);
@@ -225,8 +216,7 @@ describe("ApiService", () => {
 			const mockFetch = jest.fn().mockResolvedValue({
 				ok: false,
 				status: 401,
-				json: () =>
-					Promise.resolve({ errors: [{ id: 1611079217, message: "Auth failed" }] }),
+				json: () => Promise.resolve({ errors: [{ id: 1611079217, message: "Auth failed" }] }),
 			});
 
 			await expect(
@@ -279,12 +269,7 @@ describe("ApiService", () => {
 				json: () => Promise.resolve({ suggestions: [] }),
 			});
 
-			await service.getAutocompleteApiResults(
-				apiConfig,
-				"123 Main",
-				selectedAddress,
-				mockFetch,
-			);
+			await service.getAutocompleteApiResults(apiConfig, "123 Main", selectedAddress, mockFetch);
 
 			const calledUrl = mockFetch.mock.calls[0][0];
 			expect(calledUrl).toContain("selected=");

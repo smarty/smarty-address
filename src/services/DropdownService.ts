@@ -1,15 +1,6 @@
 import { BaseService } from "./BaseService";
 import { AddressSuggestion, SmartyAddressConfig, UiSuggestionItem } from "../interfaces";
-import { getSmartyLogo } from "../utils/getSmartyLogo";
-
-interface ElementConfig {
-	name?: string;
-	text?: string;
-	elementType?: string;
-	className?: string[];
-	attributes?: Record<string, string>;
-	children?: ElementConfig[] | undefined;
-}
+import { ElementConfig } from "./DomService";
 
 export class DropdownService extends BaseService {
 	private instanceId: number;
@@ -53,7 +44,7 @@ export class DropdownService extends BaseService {
 
 	async setupDom(): Promise<void> {
 		const instanceClassname = this.services.styleService!.getInstanceClassName(this.instanceId);
-		const elements = this.buildAutocompleteDomElements(instanceClassname);
+		const elements = this.services.domService!.buildAutocompleteDomElements(instanceClassname);
 		const { customStylesElement, dropdownWrapperElement } = elements;
 
 		if (dropdownWrapperElement) {
@@ -96,9 +87,10 @@ export class DropdownService extends BaseService {
 			);
 
 			const dynamicStylingHandler = () =>
-				this.updateDynamicStyles(
+				this.services.styleService!.updateDynamicStyles(
 					this.customStylesElement as HTMLStyleElement,
 					searchInputElement,
+					this.instanceId,
 				);
 
 			this.configureDynamicStyling(dynamicStylingHandler, searchInputElement);
@@ -186,7 +178,10 @@ export class DropdownService extends BaseService {
 		});
 
 		if (items[newIndex]) {
-			this.scrollToHighlightedSuggestion(items[newIndex].suggestionElement, this.suggestionsElement!);
+			this.scrollToHighlightedSuggestion(
+				items[newIndex].suggestionElement,
+				this.suggestionsElement!,
+			);
 		}
 		this.setHighlightedIndex(newIndex);
 
@@ -353,11 +348,11 @@ export class DropdownService extends BaseService {
 	}
 
 	getMergedSuggestions(): UiSuggestionItem[] {
-		return this.services.styleService!.getMergedAddressSuggestions({
-			addressSuggestionResults: this.addressSuggestionResults,
-			secondaryAddressSuggestionResults: this.secondaryAddressSuggestionResults,
-			selectedSuggestionIndex: this.selectedSuggestionIndex,
-		});
+		return this.addressSuggestionResults.toSpliced(
+			this.selectedSuggestionIndex + 1,
+			0,
+			...this.secondaryAddressSuggestionResults,
+		);
 	}
 
 	getHighlightedIndex(): number {
@@ -515,8 +510,7 @@ export class DropdownService extends BaseService {
 		const entriesChildren: ElementConfig[] | undefined =
 			entries > 1 ? [{ text: `${entries} entries` }] : undefined;
 
-		const formattedAddress =
-			this.services.styleService!.getFormattedAddressSuggestion(suggestion);
+		const formattedAddress = this.services.styleService!.getFormattedAddressSuggestion(suggestion);
 		const highlightedParts = this.services.styleService!.createHighlightedTextElements(
 			formattedAddress,
 			searchString,
@@ -568,7 +562,7 @@ export class DropdownService extends BaseService {
 			},
 		];
 
-		return this.buildElementsFromMap(elementsMap);
+		return this.services.domService!.buildElementsFromMap(elementsMap);
 	}
 
 	createSecondarySuggestionElement(
@@ -607,7 +601,7 @@ export class DropdownService extends BaseService {
 			attributes.id = suggestionId;
 		}
 
-		const elementsMap = [
+		const elementsMap: ElementConfig[] = [
 			{
 				name: "secondarySuggestionElement",
 				elementType: "li",
@@ -630,7 +624,7 @@ export class DropdownService extends BaseService {
 			},
 		];
 
-		return this.buildElementsFromMap(elementsMap);
+		return this.services.domService!.buildElementsFromMap(elementsMap);
 	}
 
 	scrollToHighlightedSuggestion(highlightedElement: HTMLElement, container: HTMLElement): void {
@@ -652,195 +646,6 @@ export class DropdownService extends BaseService {
 
 	hideElement(element: HTMLElement): void {
 		element.classList.add("smartyAddress__hidden");
-	}
-
-	getNearestStyledElement(element: HTMLElement, colorProperty: string): HTMLElement {
-		const colorValue = this.services.domService!.getElementStyles(element, colorProperty);
-		const { alpha } = this.services.styleService!.getRgbaFromCssColor(colorValue);
-
-		return alpha < 0.1 && element.parentElement
-			? this.getNearestStyledElement(element.parentElement, colorProperty)
-			: element;
-	}
-
-	updateDynamicStyles(stylesElement: HTMLStyleElement, searchInputElement: HTMLInputElement): void {
-		const { left, bottom, width } = searchInputElement.getBoundingClientRect();
-		const scrollY = window.scrollY;
-		const scrollX = window.scrollX;
-
-		const backgroundColorElement = this.getNearestStyledElement(
-			searchInputElement,
-			"backgroundColor",
-		);
-		const colorElement = this.getNearestStyledElement(searchInputElement, "color");
-		const inputBackgroundColor = this.services.domService!.getElementStyles(
-			backgroundColorElement,
-			"backgroundColor",
-		);
-		const inputTextColor = this.services.domService!.getElementStyles(colorElement, "color");
-		const { hue, saturation, lightness } =
-			this.services.styleService!.getHslFromColorString(inputBackgroundColor);
-
-		const isLightMode = lightness > 50;
-		const useBlueLogo = lightness > 75;
-
-		const secondaryLightness = isLightMode ? lightness - 10 : lightness + 10;
-		const tertiaryLightness = isLightMode ? lightness - 20 : lightness + 20;
-		const secondarySurfaceColor = `hsl(${hue} ${saturation}% ${secondaryLightness}%)`;
-		const tertiarySurfaceColor = `hsl(${hue} ${saturation}% ${tertiaryLightness}%)`;
-		const hoverMixColor = isLightMode ? "#000" : "#fff";
-
-		const accentColor = isLightMode ? "#0066ff" : "#6699ff";
-
-		const dynamicColorStyles = {
-			"--smartyAddress__textBasePrimaryColor": inputTextColor,
-			"--smartyAddress__surfaceBasePrimaryColor": inputBackgroundColor,
-			"--smartyAddress__surfaceBaseSecondaryColor": secondarySurfaceColor,
-			"--smartyAddress__surfaceBaseTertiaryColor": tertiarySurfaceColor,
-			"--smartyAddress__surfaceInverseExtremeColor": hoverMixColor,
-			"--smartyAddress__surfaceBasePrimaryInverseColor": inputTextColor,
-			"--smartyAddress__textAccentColor": accentColor,
-			"--smartyAddress__logoDarkDisplay": useBlueLogo ? "block" : "none",
-			"--smartyAddress__logoLightDisplay": useBlueLogo ? "none" : "block",
-			"--smartyAddress__largeShadow1": "0 12px 24px 0 rgba(4, 34, 75, 0.10)",
-			"--smartyAddress__largeShadow2": "0 20px 40px 0 rgba(21, 27, 35, 0.06)",
-		};
-
-		const dynamicPositionStyles = {
-			"--smartyAddress__dropdownPositionTop": `${bottom + scrollY}px`,
-			"--smartyAddress__dropdownPositionLeft": `${left + scrollX}px`,
-			"--smartyAddress__dropdownWidth": `${width}px`,
-		};
-
-		const colorsStyleBlock = this.services.styleService!.formatStyleBlock(
-			`.smartyAddress__color_dynamic.${this.services.styleService!.getInstanceClassName(this.instanceId)}`,
-			dynamicColorStyles,
-		);
-		const positionStyleBlock = this.services.styleService!.formatStyleBlock(
-			`.smartyAddress__position_dynamic.${this.services.styleService!.getInstanceClassName(this.instanceId)}`,
-			dynamicPositionStyles,
-		);
-		stylesElement.innerHTML = `${colorsStyleBlock} ${positionStyleBlock}`;
-	}
-
-	private buildElementsFromMap(
-		fullElementsMap: ElementConfig[],
-	): Record<string, HTMLElement | Text> {
-		const elements: Record<string, HTMLElement | Text> = {};
-
-		const buildElement = ({
-			name,
-			text,
-			elementType,
-			className = [],
-			attributes = {},
-			children = [],
-		}: ElementConfig): HTMLElement | Text => {
-			const element = text
-				? document.createTextNode(text)
-				: this.services.domService!.createDomElement(
-						elementType!,
-						className,
-						children.map(buildElement),
-					);
-
-			if (element instanceof HTMLElement) {
-				Object.entries(attributes).forEach(([attr, value]) => {
-					element.setAttribute(attr, value);
-				});
-			}
-
-			if (name) {
-				elements[name] = element;
-			}
-
-			return element;
-		};
-
-		fullElementsMap.map(buildElement);
-
-		return elements;
-	}
-
-	buildAutocompleteDomElements(instanceClassname: string): Record<string, HTMLElement | Text> {
-		const darkLogoElementClasses = ["smartyAddress__smartyLogoDark"];
-		const lightLogoElementClasses = ["smartyAddress__smartyLogoLight"];
-		const suggestionsElementClasses = ["smartyAddress__suggestionsElement"];
-		const poweredByElementClasses = ["smartyAddress__poweredBy"];
-		const dropdownElementInitialClasses = [
-			"smartyAddress__dropdownElement",
-			"smartyAddress__hidden",
-		];
-		const dropdownWrapperElementClasses = [
-			"smartyAddress__suggestionsWrapperElement",
-			instanceClassname,
-		];
-		const announcementElementClasses = ["smartyAddress__srOnly"];
-
-		const elementsMap = [
-			{ name: "customStylesElement", elementType: "style" },
-			{
-				name: "dropdownWrapperElement",
-				elementType: "div",
-				className: dropdownWrapperElementClasses,
-				children: [
-					{
-						name: "announcementElement",
-						elementType: "div",
-						className: announcementElementClasses,
-						attributes: {
-							"aria-live": "polite",
-							"aria-atomic": "true",
-						},
-					},
-					{
-						name: "dropdownElement",
-						elementType: "div",
-						className: dropdownElementInitialClasses,
-						attributes: {
-							role: "listbox",
-							"aria-label": "Address suggestions",
-						},
-						children: [
-							{
-								name: "suggestionsElement",
-								elementType: "ul",
-								className: suggestionsElementClasses,
-							},
-							{
-								name: "poweredBySmartyElement",
-								elementType: "div",
-								className: poweredByElementClasses,
-								attributes: { "aria-hidden": "true" },
-								children: [
-									{ text: "Powered by" },
-									{
-										elementType: "img",
-										className: darkLogoElementClasses,
-										attributes: {
-											src: getSmartyLogo("#0066FF"),
-											alt: "",
-											"aria-hidden": "true",
-										},
-									},
-									{
-										elementType: "img",
-										className: lightLogoElementClasses,
-										attributes: {
-											src: getSmartyLogo("#FFFFFF"),
-											alt: "",
-											"aria-hidden": "true",
-										},
-									},
-								],
-							},
-						],
-					},
-				],
-			},
-		];
-
-		return this.buildElementsFromMap(elementsMap);
 	}
 
 	configureSearchInputForAutocomplete(
