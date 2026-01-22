@@ -266,8 +266,8 @@ export class DropdownService extends BaseService {
 		this.updateDropdownContents(suggestionItems);
 
 		if (suggestionItems.length) {
-			const newIndex = this.highlightNewAddress(0);
-			this.setHighlightedIndex(newIndex);
+			this.setHighlightedIndex(0);
+			this.highlightNewAddress(0);
 		}
 
 		const count = suggestionItems.length;
@@ -411,6 +411,7 @@ export class DropdownService extends BaseService {
 	reset(): void {
 		this.selectedAddressSearchTerm = "";
 		this.selectedSuggestionIndex = -1;
+		this.highlightedSuggestionIndex = 0;
 	}
 
 	getDropdownId(): string {
