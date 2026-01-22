@@ -35,10 +35,11 @@ export class FormService extends BaseService {
 
 		if (!elements?.streetLineInputElement) return;
 
-		this.services.domService!.setInputValue(
-			elements.streetLineInputElement,
-			this.services.domService!.getStreetLineFormValue(elements, selectedAddress),
+		const streetLineValue = this.services.domService!.getStreetLineFormValue(
+			elements,
+			selectedAddress,
 		);
+		this.services.domService!.setInputValue(elements.streetLineInputElement, streetLineValue);
 
 		if (elements.secondaryInputElement) {
 			this.services.domService!.setInputValue(

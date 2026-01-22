@@ -177,11 +177,13 @@ export class DomService extends BaseService {
 
 	getStreetLineFormValue(
 		{
+			streetLineInputElement,
 			secondaryInputElement,
 			cityInputElement,
 			stateInputElement,
 			zipcodeInputElement,
 		}: {
+			streetLineInputElement: HTMLElement | null;
 			secondaryInputElement: HTMLInputElement | null;
 			cityInputElement: HTMLInputElement | null;
 			stateInputElement: HTMLInputElement | null;
@@ -195,10 +197,20 @@ export class DomService extends BaseService {
 			streetLineValues.push(address.secondary || "");
 		}
 
-		if (!secondaryInputElement && !cityInputElement && !stateInputElement && !zipcodeInputElement) {
-			[address.city, address.state, address.zipcode].forEach((value) => {
-				value.length && streetLineValues.push(value);
-			});
+		const isSingleFieldForm =
+			!secondaryInputElement && !cityInputElement && !stateInputElement && !zipcodeInputElement;
+
+		if (isSingleFieldForm) {
+			const isTextarea = streetLineInputElement instanceof HTMLTextAreaElement;
+			const cityStateZip = [address.city, address.state, address.zipcode]
+				.filter((value) => value.length)
+				.join(", ");
+
+			if (isTextarea) {
+				return streetLineValues.join(", ") + "\n" + cityStateZip;
+			}
+
+			return [...streetLineValues, cityStateZip].join(", ");
 		}
 
 		return streetLineValues.join(", ");
