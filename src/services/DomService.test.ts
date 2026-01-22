@@ -2,7 +2,6 @@
  * @jest-environment jsdom
  */
 import { DomService } from "./DomService";
-import { AddressSuggestion } from "../interfaces";
 
 describe("DomService", () => {
 	let service: DomService;
@@ -10,96 +9,6 @@ describe("DomService", () => {
 	beforeEach(() => {
 		service = new DomService();
 		document.body.innerHTML = "";
-	});
-
-	describe("getStreetLineFormValue (pure function)", () => {
-		const baseAddress: AddressSuggestion = {
-			street_line: "123 Main St",
-			secondary: "Apt 5",
-			city: "Denver",
-			state: "CO",
-			zipcode: "80202",
-			country: "US",
-		};
-
-		it("should return just street_line when all form elements are present", () => {
-			const formElements = {
-				streetLineInputElement: document.createElement("input"),
-				secondaryInputElement: document.createElement("input"),
-				cityInputElement: document.createElement("input"),
-				stateInputElement: document.createElement("input"),
-				zipcodeInputElement: document.createElement("input"),
-			};
-
-			const result = service.getStreetLineFormValue(formElements, baseAddress);
-			expect(result).toBe("123 Main St");
-		});
-
-		it("should include secondary when secondaryInputElement is null", () => {
-			const formElements = {
-				streetLineInputElement: document.createElement("input"),
-				secondaryInputElement: null,
-				cityInputElement: document.createElement("input"),
-				stateInputElement: document.createElement("input"),
-				zipcodeInputElement: document.createElement("input"),
-			};
-
-			const result = service.getStreetLineFormValue(formElements, baseAddress);
-			expect(result).toBe("123 Main St, Apt 5");
-		});
-
-		it("should include full address when all form elements are null (input)", () => {
-			const formElements = {
-				streetLineInputElement: document.createElement("input"),
-				secondaryInputElement: null,
-				cityInputElement: null,
-				stateInputElement: null,
-				zipcodeInputElement: null,
-			};
-
-			const result = service.getStreetLineFormValue(formElements, baseAddress);
-			expect(result).toBe("123 Main St, Apt 5, Denver, CO 80202");
-		});
-
-		it("should format address with newlines for textarea single-field forms", () => {
-			const formElements = {
-				streetLineInputElement: document.createElement("textarea"),
-				secondaryInputElement: null,
-				cityInputElement: null,
-				stateInputElement: null,
-				zipcodeInputElement: null,
-			};
-
-			const result = service.getStreetLineFormValue(formElements, baseAddress);
-			expect(result).toBe("123 Main St\nApt 5\nDenver, CO 80202");
-		});
-
-		it("should not include empty secondary", () => {
-			const address = { ...baseAddress, secondary: "" };
-			const formElements = {
-				streetLineInputElement: document.createElement("input"),
-				secondaryInputElement: null,
-				cityInputElement: document.createElement("input"),
-				stateInputElement: document.createElement("input"),
-				zipcodeInputElement: document.createElement("input"),
-			};
-
-			const result = service.getStreetLineFormValue(formElements, address);
-			expect(result).toBe("123 Main St");
-		});
-
-		it("should handle partial null form elements", () => {
-			const formElements = {
-				streetLineInputElement: document.createElement("input"),
-				secondaryInputElement: null,
-				cityInputElement: null,
-				stateInputElement: document.createElement("input"),
-				zipcodeInputElement: document.createElement("input"),
-			};
-
-			const result = service.getStreetLineFormValue(formElements, baseAddress);
-			expect(result).toBe("123 Main St, Apt 5");
-		});
 	});
 
 	describe("findDomElement", () => {

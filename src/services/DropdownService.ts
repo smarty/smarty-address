@@ -1,6 +1,5 @@
 import { BaseService } from "./BaseService";
 import { AddressSuggestion, SmartyAddressConfig, UiSuggestionItem } from "../interfaces";
-import { ElementConfig } from "./DomService";
 
 export class DropdownService extends BaseService {
 	private instanceId: number;
@@ -502,67 +501,21 @@ export class DropdownService extends BaseService {
 		suggestionId?: string,
 	): Record<string, HTMLElement | Text> {
 		const { entries = 0 } = suggestion;
-		const addressElementClasses = ["smartyAddress__autocompleteAddress"];
-		const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
-		const entriesElementClasses = ["smartyAddress__suggestionEntries"];
-		const suggestionElementClasses = ["smartyAddress__suggestion"];
-
-		const entriesChildren: ElementConfig[] | undefined =
-			entries > 1 ? [{ text: `${entries} entries` }] : undefined;
-
 		const formattedAddress = this.services.styleService!.getFormattedAddressSuggestion(suggestion);
 		const highlightedParts = this.services.styleService!.createHighlightedTextElements(
 			formattedAddress,
 			searchString,
 		);
-		const addressChildren: ElementConfig[] = highlightedParts.map((part) => ({
-			elementType: "span",
-			className: part.isMatch ? ["smartyAddress__matchedText"] : [],
-			children: [{ text: part.text }],
-		}));
-
 		const entriesLabel = entries > 1 ? `, ${entries} entries available` : "";
 		const ariaLabel = `${formattedAddress}${entriesLabel}`;
 
-		const attributes: Record<string, string> = {
-			"data-address": JSON.stringify(suggestion),
-			role: "option",
-			"aria-label": ariaLabel,
-		};
-		if (suggestionId) {
-			attributes.id = suggestionId;
-		}
-
-		const elementsMap: ElementConfig[] = [
-			{
-				name: "suggestionElement",
-				elementType: "li",
-				className: suggestionElementClasses,
-				attributes,
-				children: [
-					{
-						elementType: "div",
-						className: addressWrapperElementClasses,
-						children: [
-							{
-								name: "addressElement",
-								elementType: "div",
-								className: addressElementClasses,
-								children: addressChildren,
-							},
-							{
-								name: "entriesElement",
-								elementType: "div",
-								className: entriesElementClasses,
-								children: entriesChildren,
-							},
-						],
-					},
-				],
-			},
-		];
-
-		return this.services.domService!.buildElementsFromMap(elementsMap);
+		return this.services.domService!.buildSuggestionElement(
+			highlightedParts,
+			JSON.stringify(suggestion),
+			ariaLabel,
+			entries,
+			suggestionId,
+		);
 	}
 
 	createSecondarySuggestionElement(
@@ -570,10 +523,6 @@ export class DropdownService extends BaseService {
 		searchString: string = "",
 		suggestionId?: string,
 	): Record<string, HTMLElement | Text> {
-		const addressElementClasses = ["smartyAddress__autocompleteAddress"];
-		const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
-		const secondarySuggestionElementClasses = ["smartyAddress__secondarySuggestion"];
-
 		const formattedAddress = this.services.styleService!.getFormattedAddressSuggestion(
 			suggestion,
 			true,
@@ -586,45 +535,13 @@ export class DropdownService extends BaseService {
 			formattedAddress,
 			searchString,
 		);
-		const addressChildren: ElementConfig[] = highlightedParts.map((part) => ({
-			elementType: "span",
-			className: part.isMatch ? ["smartyAddress__matchedText"] : [],
-			children: [{ text: part.text }],
-		}));
 
-		const attributes: Record<string, string> = {
-			"data-address": JSON.stringify(suggestion),
-			role: "option",
-			"aria-label": fullAddress,
-		};
-		if (suggestionId) {
-			attributes.id = suggestionId;
-		}
-
-		const elementsMap: ElementConfig[] = [
-			{
-				name: "secondarySuggestionElement",
-				elementType: "li",
-				className: secondarySuggestionElementClasses,
-				attributes,
-				children: [
-					{
-						elementType: "div",
-						className: addressWrapperElementClasses,
-						children: [
-							{
-								name: "addressElement",
-								elementType: "div",
-								className: addressElementClasses,
-								children: addressChildren,
-							},
-						],
-					},
-				],
-			},
-		];
-
-		return this.services.domService!.buildElementsFromMap(elementsMap);
+		return this.services.domService!.buildSecondarySuggestionElement(
+			highlightedParts,
+			JSON.stringify(suggestion),
+			fullAddress,
+			suggestionId,
+		);
 	}
 
 	scrollToHighlightedSuggestion(highlightedElement: HTMLElement, container: HTMLElement): void {

@@ -118,6 +118,50 @@ export class FormService extends BaseService {
 		return stateValue;
 	}
 
+	getStreetLineFormValue(
+		{
+			streetLineInputElement,
+			secondaryInputElement,
+			cityInputElement,
+			stateInputElement,
+			zipcodeInputElement,
+		}: {
+			streetLineInputElement: HTMLElement | null;
+			secondaryInputElement: HTMLInputElement | null;
+			cityInputElement: HTMLInputElement | null;
+			stateInputElement: HTMLInputElement | null;
+			zipcodeInputElement: HTMLInputElement | null;
+		},
+		address: AddressSuggestion,
+	): string {
+		const streetLineValues = [address.street_line];
+
+		if (!secondaryInputElement && address.secondary?.length) {
+			streetLineValues.push(address.secondary || "");
+		}
+
+		const isSingleFieldForm =
+			!secondaryInputElement && !cityInputElement && !stateInputElement && !zipcodeInputElement;
+
+		if (isSingleFieldForm) {
+			const isTextarea = streetLineInputElement instanceof HTMLTextAreaElement;
+			const cityStateZip =
+				[address.city, address.state].filter((value) => value.length).join(", ") +
+				(address.zipcode ? " " + address.zipcode : "");
+
+			if (isTextarea) {
+				const lines = [address.street_line];
+				if (address.secondary?.length) lines.push(address.secondary);
+				lines.push(cityStateZip);
+				return lines.join("\n");
+			}
+
+			return [...streetLineValues, cityStateZip].join(", ");
+		}
+
+		return streetLineValues.join(", ");
+	}
+
 	populateFormWithAddress(selectedAddress: AddressSuggestion) {
 		const elements = {
 			streetLineInputElement: this.services.domService!.findDomElement(this.streetSelector),
@@ -137,10 +181,7 @@ export class FormService extends BaseService {
 
 		if (!elements?.streetLineInputElement) return;
 
-		const streetLineValue = this.services.domService!.getStreetLineFormValue(
-			elements,
-			selectedAddress,
-		);
+		const streetLineValue = this.getStreetLineFormValue(elements, selectedAddress);
 		this.services.domService!.setInputValue(elements.streetLineInputElement, streetLineValue);
 
 		if (elements.secondaryInputElement) {

@@ -1,5 +1,4 @@
 import { BaseService } from "./BaseService";
-import { AddressSuggestion } from "../interfaces";
 import { getSmartyLogo } from "../utils/getSmartyLogo";
 
 export interface ElementConfig {
@@ -81,50 +80,6 @@ export class DomService extends BaseService {
 	): CSSStyleDeclaration {
 		const styles = getComputedStyleFn(element);
 		return (styles as any)[property] ?? "rgba(0, 0, 0, 0)";
-	}
-
-	getStreetLineFormValue(
-		{
-			streetLineInputElement,
-			secondaryInputElement,
-			cityInputElement,
-			stateInputElement,
-			zipcodeInputElement,
-		}: {
-			streetLineInputElement: HTMLElement | null;
-			secondaryInputElement: HTMLInputElement | null;
-			cityInputElement: HTMLInputElement | null;
-			stateInputElement: HTMLInputElement | null;
-			zipcodeInputElement: HTMLInputElement | null;
-		},
-		address: AddressSuggestion,
-	): string {
-		const streetLineValues = [address.street_line];
-
-		if (!secondaryInputElement && address.secondary?.length) {
-			streetLineValues.push(address.secondary || "");
-		}
-
-		const isSingleFieldForm =
-			!secondaryInputElement && !cityInputElement && !stateInputElement && !zipcodeInputElement;
-
-		if (isSingleFieldForm) {
-			const isTextarea = streetLineInputElement instanceof HTMLTextAreaElement;
-			const cityStateZip =
-				[address.city, address.state].filter((value) => value.length).join(", ") +
-				(address.zipcode ? " " + address.zipcode : "");
-
-			if (isTextarea) {
-				const lines = [address.street_line];
-				if (address.secondary?.length) lines.push(address.secondary);
-				lines.push(cityStateZip);
-				return lines.join("\n");
-			}
-
-			return [...streetLineValues, cityStateZip].join(", ");
-		}
-
-		return streetLineValues.join(", ");
 	}
 
 	buildElementsFromMap(fullElementsMap: ElementConfig[]): Record<string, HTMLElement | Text> {
@@ -231,6 +186,119 @@ export class DomService extends BaseService {
 										},
 									},
 								],
+							},
+						],
+					},
+				],
+			},
+		];
+
+		return this.buildElementsFromMap(elementsMap);
+	}
+
+	buildSuggestionElement(
+		highlightedParts: Array<{ text: string; isMatch?: boolean }>,
+		suggestionData: string,
+		ariaLabel: string,
+		entries: number = 0,
+		suggestionId?: string,
+	): Record<string, HTMLElement | Text> {
+		const addressElementClasses = ["smartyAddress__autocompleteAddress"];
+		const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
+		const entriesElementClasses = ["smartyAddress__suggestionEntries"];
+		const suggestionElementClasses = ["smartyAddress__suggestion"];
+
+		const entriesChildren: ElementConfig[] | undefined =
+			entries > 1 ? [{ text: `${entries} entries` }] : undefined;
+
+		const addressChildren: ElementConfig[] = highlightedParts.map((part) => ({
+			elementType: "span",
+			className: part.isMatch ? ["smartyAddress__matchedText"] : [],
+			children: [{ text: part.text }],
+		}));
+
+		const attributes: Record<string, string> = {
+			"data-address": suggestionData,
+			role: "option",
+			"aria-label": ariaLabel,
+		};
+		if (suggestionId) {
+			attributes.id = suggestionId;
+		}
+
+		const elementsMap: ElementConfig[] = [
+			{
+				name: "suggestionElement",
+				elementType: "li",
+				className: suggestionElementClasses,
+				attributes,
+				children: [
+					{
+						elementType: "div",
+						className: addressWrapperElementClasses,
+						children: [
+							{
+								name: "addressElement",
+								elementType: "div",
+								className: addressElementClasses,
+								children: addressChildren,
+							},
+							{
+								name: "entriesElement",
+								elementType: "div",
+								className: entriesElementClasses,
+								children: entriesChildren,
+							},
+						],
+					},
+				],
+			},
+		];
+
+		return this.buildElementsFromMap(elementsMap);
+	}
+
+	buildSecondarySuggestionElement(
+		highlightedParts: Array<{ text: string; isMatch?: boolean }>,
+		suggestionData: string,
+		ariaLabel: string,
+		suggestionId?: string,
+	): Record<string, HTMLElement | Text> {
+		const addressElementClasses = ["smartyAddress__autocompleteAddress"];
+		const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
+		const secondarySuggestionElementClasses = ["smartyAddress__secondarySuggestion"];
+
+		const addressChildren: ElementConfig[] = highlightedParts.map((part) => ({
+			elementType: "span",
+			className: part.isMatch ? ["smartyAddress__matchedText"] : [],
+			children: [{ text: part.text }],
+		}));
+
+		const attributes: Record<string, string> = {
+			"data-address": suggestionData,
+			role: "option",
+			"aria-label": ariaLabel,
+		};
+		if (suggestionId) {
+			attributes.id = suggestionId;
+		}
+
+		const elementsMap: ElementConfig[] = [
+			{
+				name: "secondarySuggestionElement",
+				elementType: "li",
+				className: secondarySuggestionElementClasses,
+				attributes,
+				children: [
+					{
+						elementType: "div",
+						className: addressWrapperElementClasses,
+						children: [
+							{
+								name: "addressElement",
+								elementType: "div",
+								className: addressElementClasses,
+								children: addressChildren,
 							},
 						],
 					},
