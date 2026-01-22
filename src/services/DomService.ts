@@ -202,12 +202,15 @@ export class DomService extends BaseService {
 
 		if (isSingleFieldForm) {
 			const isTextarea = streetLineInputElement instanceof HTMLTextAreaElement;
-			const cityStateZip = [address.city, address.state, address.zipcode]
-				.filter((value) => value.length)
-				.join(", ");
+			const cityStateZip =
+				[address.city, address.state].filter((value) => value.length).join(", ") +
+				(address.zipcode ? " " + address.zipcode : "");
 
 			if (isTextarea) {
-				return streetLineValues.join(", ") + "\n" + cityStateZip;
+				const lines = [address.street_line];
+				if (address.secondary?.length) lines.push(address.secondary);
+				lines.push(cityStateZip);
+				return lines.join("\n");
 			}
 
 			return [...streetLineValues, cityStateZip].join(", ");

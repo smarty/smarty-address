@@ -24,6 +24,7 @@ describe("DomService", () => {
 
 		it("should return just street_line when all form elements are present", () => {
 			const formElements = {
+				streetLineInputElement: document.createElement("input"),
 				secondaryInputElement: document.createElement("input"),
 				cityInputElement: document.createElement("input"),
 				stateInputElement: document.createElement("input"),
@@ -36,6 +37,7 @@ describe("DomService", () => {
 
 		it("should include secondary when secondaryInputElement is null", () => {
 			const formElements = {
+				streetLineInputElement: document.createElement("input"),
 				secondaryInputElement: null,
 				cityInputElement: document.createElement("input"),
 				stateInputElement: document.createElement("input"),
@@ -46,8 +48,9 @@ describe("DomService", () => {
 			expect(result).toBe("123 Main St, Apt 5");
 		});
 
-		it("should include full address when all form elements are null", () => {
+		it("should include full address when all form elements are null (input)", () => {
 			const formElements = {
+				streetLineInputElement: document.createElement("input"),
 				secondaryInputElement: null,
 				cityInputElement: null,
 				stateInputElement: null,
@@ -55,12 +58,26 @@ describe("DomService", () => {
 			};
 
 			const result = service.getStreetLineFormValue(formElements, baseAddress);
-			expect(result).toBe("123 Main St, Apt 5, Denver, CO, 80202");
+			expect(result).toBe("123 Main St, Apt 5, Denver, CO 80202");
+		});
+
+		it("should format address with newlines for textarea single-field forms", () => {
+			const formElements = {
+				streetLineInputElement: document.createElement("textarea"),
+				secondaryInputElement: null,
+				cityInputElement: null,
+				stateInputElement: null,
+				zipcodeInputElement: null,
+			};
+
+			const result = service.getStreetLineFormValue(formElements, baseAddress);
+			expect(result).toBe("123 Main St\nApt 5\nDenver, CO 80202");
 		});
 
 		it("should not include empty secondary", () => {
 			const address = { ...baseAddress, secondary: "" };
 			const formElements = {
+				streetLineInputElement: document.createElement("input"),
 				secondaryInputElement: null,
 				cityInputElement: document.createElement("input"),
 				stateInputElement: document.createElement("input"),
@@ -73,6 +90,7 @@ describe("DomService", () => {
 
 		it("should handle partial null form elements", () => {
 			const formElements = {
+				streetLineInputElement: document.createElement("input"),
 				secondaryInputElement: null,
 				cityInputElement: null,
 				stateInputElement: document.createElement("input"),
