@@ -44,60 +44,77 @@ export class DropdownService extends BaseService {
 	async setupDom(): Promise<void> {
 		const instanceClassname = this.styleService.getInstanceClassName(this.instanceId);
 		const elements = this.domService.buildAutocompleteDomElements(instanceClassname);
+
+		this.appendElementsToDocument(elements);
+		this.storeElementReferences(elements);
+		this.configureDropdownInteractions();
+
+		if (elements.dropdownWrapperElement instanceof HTMLElement) {
+			this.updateThemeClass(this.theme, [], elements.dropdownWrapperElement);
+		}
+
+		await this.setupSearchInput();
+	}
+
+	private appendElementsToDocument(elements: Record<string, HTMLElement | null>): void {
 		const { customStylesElement, dropdownWrapperElement } = elements;
 
 		if (dropdownWrapperElement) {
 			document.body.appendChild(dropdownWrapperElement);
 		}
+
 		const head = document.getElementsByTagName("head")[0];
 		if (head && customStylesElement) {
 			head.appendChild(customStylesElement);
 		}
+	}
 
+	private storeElementReferences(elements: Record<string, HTMLElement | null>): void {
 		this.customStylesElement = elements.customStylesElement as HTMLStyleElement;
 		this.dropdownWrapperElement = elements.dropdownWrapperElement as HTMLElement;
 		this.dropdownElement = elements.dropdownElement as HTMLElement;
 		this.suggestionsElement = elements.suggestionsElement as HTMLElement;
 		this.announcementElement = elements.announcementElement as HTMLElement;
+	}
 
-		if (this.dropdownElement) {
-			this.dropdownElement.id = this.getDropdownId();
-			this.dropdownElement.addEventListener("mousedown", () => {
-				this.isInteractingWithDropdown = true;
-			});
-			document.addEventListener("mouseup", () => {
-				this.isInteractingWithDropdown = false;
-			});
-		}
+	private configureDropdownInteractions(): void {
+		if (!this.dropdownElement) return;
 
-		if (dropdownWrapperElement instanceof HTMLElement) {
-			this.updateThemeClass(this.theme, [], dropdownWrapperElement);
-		}
+		this.dropdownElement.id = this.getDropdownId();
+		this.dropdownElement.addEventListener("mousedown", () => {
+			this.isInteractingWithDropdown = true;
+		});
+		document.addEventListener("mouseup", () => {
+			this.isInteractingWithDropdown = false;
+		});
+	}
 
+	private async setupSearchInput(): Promise<void> {
 		const searchInputElement = (await this.domService.findDomElementWithRetry(
 			this.searchInputSelector,
 		)) as HTMLInputElement | null;
 
-		if (searchInputElement) {
-			this.attachEventListeners(
-				(e) => this.handleSearchInputOnChange(e),
-				(e) => this.handleAutocompleteKeydown(e),
-				(e) => this.handleSearchInputFocusOut(e),
-			);
-
-			const dynamicStylingHandler = () =>
-				this.styleService.updateDynamicStyles(
-					this.customStylesElement as HTMLStyleElement,
-					searchInputElement,
-					this.instanceId,
-				);
-
-			this.configureDynamicStyling(dynamicStylingHandler, searchInputElement);
-		} else {
+		if (!searchInputElement) {
 			console.error(
 				`Failed to find search input element with selector "${this.searchInputSelector}".`,
 			);
+			return;
 		}
+
+		this.attachEventListeners(
+			(e) => this.handleSearchInputOnChange(e),
+			(e) => this.handleAutocompleteKeydown(e),
+			(e) => this.handleSearchInputFocusOut(e),
+		);
+
+		const dynamicStylingHandler = () =>
+			this.styleService.updateDynamicStyles(
+				this.customStylesElement as HTMLStyleElement,
+				searchInputElement,
+				this.instanceId,
+			);
+
+		this.configureDynamicStyling(dynamicStylingHandler, searchInputElement);
 	}
 
 	handleSearchInputFocusOut(event: FocusEvent): void {
@@ -564,22 +581,24 @@ export class DropdownService extends BaseService {
 		dynamicStylingHandler();
 		window.addEventListener("scroll", () => dynamicStylingHandler());
 		window.addEventListener("resize", () => dynamicStylingHandler());
+		this.observeAncestorStyleChanges(searchInputElement, dynamicStylingHandler);
+	}
 
-		const observerCallback = () => dynamicStylingHandler();
-		const observerOptions: MutationObserverInit = {
+	private observeAncestorStyleChanges(element: HTMLElement, callback: Function): void {
+		const observer = new MutationObserver(() => callback());
+		const options: MutationObserverInit = {
 			attributes: true,
 			attributeFilter: ["style", "class"],
 		};
 
-		const observer = new MutationObserver(observerCallback);
-
-		let element: HTMLElement | null = searchInputElement;
-		while (element && element !== document.body) {
-			observer.observe(element, observerOptions);
-			element = element.parentElement;
+		let current: HTMLElement | null = element;
+		while (current && current !== document.body) {
+			observer.observe(current, options);
+			current = current.parentElement;
 		}
+
 		if (document.body) {
-			observer.observe(document.body, observerOptions);
+			observer.observe(document.body, options);
 		}
 	}
 

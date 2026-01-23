@@ -161,61 +161,79 @@ export class StyleService extends BaseService {
 		searchInputElement: HTMLInputElement,
 		instanceId: number,
 	): void {
-		const { left, bottom, width } = searchInputElement.getBoundingClientRect();
-		const scrollY = window.scrollY;
-		const scrollX = window.scrollX;
+		const positionStyles = this.calculatePositionStyles(searchInputElement);
+		const colorStyles = this.calculateColorStyles(searchInputElement);
+		const instanceClass = this.getInstanceClassName(instanceId);
 
-		const backgroundColorElement = this.getNearestStyledElement(
-			searchInputElement,
-			"backgroundColor",
+		const colorsStyleBlock = this.formatStyleBlock(
+			`.smartyAddress__color_dynamic.${instanceClass}`,
+			colorStyles,
 		);
-		const colorElement = this.getNearestStyledElement(searchInputElement, "color");
+		const positionStyleBlock = this.formatStyleBlock(
+			`.smartyAddress__position_dynamic.${instanceClass}`,
+			positionStyles,
+		);
+
+		stylesElement.innerHTML = `${colorsStyleBlock} ${positionStyleBlock}`;
+	}
+
+	private calculatePositionStyles(element: HTMLElement): Record<string, string> {
+		const { left, bottom, width } = element.getBoundingClientRect();
+		return {
+			"--smartyAddress__dropdownPositionTop": `${bottom + window.scrollY}px`,
+			"--smartyAddress__dropdownPositionLeft": `${left + window.scrollX}px`,
+			"--smartyAddress__dropdownWidth": `${width}px`,
+		};
+	}
+
+	private calculateColorStyles(element: HTMLElement): Record<string, string> {
+		const backgroundColorElement = this.getNearestStyledElement(element, "backgroundColor");
+		const colorElement = this.getNearestStyledElement(element, "color");
+
 		const inputBackgroundColor = this.domService.getElementStyles(
 			backgroundColorElement,
 			"backgroundColor",
 		);
 		const inputTextColor = this.domService.getElementStyles(colorElement, "color");
+
 		const { hue, saturation, lightness } = this.getHslFromColorString(inputBackgroundColor);
+		const derivedColors = this.deriveSurfaceColors(hue, saturation, lightness);
 
-		const isLightMode = lightness > 50;
-		const useBlueLogo = lightness > 75;
-
-		const secondaryLightness = isLightMode ? lightness - 10 : lightness + 10;
-		const tertiaryLightness = isLightMode ? lightness - 20 : lightness + 20;
-		const secondarySurfaceColor = `hsl(${hue} ${saturation}% ${secondaryLightness}%)`;
-		const tertiarySurfaceColor = `hsl(${hue} ${saturation}% ${tertiaryLightness}%)`;
-		const hoverMixColor = isLightMode ? "#000" : "#fff";
-
-		const accentColor = isLightMode ? "#0066ff" : "#6699ff";
-
-		const dynamicColorStyles = {
+		return {
 			"--smartyAddress__textBasePrimaryColor": inputTextColor,
 			"--smartyAddress__surfaceBasePrimaryColor": inputBackgroundColor,
-			"--smartyAddress__surfaceBaseSecondaryColor": secondarySurfaceColor,
-			"--smartyAddress__surfaceBaseTertiaryColor": tertiarySurfaceColor,
-			"--smartyAddress__surfaceInverseExtremeColor": hoverMixColor,
+			"--smartyAddress__surfaceBaseSecondaryColor": derivedColors.secondary,
+			"--smartyAddress__surfaceBaseTertiaryColor": derivedColors.tertiary,
+			"--smartyAddress__surfaceInverseExtremeColor": derivedColors.hoverMix,
 			"--smartyAddress__surfaceBasePrimaryInverseColor": inputTextColor,
-			"--smartyAddress__textAccentColor": accentColor,
-			"--smartyAddress__logoDarkDisplay": useBlueLogo ? "block" : "none",
-			"--smartyAddress__logoLightDisplay": useBlueLogo ? "none" : "block",
+			"--smartyAddress__textAccentColor": derivedColors.accent,
+			"--smartyAddress__logoDarkDisplay": derivedColors.useBlueLogo ? "block" : "none",
+			"--smartyAddress__logoLightDisplay": derivedColors.useBlueLogo ? "none" : "block",
 			"--smartyAddress__largeShadow1": "0 12px 24px 0 rgba(4, 34, 75, 0.10)",
 			"--smartyAddress__largeShadow2": "0 20px 40px 0 rgba(21, 27, 35, 0.06)",
 		};
+	}
 
-		const dynamicPositionStyles = {
-			"--smartyAddress__dropdownPositionTop": `${bottom + scrollY}px`,
-			"--smartyAddress__dropdownPositionLeft": `${left + scrollX}px`,
-			"--smartyAddress__dropdownWidth": `${width}px`,
+	private deriveSurfaceColors(
+		hue: number,
+		saturation: number,
+		lightness: number,
+	): {
+		secondary: string;
+		tertiary: string;
+		hoverMix: string;
+		accent: string;
+		useBlueLogo: boolean;
+	} {
+		const isLightMode = lightness > 50;
+		const lightnessOffset = isLightMode ? -10 : 10;
+
+		return {
+			secondary: `hsl(${hue} ${saturation}% ${lightness + lightnessOffset}%)`,
+			tertiary: `hsl(${hue} ${saturation}% ${lightness + lightnessOffset * 2}%)`,
+			hoverMix: isLightMode ? "#000" : "#fff",
+			accent: isLightMode ? "#0066ff" : "#6699ff",
+			useBlueLogo: lightness > 75,
 		};
-
-		const colorsStyleBlock = this.formatStyleBlock(
-			`.smartyAddress__color_dynamic.${this.getInstanceClassName(instanceId)}`,
-			dynamicColorStyles,
-		);
-		const positionStyleBlock = this.formatStyleBlock(
-			`.smartyAddress__position_dynamic.${this.getInstanceClassName(instanceId)}`,
-			dynamicPositionStyles,
-		);
-		stylesElement.innerHTML = `${colorsStyleBlock} ${positionStyleBlock}`;
 	}
 }

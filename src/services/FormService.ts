@@ -81,41 +81,46 @@ export class FormService extends BaseService {
 		}
 
 		const options = Array.from(element.options);
-		const normalizedStateValue = stateValue.trim().toLowerCase();
+		const normalized = stateValue.trim().toLowerCase();
 
-		const exactMatch = options.find((opt) => opt.value.toLowerCase() === normalizedStateValue);
-		if (exactMatch) {
-			return exactMatch.value;
-		}
-
-		const textMatch = options.find((opt) => opt.text.toLowerCase() === normalizedStateValue);
-		if (textMatch) {
-			return textMatch.value;
-		}
-
-		const stateAbbreviation = STATE_ABBREVIATIONS[stateValue];
-		if (stateAbbreviation) {
-			const abbreviationMatch = options.find(
-				(opt) => opt.value.toLowerCase() === stateAbbreviation.toLowerCase(),
-			);
-			if (abbreviationMatch) {
-				return abbreviationMatch.value;
-			}
-		}
-
-		const fullStateName = Object.keys(STATE_ABBREVIATIONS).find(
-			(key) => STATE_ABBREVIATIONS[key]?.toLowerCase() === normalizedStateValue,
+		return (
+			this.findOptionByValue(options, normalized) ??
+			this.findOptionByText(options, normalized) ??
+			this.findOptionByAbbreviation(options, stateValue) ??
+			this.findOptionByFullName(options, normalized) ??
+			stateValue
 		);
-		if (fullStateName) {
-			const fullNameMatch = options.find(
-				(opt) => opt.value.toLowerCase() === fullStateName.toLowerCase(),
-			);
-			if (fullNameMatch) {
-				return fullNameMatch.value;
-			}
-		}
+	}
 
-		return stateValue;
+	private findOptionByValue(options: HTMLOptionElement[], normalized: string): string | null {
+		const match = options.find((opt) => opt.value.toLowerCase() === normalized);
+		return match?.value ?? null;
+	}
+
+	private findOptionByText(options: HTMLOptionElement[], normalized: string): string | null {
+		const match = options.find((opt) => opt.text.toLowerCase() === normalized);
+		return match?.value ?? null;
+	}
+
+	private findOptionByAbbreviation(
+		options: HTMLOptionElement[],
+		stateValue: string,
+	): string | null {
+		const abbreviation = STATE_ABBREVIATIONS[stateValue]?.toLowerCase();
+		if (!abbreviation) return null;
+
+		const match = options.find((opt) => opt.value.toLowerCase() === abbreviation);
+		return match?.value ?? null;
+	}
+
+	private findOptionByFullName(options: HTMLOptionElement[], normalized: string): string | null {
+		const fullName = Object.keys(STATE_ABBREVIATIONS).find(
+			(key) => STATE_ABBREVIATIONS[key]?.toLowerCase() === normalized,
+		);
+		if (!fullName) return null;
+
+		const match = options.find((opt) => opt.value.toLowerCase() === fullName.toLowerCase());
+		return match?.value ?? null;
 	}
 
 	getStreetLineFormValue(
