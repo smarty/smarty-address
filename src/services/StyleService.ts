@@ -148,7 +148,7 @@ export class StyleService extends BaseService {
 	}
 
 	getNearestStyledElement(element: HTMLElement, colorProperty: string): HTMLElement {
-		const colorValue = this.services.domService!.getElementStyles(element, colorProperty);
+		const colorValue = this.domService.getElementStyles(element, colorProperty);
 		const { alpha } = this.getRgbaFromCssColor(colorValue);
 
 		return alpha < 0.1 && element.parentElement
@@ -170,11 +170,11 @@ export class StyleService extends BaseService {
 			"backgroundColor",
 		);
 		const colorElement = this.getNearestStyledElement(searchInputElement, "color");
-		const inputBackgroundColor = this.services.domService!.getElementStyles(
+		const inputBackgroundColor = this.domService.getElementStyles(
 			backgroundColorElement,
 			"backgroundColor",
 		);
-		const inputTextColor = this.services.domService!.getElementStyles(colorElement, "color");
+		const inputTextColor = this.domService.getElementStyles(colorElement, "color");
 		const { hue, saturation, lightness } = this.getHslFromColorString(inputBackgroundColor);
 
 		const isLightMode = lightness > 50;

@@ -42,8 +42,8 @@ export class DropdownService extends BaseService {
 	}
 
 	async setupDom(): Promise<void> {
-		const instanceClassname = this.services.styleService!.getInstanceClassName(this.instanceId);
-		const elements = this.services.domService!.buildAutocompleteDomElements(instanceClassname);
+		const instanceClassname = this.styleService.getInstanceClassName(this.instanceId);
+		const elements = this.domService.buildAutocompleteDomElements(instanceClassname);
 		const { customStylesElement, dropdownWrapperElement } = elements;
 
 		if (dropdownWrapperElement) {
@@ -74,7 +74,7 @@ export class DropdownService extends BaseService {
 			this.updateThemeClass(this.theme, [], dropdownWrapperElement);
 		}
 
-		const searchInputElement = (await this.services.domService!.findDomElementWithRetry(
+		const searchInputElement = (await this.domService.findDomElementWithRetry(
 			this.searchInputSelector,
 		)) as HTMLInputElement | null;
 
@@ -86,7 +86,7 @@ export class DropdownService extends BaseService {
 			);
 
 			const dynamicStylingHandler = () =>
-				this.services.styleService!.updateDynamicStyles(
+				this.styleService.updateDynamicStyles(
 					this.customStylesElement as HTMLStyleElement,
 					searchInputElement,
 					this.instanceId,
@@ -148,7 +148,7 @@ export class DropdownService extends BaseService {
 
 		if (searchInputValue.length) {
 			if (currentSelectedIndex > -1 && selectedAddress) {
-				this.services.apiService?.fetchSecondaryAddressSuggestions(
+				this.apiService.fetchSecondaryAddressSuggestions(
 					searchInputValue,
 					selectedAddress.address,
 					{
@@ -158,7 +158,7 @@ export class DropdownService extends BaseService {
 					},
 				);
 			} else {
-				this.services.apiService?.fetchAddressSuggestions(searchInputValue, {
+				this.apiService.fetchAddressSuggestions(searchInputValue, {
 					onSuccess: (suggestions, searchString) =>
 						this.formatAddressSuggestions(suggestions, searchString),
 					onError: () => this.handleApiError(),
@@ -209,7 +209,7 @@ export class DropdownService extends BaseService {
 			const newSearchTerm = `${street_line} ${secondary}`;
 			this.setSelectedAddressSearchTerm(newSearchTerm);
 			searchInputElement.value = newSearchTerm;
-			this.services.apiService?.fetchSecondaryAddressSuggestions(
+			this.apiService.fetchSecondaryAddressSuggestions(
 				newSearchTerm,
 				selectedAddress.address,
 				{
@@ -220,7 +220,7 @@ export class DropdownService extends BaseService {
 			);
 			searchInputElement.focus();
 		} else {
-			this.services.formService?.populateFormWithAddress(selectedAddress.address);
+			this.formService.populateFormWithAddress(selectedAddress.address);
 			this.closeDropdown();
 		}
 	}
@@ -396,7 +396,7 @@ export class DropdownService extends BaseService {
 	}
 
 	getSearchInputElement(): HTMLInputElement | null {
-		return this.services.domService!.findDomElement(
+		return this.domService.findDomElement(
 			this.searchInputSelector,
 		) as HTMLInputElement | null;
 	}
@@ -478,15 +478,15 @@ export class DropdownService extends BaseService {
 		suggestionId?: string,
 	): Record<string, HTMLElement | Text> {
 		const { entries = 0 } = suggestion;
-		const formattedAddress = this.services.styleService!.getFormattedAddressSuggestion(suggestion);
-		const highlightedParts = this.services.styleService!.createHighlightedTextElements(
+		const formattedAddress = this.styleService.getFormattedAddressSuggestion(suggestion);
+		const highlightedParts = this.styleService.createHighlightedTextElements(
 			formattedAddress,
 			searchString,
 		);
 		const entriesLabel = entries > 1 ? `, ${entries} entries available` : "";
 		const ariaLabel = `${formattedAddress}${entriesLabel}`;
 
-		return this.services.domService!.buildSuggestionElement(
+		return this.domService.buildSuggestionElement(
 			highlightedParts,
 			JSON.stringify(suggestion),
 			ariaLabel,
@@ -500,20 +500,20 @@ export class DropdownService extends BaseService {
 		searchString: string = "",
 		suggestionId?: string,
 	): Record<string, HTMLElement | Text> {
-		const formattedAddress = this.services.styleService!.getFormattedAddressSuggestion(
+		const formattedAddress = this.styleService.getFormattedAddressSuggestion(
 			suggestion,
 			true,
 		);
-		const fullAddress = this.services.styleService!.getFormattedAddressSuggestion(
+		const fullAddress = this.styleService.getFormattedAddressSuggestion(
 			suggestion,
 			false,
 		);
-		const highlightedParts = this.services.styleService!.createHighlightedTextElements(
+		const highlightedParts = this.styleService.createHighlightedTextElements(
 			formattedAddress,
 			searchString,
 		);
 
-		return this.services.domService!.buildSecondarySuggestionElement(
+		return this.domService.buildSecondarySuggestionElement(
 			highlightedParts,
 			JSON.stringify(suggestion),
 			fullAddress,

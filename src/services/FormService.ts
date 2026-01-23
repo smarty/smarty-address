@@ -164,17 +164,17 @@ export class FormService extends BaseService {
 
 	populateFormWithAddress(selectedAddress: AddressSuggestion) {
 		const elements = {
-			streetLineInputElement: this.services.domService!.findDomElement(this.streetSelector),
-			secondaryInputElement: this.services.domService!.findDomElement(
+			streetLineInputElement: this.domService.findDomElement(this.streetSelector),
+			secondaryInputElement: this.domService.findDomElement(
 				this.secondarySelector,
 			) as HTMLInputElement | null,
-			cityInputElement: this.services.domService!.findDomElement(
+			cityInputElement: this.domService.findDomElement(
 				this.citySelector,
 			) as HTMLInputElement | null,
-			stateInputElement: this.services.domService!.findDomElement(
+			stateInputElement: this.domService.findDomElement(
 				this.stateSelector,
 			) as HTMLInputElement | null,
-			zipcodeInputElement: this.services.domService!.findDomElement(
+			zipcodeInputElement: this.domService.findDomElement(
 				this.zipcodeSelector,
 			) as HTMLInputElement | null,
 		};
@@ -182,25 +182,25 @@ export class FormService extends BaseService {
 		if (!elements?.streetLineInputElement) return;
 
 		const streetLineValue = this.getStreetLineFormValue(elements, selectedAddress);
-		this.services.domService!.setInputValue(elements.streetLineInputElement, streetLineValue);
+		this.domService.setInputValue(elements.streetLineInputElement, streetLineValue);
 
 		if (elements.secondaryInputElement) {
-			this.services.domService!.setInputValue(
+			this.domService.setInputValue(
 				elements.secondaryInputElement,
 				selectedAddress.secondary ?? "",
 			);
 		}
 		if (elements.cityInputElement) {
-			this.services.domService!.setInputValue(elements.cityInputElement, selectedAddress.city);
+			this.domService.setInputValue(elements.cityInputElement, selectedAddress.city);
 		}
 		if (elements.stateInputElement) {
-			this.services.domService!.setInputValue(
+			this.domService.setInputValue(
 				elements.stateInputElement,
 				this.getStateValueForInput(elements.stateInputElement, selectedAddress.state),
 			);
 		}
 		if (elements.zipcodeInputElement) {
-			this.services.domService!.setInputValue(
+			this.domService.setInputValue(
 				elements.zipcodeInputElement,
 				selectedAddress.zipcode,
 			);

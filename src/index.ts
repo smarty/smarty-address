@@ -63,11 +63,7 @@ export default class SmartyAddress {
 			styleService: this.styleService,
 		};
 
-		this.apiService.setServices(services);
-		this.dropdownService.setServices(services);
-		this.formService.setServices(services);
-		this.domService.setServices(services);
-		this.styleService.setServices(services);
+		Object.values(services).forEach((service) => service.setServices(services));
 
 		this.init(config);
 	}
