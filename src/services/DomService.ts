@@ -43,24 +43,7 @@ export class DomService extends BaseService {
 	}
 
 	setInputValue(element: HTMLElement, value: string): void {
-		let nativeValueSetter;
-
-		if (element instanceof HTMLInputElement) {
-			nativeValueSetter = Object.getOwnPropertyDescriptor(
-				window.HTMLInputElement.prototype,
-				"value",
-			)?.set;
-		} else if (element instanceof HTMLTextAreaElement) {
-			nativeValueSetter = Object.getOwnPropertyDescriptor(
-				window.HTMLTextAreaElement.prototype,
-				"value",
-			)?.set;
-		} else if (element instanceof HTMLSelectElement) {
-			nativeValueSetter = Object.getOwnPropertyDescriptor(
-				window.HTMLSelectElement.prototype,
-				"value",
-			)?.set;
-		}
+		const nativeValueSetter = this.getNativeValueSetter(element);
 
 		if (nativeValueSetter) {
 			nativeValueSetter.call(element, value);
@@ -71,6 +54,22 @@ export class DomService extends BaseService {
 		} else {
 			element.textContent = value;
 		}
+	}
+
+	private getNativeValueSetter(element: HTMLElement): ((v: string) => void) | undefined {
+		const prototypeMap: [Function, object][] = [
+			[HTMLInputElement, window.HTMLInputElement.prototype],
+			[HTMLTextAreaElement, window.HTMLTextAreaElement.prototype],
+			[HTMLSelectElement, window.HTMLSelectElement.prototype],
+		];
+
+		for (const [ElementType, prototype] of prototypeMap) {
+			if (element instanceof ElementType) {
+				return Object.getOwnPropertyDescriptor(prototype, "value")?.set;
+			}
+		}
+
+		return undefined;
 	}
 
 	getElementStyles(

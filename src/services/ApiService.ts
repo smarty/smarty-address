@@ -135,44 +135,60 @@ export class ApiService extends BaseService {
 		fetchFn: typeof fetch = fetch,
 	): Promise<AddressSuggestion[]> {
 		try {
-			const requestData: Record<string, string> = {
-				"auth-id": apiConfig.embeddedKey,
-				"user-agent": USER_AGENT,
-				search: searchString,
-				selected: selectedAddress ? formatSelectedAddress(selectedAddress) : "",
-			};
-
-			API_PARAM_KEYS.forEach((param) => {
-				const value = apiConfig[param];
-				if (value !== undefined) {
-					const apiParamName = API_PARAM_MAP[param];
-					requestData[apiParamName] = Array.isArray(value) ? value.join(";") : String(value);
-				}
-			});
-
+			const requestData = this.buildRequestData(apiConfig, searchString, selectedAddress);
 			const params = new URLSearchParams(requestData);
 			const response = await fetchFn(`${apiConfig.autocompleteApiUrl}?${params}`);
 
-			if (response.ok) {
-				const { suggestions } = (await response.json()) as { suggestions: AddressSuggestion[] };
-				return suggestions;
-			} else {
-				const errorResponse = (await response.json()) as { errors: ApiErrorResponse[] };
-				const error = this.getApiError(response.status, errorResponse);
-				console.error(error.message);
-
-				throw new Error(error.name);
-			}
+			return await this.parseResponse(response);
 		} catch (error) {
-			if (error instanceof Error) {
-				const knownErrorNames = knownAutocompleteErrors.map((e) => e.name);
-				if (knownErrorNames.includes(error.message)) {
-					throw error;
-				}
-			}
-			console.error(unknownError.message);
-			throw new Error(unknownError.name);
+			return this.handleFetchError(error);
 		}
+	}
+
+	private buildRequestData(
+		apiConfig: ApiConfig,
+		searchString: string,
+		selectedAddress: AddressSuggestion | null,
+	): Record<string, string> {
+		const requestData: Record<string, string> = {
+			"auth-id": apiConfig.embeddedKey,
+			"user-agent": USER_AGENT,
+			search: searchString,
+			selected: selectedAddress ? formatSelectedAddress(selectedAddress) : "",
+		};
+
+		API_PARAM_KEYS.forEach((param) => {
+			const value = apiConfig[param];
+			if (value !== undefined) {
+				const apiParamName = API_PARAM_MAP[param];
+				requestData[apiParamName] = Array.isArray(value) ? value.join(";") : String(value);
+			}
+		});
+
+		return requestData;
+	}
+
+	private async parseResponse(response: Response): Promise<AddressSuggestion[]> {
+		if (response.ok) {
+			const { suggestions } = (await response.json()) as { suggestions: AddressSuggestion[] };
+			return suggestions;
+		}
+
+		const errorResponse = (await response.json()) as { errors: ApiErrorResponse[] };
+		const error = this.getApiError(response.status, errorResponse);
+		console.error(error.message);
+		throw new Error(error.name);
+	}
+
+	private handleFetchError(error: unknown): never {
+		if (error instanceof Error) {
+			const knownErrorNames = knownAutocompleteErrors.map((e) => e.name);
+			if (knownErrorNames.includes(error.message)) {
+				throw error;
+			}
+		}
+		console.error(unknownError.message);
+		throw new Error(unknownError.name);
 	}
 
 	getMatchingResult(

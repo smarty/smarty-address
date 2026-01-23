@@ -74,37 +74,41 @@ export class StyleService extends BaseService {
 	}
 
 	rgbToHsl({ red, green, blue, alpha }: RgbaColor): HslColor {
-		red /= 255;
-		green /= 255;
-		blue /= 255;
-		const cmin = Math.min(red, green, blue);
-		const cmax = Math.max(red, green, blue);
+		const r = red / 255;
+		const g = green / 255;
+		const b = blue / 255;
+
+		const cmin = Math.min(r, g, b);
+		const cmax = Math.max(r, g, b);
 		const delta = cmax - cmin;
-		const minMaxAverage = (cmin + cmax) / 2;
+		const midpoint = (cmin + cmax) / 2;
 
-		let hue = 0;
-		const lightness = this.convertDecimalToPercentage(minMaxAverage);
-		const saturation = this.convertDecimalToPercentage(
-			delta === 0 ? 0 : delta / (1 - Math.abs(2 * minMaxAverage - 1)),
-		);
+		const hue = this.calculateHue(r, g, b, cmax, delta);
+		const saturation = this.calculateSaturation(delta, midpoint);
+		const lightness = this.convertDecimalToPercentage(midpoint);
 
-		if (delta === 0) {
-			hue = 0;
-		} else if (cmax === red) {
-			hue = ((green - blue) / delta) % 6;
-		} else if (cmax === green) {
-			hue = (blue - red) / delta + 2;
+		return { hue, saturation, lightness, alpha };
+	}
+
+	private calculateHue(r: number, g: number, b: number, cmax: number, delta: number): number {
+		if (delta === 0) return 0;
+
+		let hue: number;
+		if (cmax === r) {
+			hue = ((g - b) / delta) % 6;
+		} else if (cmax === g) {
+			hue = (b - r) / delta + 2;
 		} else {
-			hue = (red - green) / delta + 4;
+			hue = (r - g) / delta + 4;
 		}
 
 		hue *= 60;
+		return hue < 0 ? hue + 360 : hue;
+	}
 
-		if (hue < 0) {
-			hue += 360;
-		}
-
-		return { hue, saturation, lightness, alpha };
+	private calculateSaturation(delta: number, midpoint: number): number {
+		if (delta === 0) return 0;
+		return this.convertDecimalToPercentage(delta / (1 - Math.abs(2 * midpoint - 1)));
 	}
 
 	getHslFromColorString(cssColor: CSSStyleDeclaration): HslColor {

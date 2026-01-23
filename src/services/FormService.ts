@@ -124,13 +124,7 @@ export class FormService extends BaseService {
 	}
 
 	getStreetLineFormValue(
-		{
-			streetLineInputElement,
-			secondaryInputElement,
-			cityInputElement,
-			stateInputElement,
-			zipcodeInputElement,
-		}: {
+		elements: {
 			streetLineInputElement: HTMLElement | null;
 			secondaryInputElement: HTMLInputElement | null;
 			cityInputElement: HTMLInputElement | null;
@@ -139,32 +133,38 @@ export class FormService extends BaseService {
 		},
 		address: AddressSuggestion,
 	): string {
-		const streetLineValues = [address.street_line];
-
-		if (!secondaryInputElement && address.secondary?.length) {
-			streetLineValues.push(address.secondary || "");
-		}
-
-		const isSingleFieldForm =
-			!secondaryInputElement && !cityInputElement && !stateInputElement && !zipcodeInputElement;
+		const { streetLineInputElement, secondaryInputElement, cityInputElement, stateInputElement, zipcodeInputElement } = elements;
+		const isSingleFieldForm = !secondaryInputElement && !cityInputElement && !stateInputElement && !zipcodeInputElement;
 
 		if (isSingleFieldForm) {
-			const isTextarea = streetLineInputElement instanceof HTMLTextAreaElement;
-			const cityStateZip =
-				[address.city, address.state].filter((value) => value.length).join(", ") +
-				(address.zipcode ? " " + address.zipcode : "");
-
-			if (isTextarea) {
-				const lines = [address.street_line];
-				if (address.secondary?.length) lines.push(address.secondary);
-				lines.push(cityStateZip);
-				return lines.join("\n");
-			}
-
-			return [...streetLineValues, cityStateZip].join(", ");
+			return this.formatSingleFieldAddress(address, streetLineInputElement instanceof HTMLTextAreaElement);
 		}
 
-		return streetLineValues.join(", ");
+		const includeSecondary = !secondaryInputElement && address.secondary?.length;
+		return includeSecondary
+			? `${address.street_line}, ${address.secondary}`
+			: address.street_line;
+	}
+
+	private formatSingleFieldAddress(address: AddressSuggestion, isTextarea: boolean): string {
+		const cityStateZip = this.formatCityStateZip(address);
+
+		if (isTextarea) {
+			const lines = [address.street_line];
+			if (address.secondary?.length) lines.push(address.secondary);
+			lines.push(cityStateZip);
+			return lines.join("\n");
+		}
+
+		const parts = [address.street_line];
+		if (address.secondary?.length) parts.push(address.secondary);
+		parts.push(cityStateZip);
+		return parts.join(", ");
+	}
+
+	private formatCityStateZip(address: AddressSuggestion): string {
+		const cityState = [address.city, address.state].filter(Boolean).join(", ");
+		return address.zipcode ? `${cityState} ${address.zipcode}` : cityState;
 	}
 
 	populateFormWithAddress(selectedAddress: AddressSuggestion) {

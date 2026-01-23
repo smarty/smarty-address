@@ -257,18 +257,10 @@ export class DropdownService extends BaseService {
 
 		this.setAddressSuggestions(suggestionItems);
 		this.setSecondarySuggestions([]);
-		this.updateDropdownContents(suggestionItems);
-
-		if (suggestionItems.length) {
-			this.setHighlightedIndex(0);
-			this.highlightNewAddress(0);
-		}
 
 		const count = suggestionItems.length;
-		const plural = count === 1 ? "" : "es";
-		this.announce(`${count} address${plural} found. Use arrow keys to navigate.`);
-
-		this.openDropdown();
+		const announcement = `${count} address${count === 1 ? "" : "es"} found. Use arrow keys to navigate.`;
+		this.displaySuggestions(suggestionItems, suggestionItems, 0, announcement);
 	}
 
 	formatSecondaryAddressSuggestions(suggestions: AddressSuggestion[], searchString: string): void {
@@ -282,17 +274,26 @@ export class DropdownService extends BaseService {
 		);
 
 		this.setSecondarySuggestions(suggestionItems);
-		this.updateDropdownContents(this.getMergedSuggestions());
 
-		if (suggestionItems.length) {
-			this.setHighlightedIndex(this.getSelectedIndex() + 1);
+		const count = suggestionItems.length;
+		const announcement = `${count} unit entr${count === 1 ? "y" : "ies"} found. Use arrow keys to navigate.`;
+		this.displaySuggestions(suggestionItems, this.getMergedSuggestions(), this.getSelectedIndex() + 1, announcement);
+	}
+
+	private displaySuggestions(
+		newItems: UiSuggestionItem[],
+		allItems: UiSuggestionItem[],
+		initialHighlightIndex: number,
+		announcement: string,
+	): void {
+		this.updateDropdownContents(allItems);
+
+		if (newItems.length) {
+			this.setHighlightedIndex(initialHighlightIndex);
 			this.highlightNewAddress(0);
 		}
 
-		const count = suggestionItems.length;
-		const plural = count === 1 ? "y" : "ies";
-		this.announce(`${count} unit entr${plural} found. Use arrow keys to navigate.`);
-
+		this.announce(announcement);
 		this.openDropdown();
 	}
 
