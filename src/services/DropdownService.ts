@@ -154,14 +154,14 @@ export class DropdownService extends BaseService {
 					{
 						onSuccess: (suggestions, searchString) =>
 							this.formatSecondaryAddressSuggestions(suggestions, searchString),
-						onError: (errorMessage) => this.handleAutocompleteSecondaryError(errorMessage),
+						onError: () => this.handleApiError(),
 					},
 				);
 			} else {
 				this.services.apiService?.fetchAddressSuggestions(searchInputValue, {
 					onSuccess: (suggestions, searchString) =>
 						this.formatAddressSuggestions(suggestions, searchString),
-					onError: (errorMessage) => this.handleAutocompleteError(errorMessage),
+					onError: () => this.handleApiError(),
 				});
 			}
 		}
@@ -215,7 +215,7 @@ export class DropdownService extends BaseService {
 				{
 					onSuccess: (suggestions, searchString) =>
 						this.formatSecondaryAddressSuggestions(suggestions, searchString),
-					onError: (errorMessage) => this.handleAutocompleteSecondaryError(errorMessage),
+					onError: () => this.handleApiError(),
 				},
 			);
 			searchInputElement.focus();
@@ -231,28 +231,11 @@ export class DropdownService extends BaseService {
 			filteredSuggestions = this.config.onSuggestionsReceived(suggestions);
 		}
 
-		const selectedSuggestionIndex = this.getSelectedIndex();
-
-		const suggestionItems = filteredSuggestions.map(
-			(address: AddressSuggestion, addressIndex: number): UiSuggestionItem => {
-				const suggestionOnClickHandler = () => {
-					this.handleSelectDropdownItem(addressIndex + selectedSuggestionIndex + 1);
-				};
-
-				const suggestionId = this.getSuggestionId(addressIndex);
-				const suggestionListElements = this.createSuggestionElement(
-					address,
-					searchString,
-					suggestionId,
-				);
-				const suggestionElement = suggestionListElements["suggestionElement"] as HTMLElement;
-				suggestionElement.addEventListener("click", suggestionOnClickHandler);
-
-				return {
-					address,
-					suggestionElement,
-				};
-			},
+		const suggestionItems = this.mapSuggestionsToItems(
+			filteredSuggestions,
+			0,
+			(address, id) => this.createSuggestionElement(address, searchString, id),
+			"suggestionElement",
 		);
 
 		this.setAddressSuggestions(suggestionItems);
@@ -272,42 +255,20 @@ export class DropdownService extends BaseService {
 	}
 
 	formatSecondaryAddressSuggestions(suggestions: AddressSuggestion[], searchString: string): void {
-		const addressSuggestionResults = this.getAddressSuggestions();
-		const selectedSuggestionIndex = this.getSelectedIndex();
-		const baseIndex = addressSuggestionResults.length;
+		const baseIndex = this.getAddressSuggestions().length;
 
-		const suggestionItems = suggestions.map(
-			(address: AddressSuggestion, addressIndex: number): UiSuggestionItem => {
-				const suggestionOnClickHandler = () => {
-					this.handleSelectDropdownItem(addressIndex + selectedSuggestionIndex + 1);
-				};
-
-				const suggestionId = this.getSuggestionId(baseIndex + addressIndex);
-				const suggestionListElements = this.createSecondarySuggestionElement(
-					address,
-					searchString,
-					suggestionId,
-				);
-				const suggestionElement = suggestionListElements[
-					"secondarySuggestionElement"
-				] as HTMLElement;
-				suggestionElement.addEventListener("click", suggestionOnClickHandler);
-
-				return {
-					address,
-					suggestionElement,
-				};
-			},
+		const suggestionItems = this.mapSuggestionsToItems(
+			suggestions,
+			baseIndex,
+			(address, id) => this.createSecondarySuggestionElement(address, searchString, id),
+			"secondarySuggestionElement",
 		);
 
 		this.setSecondarySuggestions(suggestionItems);
-
-		const combinedSuggestionList = this.getMergedSuggestions();
-		this.updateDropdownContents(combinedSuggestionList);
+		this.updateDropdownContents(this.getMergedSuggestions());
 
 		if (suggestionItems.length) {
-			const selectedIndex = this.getSelectedIndex();
-			this.setHighlightedIndex(selectedIndex + 1);
+			this.setHighlightedIndex(this.getSelectedIndex() + 1);
 			this.highlightNewAddress(0);
 		}
 
@@ -318,11 +279,33 @@ export class DropdownService extends BaseService {
 		this.openDropdown();
 	}
 
-	handleAutocompleteError(_errorName: string): void {
-		this.closeDropdown();
+	private mapSuggestionsToItems(
+		suggestions: AddressSuggestion[],
+		baseIndex: number,
+		createElement: (
+			address: AddressSuggestion,
+			suggestionId: string,
+		) => Record<string, HTMLElement | Text>,
+		elementKey: string,
+	): UiSuggestionItem[] {
+		const selectedSuggestionIndex = this.getSelectedIndex();
+
+		return suggestions.map(
+			(address: AddressSuggestion, addressIndex: number): UiSuggestionItem => {
+				const suggestionId = this.getSuggestionId(baseIndex + addressIndex);
+				const elements = createElement(address, suggestionId);
+				const suggestionElement = elements[elementKey] as HTMLElement;
+
+				suggestionElement.addEventListener("click", () => {
+					this.handleSelectDropdownItem(addressIndex + selectedSuggestionIndex + 1);
+				});
+
+				return { address, suggestionElement };
+			},
+		);
 	}
 
-	handleAutocompleteSecondaryError(_errorName: string): void {
+	handleApiError(): void {
 		this.closeDropdown();
 	}
 
@@ -468,12 +451,6 @@ export class DropdownService extends BaseService {
 	updateDropdownContents(items: UiSuggestionItem[]): void {
 		if (this.suggestionsElement) {
 			this.suggestionsElement.replaceChildren(...items.map((item) => item.suggestionElement));
-		}
-	}
-
-	scrollToHighlighted(element: HTMLElement): void {
-		if (this.suggestionsElement) {
-			this.scrollToHighlightedSuggestion(element, this.suggestionsElement);
 		}
 	}
 

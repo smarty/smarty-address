@@ -94,14 +94,9 @@ export class ApiService extends BaseService {
 		searchString: string,
 		callbacks: FetchSuggestionsCallbacks,
 	): Promise<void> {
-		try {
-			const apiConfig = this.getApiConfig();
-			const suggestions = await this.getAutocompleteApiResults(apiConfig, searchString);
-			callbacks.onSuccess(suggestions, searchString);
-		} catch (error) {
-			const errorMessage = error instanceof Error ? error.message : String(error);
-			callbacks.onError(errorMessage);
-		}
+		await this.fetchWithCallbacks(callbacks, searchString, async (apiConfig) => {
+			return this.getAutocompleteApiResults(apiConfig, searchString);
+		});
 	}
 
 	async fetchSecondaryAddressSuggestions(
@@ -109,14 +104,23 @@ export class ApiService extends BaseService {
 		selectedAddress: AddressSuggestion,
 		callbacks: FetchSuggestionsCallbacks,
 	): Promise<void> {
-		try {
-			const apiConfig = this.getApiConfig();
+		await this.fetchWithCallbacks(callbacks, searchString, async (apiConfig) => {
 			const primarySuggestions = await this.getAutocompleteApiResults(apiConfig, searchString);
 			const newSelectedAddress = this.getMatchingResult(primarySuggestions, selectedAddress);
-			const suggestions = newSelectedAddress
+			return newSelectedAddress
 				? await this.getAutocompleteApiResults(apiConfig, searchString, newSelectedAddress)
 				: [];
+		});
+	}
 
+	private async fetchWithCallbacks(
+		callbacks: FetchSuggestionsCallbacks,
+		searchString: string,
+		fetchFn: (apiConfig: ApiConfig) => Promise<AddressSuggestion[]>,
+	): Promise<void> {
+		try {
+			const apiConfig = this.getApiConfig();
+			const suggestions = await fetchFn(apiConfig);
 			callbacks.onSuccess(suggestions, searchString);
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : String(error);
@@ -199,9 +203,4 @@ export class ApiService extends BaseService {
 		return matchedError ?? unknownError;
 	}
 
-	createErrorResponse(id: number, message: string): { errors: ApiErrorResponse[] } {
-		return {
-			errors: [{ id, message }],
-		};
-	}
 }

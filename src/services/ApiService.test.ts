@@ -137,24 +137,6 @@ describe("ApiService", () => {
 		});
 	});
 
-	describe("createErrorResponse", () => {
-		it("should create properly structured error response", () => {
-			const result = service.createErrorResponse(123, "Test error message");
-
-			expect(result).toEqual({
-				errors: [{ id: 123, message: "Test error message" }],
-			});
-		});
-
-		it("should handle empty message", () => {
-			const result = service.createErrorResponse(0, "");
-
-			expect(result.errors).toHaveLength(1);
-			expect(result.errors[0].id).toBe(0);
-			expect(result.errors[0].message).toBe("");
-		});
-	});
-
 	describe("getAutocompleteApiResults", () => {
 		const apiConfig: ApiConfig = {
 			embeddedKey: "test-key",
