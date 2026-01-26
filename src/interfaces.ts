@@ -39,9 +39,9 @@ export interface DefaultSmartyAddressConfig extends ApiConfig {
 
 export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 	embeddedKey: string;
-	searchInputSelector: string;
+	streetSelector: string;
 
-	streetSelector?: string;
+	searchInputSelector?: string;
 	secondarySelector?: string;
 	localitySelector?: string;
 	administrativeAreaSelector?: string;
@@ -72,9 +72,9 @@ export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 
 export interface NormalizedSmartyAddressConfig extends DefaultSmartyAddressConfig {
 	embeddedKey: string;
-	searchInputSelector: string;
+	streetSelector: string;
 
-	streetSelector?: string;
+	searchInputSelector?: string;
 	secondarySelector?: string;
 	localitySelector?: string;
 	administrativeAreaSelector?: string;

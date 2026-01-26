@@ -40,7 +40,7 @@ Get your embedded key from the [Smarty dashboard](https://www.smarty.com/account
 | Option | Type | Description |
 |--------|------|-------------|
 | `embeddedKey` | `string` | Your Smarty embedded key |
-| `streetSelector` | `string` | CSS selector for street address field |
+| `streetSelector` | `string` | CSS selector for street address field (also used as the autocomplete input unless `searchInputSelector` is provided) |
 
 ### Form Field Selectors
 
@@ -48,7 +48,7 @@ These selectors define where the selected address data gets populated:
 
 | Option | Type | Description |
 |--------|------|-------------|
-| `searchInputSelector` | `string` | CSS selector for the autocomplete input (defaults to `streetSelector`) |
+| `searchInputSelector` | `string` | CSS selector for the autocomplete input. Only needed when the autocomplete input is a different element from where the street address will be populated (e.g., a unified search field that populates separate street/city/state fields) |
 | `secondarySelector` | `string` | CSS selector for secondary address (apt, suite, etc.) |
 | `citySelector` | `string` | CSS selector for city field |
 | `stateSelector` | `string` | CSS selector for state field |
@@ -79,7 +79,7 @@ Hooks let you respond to events and customize behavior:
 ```javascript
 new SmartyAddress({
   embeddedKey: "your-key",
-  searchInputSelector: "#address-search",
+  streetSelector: "#street",
 
   onAddressSelected: (address) => {
     console.log("User selected:", address);
@@ -203,7 +203,7 @@ class CustomFormService extends SmartyAddress.services.FormService {
 
 new SmartyAddress({
   embeddedKey: "your-key",
-  searchInputSelector: "#address-search",
+  streetSelector: "#street",
   services: {
     ApiService: CustomApiService,
     FormService: CustomFormService,
@@ -218,13 +218,15 @@ new SmartyAddress({
 | `ApiService` | Handles Smarty API calls and response processing |
 | `DropdownService` | Manages dropdown UI, keyboard navigation, and events |
 | `FormService` | Populates form fields when an address is selected |
-| `DomService` | Generic DOM utilities |
-| `StyleService` | Address formatting and styling utilities |
+| `DomService` | Generic DOM utilities for element creation, manipulation, and form value handling |
+| `StyleService` | CSS generation, dynamic style calculation, and style block formatting |
+| `FormatService` | Address formatting for display and text highlighting for search matches |
+| `ColorService` | Color conversion utilities (RGB/HSL), CSS color parsing, and percentage conversions |
 
 All services extend `BaseService` which provides:
 - `setServices(services)` - Receives references to all other services
 - `init(config)` - Called with configuration (override as needed)
-- `this.services` - Access other services via `this.services.apiService`, etc.
+- Typed protected getters (e.g., `this.apiService`, `this.formService`) to access other services
 
 ## API Reference
 
