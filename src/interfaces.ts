@@ -10,13 +10,14 @@ export interface ApiConfig {
 	embeddedKey: string;
 	autocompleteApiUrl: string;
 	maxResults?: number;
-	includeOnlyCities?: string[];
-	includeOnlyStates?: string[];
-	includeOnlyZipCodes?: string[];
-	excludeStates?: string[];
-	preferCities?: string[];
-	preferStates?: string[];
-	preferZipCodes?: string[];
+
+	includeOnlyLocalities?: string[];
+	includeOnlyAdministrativeAreas?: string[];
+	includeOnlyPostalCodes?: string[];
+	excludeAdministrativeAreas?: string[];
+	preferLocalities?: string[];
+	preferAdministrativeAreas?: string[];
+	preferPostalCodes?: string[];
 	preferRatio?: number;
 	preferGeolocation?: string;
 	source?: "postal" | "all";
@@ -39,11 +40,46 @@ export interface DefaultSmartyAddressConfig extends ApiConfig {
 export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 	embeddedKey: string;
 	searchInputSelector: string;
+
 	streetSelector?: string;
 	secondarySelector?: string;
+	localitySelector?: string;
+	administrativeAreaSelector?: string;
+	postalCodeSelector?: string;
+
 	citySelector?: string;
 	stateSelector?: string;
 	zipcodeSelector?: string;
+	regionSelector?: string;
+	provinceSelector?: string;
+	postcodeSelector?: string;
+	zipSelector?: string;
+
+	includeOnlyCities?: string[];
+	includeOnlyStates?: string[];
+	includeOnlyZipCodes?: string[];
+	excludeStates?: string[];
+	preferCities?: string[];
+	preferStates?: string[];
+	preferZipCodes?: string[];
+
+	services?: ServiceClassOverrides;
+	onAddressSelected?: (address: AddressSuggestion) => void;
+	onSuggestionsReceived?: (suggestions: AddressSuggestion[]) => AddressSuggestion[];
+	onDropdownOpen?: () => void;
+	onDropdownClose?: () => void;
+}
+
+export interface NormalizedSmartyAddressConfig extends DefaultSmartyAddressConfig {
+	embeddedKey: string;
+	searchInputSelector: string;
+
+	streetSelector?: string;
+	secondarySelector?: string;
+	localitySelector?: string;
+	administrativeAreaSelector?: string;
+	postalCodeSelector?: string;
+
 	services?: ServiceClassOverrides;
 	onAddressSelected?: (address: AddressSuggestion) => void;
 	onSuggestionsReceived?: (suggestions: AddressSuggestion[]) => AddressSuggestion[];

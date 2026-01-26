@@ -1,5 +1,5 @@
 import { BaseService } from "./BaseService";
-import { AddressSuggestion, SmartyAddressConfig } from "../interfaces";
+import { AddressSuggestion, NormalizedSmartyAddressConfig } from "../interfaces";
 import { CSS_CLASSES, CSS_PREFIXES } from "../constants/cssClasses";
 import { getSmartyLogo } from "../utils/getSmartyLogo";
 import { ElementConfig } from "./DomService";
@@ -11,7 +11,7 @@ export interface UiSuggestionItem {
 
 export class DropdownService extends BaseService {
 	private instanceId: number;
-	private config?: SmartyAddressConfig;
+	private config?: NormalizedSmartyAddressConfig;
 	private theme: string[] = [];
 	private searchInputSelector: string = "";
 
@@ -34,7 +34,7 @@ export class DropdownService extends BaseService {
 		this.instanceId = instanceId;
 	}
 
-	init(config: SmartyAddressConfig): void {
+	init(config: NormalizedSmartyAddressConfig): void {
 		this.config = config;
 
 		const previousTheme = this.theme;

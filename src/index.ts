@@ -1,4 +1,9 @@
-import { DefaultSmartyAddressConfig, SmartyAddressConfig } from "./interfaces";
+import {
+	DefaultSmartyAddressConfig,
+	SmartyAddressConfig,
+	NormalizedSmartyAddressConfig,
+} from "./interfaces";
+import { normalizeConfig } from "./utils/configNormalizer";
 import { ApiService } from "./services/ApiService";
 import { ColorService } from "./services/ColorService";
 import { DropdownService } from "./services/DropdownService";
@@ -80,9 +85,10 @@ export default class SmartyAddress {
 	}
 
 	init = async (config: SmartyAddressConfig) => {
-		const mergedConfig = {
+		const normalizedConfig = normalizeConfig(config);
+		const mergedConfig: NormalizedSmartyAddressConfig = {
 			...SmartyAddress.defaultConfig,
-			...config,
+			...normalizedConfig,
 		};
 
 		validateConfig(mergedConfig);

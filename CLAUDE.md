@@ -17,6 +17,7 @@ This is a TypeScript library for Smarty address autocomplete and validation. The
 ### Class-Based Service Architecture
 
 The codebase uses ES6 classes for all services. Each service extends `BaseService` from `src/services/BaseService.ts`, which provides:
+
 - Cross-service dependency management via `setServices()`
 - Access to other services through typed protected getters (e.g., `this.apiService`, `this.formService`)
 - A default no-op `init(config)` method (override in subclasses that need initialization)

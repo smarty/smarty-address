@@ -1,5 +1,5 @@
 import { BaseService } from "./BaseService";
-import { AddressSuggestion, ApiConfig, SmartyAddressConfig } from "../interfaces";
+import { AddressSuggestion, ApiConfig, NormalizedSmartyAddressConfig } from "../interfaces";
 import { APP_VERSION } from "../constants";
 
 export interface ApiErrorResponse {
@@ -16,13 +16,13 @@ const USER_AGENT = `name:smarty-address-plugin,version:${APP_VERSION}`;
 
 export const API_PARAM_MAP = {
 	maxResults: "max_results",
-	includeOnlyCities: "include_only_cities",
-	includeOnlyStates: "include_only_states",
-	includeOnlyZipCodes: "include_only_zip_codes",
-	excludeStates: "exclude_states",
-	preferCities: "prefer_cities",
-	preferStates: "prefer_states",
-	preferZipCodes: "prefer_zip_codes",
+	includeOnlyLocalities: "include_only_cities",
+	includeOnlyAdministrativeAreas: "include_only_states",
+	includeOnlyPostalCodes: "include_only_zip_codes",
+	excludeAdministrativeAreas: "exclude_states",
+	preferLocalities: "prefer_cities",
+	preferAdministrativeAreas: "prefer_states",
+	preferPostalCodes: "prefer_zip_codes",
 	preferRatio: "prefer_ratio",
 	preferGeolocation: "prefer_geolocation",
 	source: "source",
@@ -75,7 +75,7 @@ export class ApiService extends BaseService {
 	private autocompleteApiUrl: string = "";
 	private apiParams: Record<string, unknown> = {};
 
-	init(config: SmartyAddressConfig) {
+	init(config: NormalizedSmartyAddressConfig) {
 		this.embeddedKey = config.embeddedKey;
 		this.autocompleteApiUrl = config.autocompleteApiUrl;
 

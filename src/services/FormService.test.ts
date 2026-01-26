@@ -25,9 +25,9 @@ describe("FormService", () => {
 			const formElements = {
 				streetInputElement: document.createElement("input"),
 				secondaryInputElement: document.createElement("input"),
-				cityInputElement: document.createElement("input"),
-				stateInputElement: document.createElement("input"),
-				zipcodeInputElement: document.createElement("input"),
+				localityInputElement: document.createElement("input"),
+				administrativeAreaInputElement: document.createElement("input"),
+				postalCodeInputElement: document.createElement("input"),
 			};
 
 			const result = service.getStreetFormValue(formElements, baseAddress);
@@ -38,9 +38,9 @@ describe("FormService", () => {
 			const formElements = {
 				streetInputElement: document.createElement("input"),
 				secondaryInputElement: null,
-				cityInputElement: document.createElement("input"),
-				stateInputElement: document.createElement("input"),
-				zipcodeInputElement: document.createElement("input"),
+				localityInputElement: document.createElement("input"),
+				administrativeAreaInputElement: document.createElement("input"),
+				postalCodeInputElement: document.createElement("input"),
 			};
 
 			const result = service.getStreetFormValue(formElements, baseAddress);
@@ -51,9 +51,9 @@ describe("FormService", () => {
 			const formElements = {
 				streetInputElement: document.createElement("input"),
 				secondaryInputElement: null,
-				cityInputElement: null,
-				stateInputElement: null,
-				zipcodeInputElement: null,
+				localityInputElement: null,
+				administrativeAreaInputElement: null,
+				postalCodeInputElement: null,
 			};
 
 			const result = service.getStreetFormValue(formElements, baseAddress);
@@ -64,9 +64,9 @@ describe("FormService", () => {
 			const formElements = {
 				streetInputElement: document.createElement("textarea"),
 				secondaryInputElement: null,
-				cityInputElement: null,
-				stateInputElement: null,
-				zipcodeInputElement: null,
+				localityInputElement: null,
+				administrativeAreaInputElement: null,
+				postalCodeInputElement: null,
 			};
 
 			const result = service.getStreetFormValue(formElements, baseAddress);
@@ -78,9 +78,9 @@ describe("FormService", () => {
 			const formElements = {
 				streetInputElement: document.createElement("input"),
 				secondaryInputElement: null,
-				cityInputElement: document.createElement("input"),
-				stateInputElement: document.createElement("input"),
-				zipcodeInputElement: document.createElement("input"),
+				localityInputElement: document.createElement("input"),
+				administrativeAreaInputElement: document.createElement("input"),
+				postalCodeInputElement: document.createElement("input"),
 			};
 
 			const result = service.getStreetFormValue(formElements, address);
@@ -91,9 +91,9 @@ describe("FormService", () => {
 			const formElements = {
 				streetInputElement: document.createElement("input"),
 				secondaryInputElement: null,
-				cityInputElement: null,
-				stateInputElement: document.createElement("input"),
-				zipcodeInputElement: document.createElement("input"),
+				localityInputElement: null,
+				administrativeAreaInputElement: document.createElement("input"),
+				postalCodeInputElement: document.createElement("input"),
 			};
 
 			const result = service.getStreetFormValue(formElements, baseAddress);

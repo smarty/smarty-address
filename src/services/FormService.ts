@@ -1,20 +1,20 @@
 import { BaseService } from "./BaseService";
-import { AddressSuggestion, SmartyAddressConfig } from "../interfaces";
+import { AddressSuggestion, NormalizedSmartyAddressConfig } from "../interfaces";
 import { STATE_ABBREVIATIONS } from "../constants/stateAbbreviations";
 
 export class FormService extends BaseService {
 	private streetSelector: string | null = null;
 	private secondarySelector: string | null = null;
-	private citySelector: string | null = null;
-	private stateSelector: string | null = null;
-	private zipcodeSelector: string | null = null;
+	private localitySelector: string | null = null;
+	private administrativeAreaSelector: string | null = null;
+	private postalCodeSelector: string | null = null;
 
-	init(config: SmartyAddressConfig) {
+	init(config: NormalizedSmartyAddressConfig) {
 		this.streetSelector = config?.streetSelector ?? null;
 		this.secondarySelector = config?.secondarySelector ?? null;
-		this.citySelector = config?.citySelector ?? null;
-		this.stateSelector = config?.stateSelector ?? null;
-		this.zipcodeSelector = config?.zipcodeSelector ?? null;
+		this.localitySelector = config?.localitySelector ?? null;
+		this.administrativeAreaSelector = config?.administrativeAreaSelector ?? null;
+		this.postalCodeSelector = config?.postalCodeSelector ?? null;
 	}
 
 	getStateValueForInput(element: HTMLElement, stateValue: string): string {
@@ -69,21 +69,24 @@ export class FormService extends BaseService {
 		elements: {
 			streetInputElement: HTMLElement | null;
 			secondaryInputElement: HTMLInputElement | null;
-			cityInputElement: HTMLInputElement | null;
-			stateInputElement: HTMLInputElement | null;
-			zipcodeInputElement: HTMLInputElement | null;
+			localityInputElement: HTMLInputElement | null;
+			administrativeAreaInputElement: HTMLInputElement | null;
+			postalCodeInputElement: HTMLInputElement | null;
 		},
 		address: AddressSuggestion,
 	): string {
 		const {
 			streetInputElement,
 			secondaryInputElement,
-			cityInputElement,
-			stateInputElement,
-			zipcodeInputElement,
+			localityInputElement,
+			administrativeAreaInputElement,
+			postalCodeInputElement,
 		} = elements;
 		const isSingleFieldForm =
-			!secondaryInputElement && !cityInputElement && !stateInputElement && !zipcodeInputElement;
+			!secondaryInputElement &&
+			!localityInputElement &&
+			!administrativeAreaInputElement &&
+			!postalCodeInputElement;
 
 		if (isSingleFieldForm) {
 			return this.formatSingleFieldAddress(
@@ -123,14 +126,14 @@ export class FormService extends BaseService {
 			secondaryInputElement: this.domService.findDomElement(
 				this.secondarySelector,
 			) as HTMLInputElement | null,
-			cityInputElement: this.domService.findDomElement(
-				this.citySelector,
+			localityInputElement: this.domService.findDomElement(
+				this.localitySelector,
 			) as HTMLInputElement | null,
-			stateInputElement: this.domService.findDomElement(
-				this.stateSelector,
+			administrativeAreaInputElement: this.domService.findDomElement(
+				this.administrativeAreaSelector,
 			) as HTMLInputElement | null,
-			zipcodeInputElement: this.domService.findDomElement(
-				this.zipcodeSelector,
+			postalCodeInputElement: this.domService.findDomElement(
+				this.postalCodeSelector,
 			) as HTMLInputElement | null,
 		};
 
@@ -145,17 +148,17 @@ export class FormService extends BaseService {
 				selectedAddress.secondary ?? "",
 			);
 		}
-		if (elements.cityInputElement) {
-			this.domService.setInputValue(elements.cityInputElement, selectedAddress.city);
+		if (elements.localityInputElement) {
+			this.domService.setInputValue(elements.localityInputElement, selectedAddress.city);
 		}
-		if (elements.stateInputElement) {
+		if (elements.administrativeAreaInputElement) {
 			this.domService.setInputValue(
-				elements.stateInputElement,
-				this.getStateValueForInput(elements.stateInputElement, selectedAddress.state),
+				elements.administrativeAreaInputElement,
+				this.getStateValueForInput(elements.administrativeAreaInputElement, selectedAddress.state),
 			);
 		}
-		if (elements.zipcodeInputElement) {
-			this.domService.setInputValue(elements.zipcodeInputElement, selectedAddress.zipcode);
+		if (elements.postalCodeInputElement) {
+			this.domService.setInputValue(elements.postalCodeInputElement, selectedAddress.zipcode);
 		}
 	}
 }

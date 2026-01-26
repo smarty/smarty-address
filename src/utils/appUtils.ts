@@ -4,7 +4,7 @@ import { colorStyles } from "../../assets/styles/colors";
 import { miscStyles } from "../../assets/styles/misc";
 import { spacingStyles } from "../../assets/styles/spacing";
 import { StyleService } from "../services/StyleService";
-import { SmartyAddressConfig } from "../interfaces";
+import { NormalizedSmartyAddressConfig } from "../interfaces";
 
 export class ConfigValidationError extends Error {
 	constructor(message: string) {
@@ -13,7 +13,7 @@ export class ConfigValidationError extends Error {
 	}
 }
 
-export const validateConfig = (config: SmartyAddressConfig): void => {
+export const validateConfig = (config: NormalizedSmartyAddressConfig): void => {
 	const errors: string[] = [];
 
 	if (

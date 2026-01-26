@@ -1,10 +1,11 @@
 import { validateConfig, ConfigValidationError } from "./appUtils";
-import { SmartyAddressConfig } from "../interfaces";
+import { NormalizedSmartyAddressConfig } from "../interfaces";
 
 describe("configValidation", () => {
-	const validConfig: SmartyAddressConfig = {
+	const validConfig: NormalizedSmartyAddressConfig = {
 		embeddedKey: "test-api-key",
 		streetSelector: "#address-input",
+		searchInputSelector: "#address-input",
 		theme: [],
 		autocompleteApiUrl: "https://api.example.com",
 	};
@@ -16,7 +17,10 @@ describe("configValidation", () => {
 
 		describe("embeddedKey validation", () => {
 			it("should throw when embeddedKey is missing", () => {
-				const config = { ...validConfig, embeddedKey: undefined } as unknown as SmartyAddressConfig;
+				const config = {
+					...validConfig,
+					embeddedKey: undefined,
+				} as unknown as NormalizedSmartyAddressConfig;
 				expect(() => validateConfig(config)).toThrow(ConfigValidationError);
 				expect(() => validateConfig(config)).toThrow(/embeddedKey is required/);
 			});
@@ -34,7 +38,10 @@ describe("configValidation", () => {
 			});
 
 			it("should throw when embeddedKey is not a string", () => {
-				const config = { ...validConfig, embeddedKey: 12345 } as unknown as SmartyAddressConfig;
+				const config = {
+					...validConfig,
+					embeddedKey: 12345,
+				} as unknown as NormalizedSmartyAddressConfig;
 				expect(() => validateConfig(config)).toThrow(ConfigValidationError);
 				expect(() => validateConfig(config)).toThrow(/embeddedKey is required/);
 			});
@@ -42,7 +49,10 @@ describe("configValidation", () => {
 
 		describe("streetSelector validation", () => {
 			it("should throw when streetSelector is missing", () => {
-				const config = { ...validConfig, streetSelector: undefined } as unknown as SmartyAddressConfig;
+				const config = {
+					...validConfig,
+					streetSelector: undefined,
+				} as unknown as NormalizedSmartyAddressConfig;
 				expect(() => validateConfig(config)).toThrow(ConfigValidationError);
 				expect(() => validateConfig(config)).toThrow(/streetSelector is required/);
 			});

@@ -218,7 +218,7 @@ describe("ApiService", () => {
 			const configWithParams: ApiConfig = {
 				...apiConfig,
 				maxResults: 10,
-				includeOnlyStates: ["CO", "CA"],
+				includeOnlyAdministrativeAreas: ["CO", "CA"],
 				preferGeolocation: "city",
 			};
 
@@ -294,12 +294,12 @@ describe("ApiService", () => {
 				searchInputSelector: "#search",
 				theme: [],
 				maxResults: 5,
-				preferStates: ["CO"],
+				preferAdministrativeAreas: ["CO"],
 			});
 
 			const apiConfig = service.getApiConfig();
 			expect(apiConfig.maxResults).toBe(5);
-			expect(apiConfig.preferStates).toEqual(["CO"]);
+			expect(apiConfig.preferAdministrativeAreas).toEqual(["CO"]);
 		});
 	});
 });
