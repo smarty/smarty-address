@@ -1,12 +1,6 @@
 import { BaseService } from "./BaseService";
 import { HslColor, RgbaColor, StylesObject } from "../interfaces";
 import { CSS_CLASSES, CSS_PREFIXES } from "../constants/cssClasses";
-import {
-	convertDecimalToPercentage,
-	getHslFromColorString,
-	getRgbaFromCssColor,
-	rgbToHsl,
-} from "../utils/colorUtils";
 
 export class StyleService extends BaseService {
 	static convertStylesObjectToCssBlock(stylesObject: StylesObject): string {
@@ -35,24 +29,24 @@ export class StyleService extends BaseService {
 	}
 
 	convertDecimalToPercentage(decimal: number): number {
-		return convertDecimalToPercentage(decimal);
+		return this.colorService.convertDecimalToPercentage(decimal);
 	}
 
 	rgbToHsl(rgba: RgbaColor): HslColor {
-		return rgbToHsl(rgba);
+		return this.colorService.rgbToHsl(rgba);
 	}
 
 	getHslFromColorString(cssColor: string): HslColor {
-		return getHslFromColorString(cssColor);
+		return this.colorService.getHslFromColorString(cssColor);
 	}
 
 	getRgbaFromCssColor(cssColor: string): RgbaColor {
-		return getRgbaFromCssColor(cssColor);
+		return this.colorService.getRgbaFromCssColor(cssColor);
 	}
 
 	getNearestStyledElement(element: HTMLElement, colorProperty: string): HTMLElement {
 		const colorValue = this.domService.getElementStyles(element, colorProperty);
-		const { alpha } = getRgbaFromCssColor(colorValue);
+		const { alpha } = this.colorService.getRgbaFromCssColor(colorValue);
 
 		return alpha < 0.1 && element.parentElement
 			? this.getNearestStyledElement(element.parentElement, colorProperty)
@@ -99,7 +93,7 @@ export class StyleService extends BaseService {
 		);
 		const inputTextColor = this.domService.getElementStyles(colorElement, "color");
 
-		const { hue, saturation, lightness } = getHslFromColorString(inputBackgroundColor);
+		const { hue, saturation, lightness } = this.colorService.getHslFromColorString(inputBackgroundColor);
 		const derivedColors = this.deriveSurfaceColors(hue, saturation, lightness);
 
 		return {
