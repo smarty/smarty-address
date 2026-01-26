@@ -49,7 +49,13 @@ export default class SmartyAddress {
 	private domService: DomService;
 	private styleService: StyleService;
 
-	constructor(config: SmartyAddressConfig) {
+	static async create(config: SmartyAddressConfig): Promise<SmartyAddress> {
+		const instance = new SmartyAddress(config);
+		await instance.init(config);
+		return instance;
+	}
+
+	private constructor(config: SmartyAddressConfig) {
 		SmartyAddress.instances.push(this);
 		this.instanceId = SmartyAddress.instances.length;
 
@@ -80,11 +86,9 @@ export default class SmartyAddress {
 		};
 
 		Object.values(services).forEach((service) => service.setServices(services));
-
-		this.init(config);
 	}
 
-	init = async (config: SmartyAddressConfig) => {
+	private init = async (config: SmartyAddressConfig): Promise<void> => {
 		const normalizedConfig = normalizeConfig(config);
 		const mergedConfig: NormalizedSmartyAddressConfig = {
 			...SmartyAddress.defaultConfig,
@@ -97,4 +101,19 @@ export default class SmartyAddress {
 		this.dropdownService.init(mergedConfig);
 		this.formService.init(mergedConfig);
 	};
+
+	destroy(): void {
+		this.apiService.destroy();
+		this.colorService.destroy();
+		this.dropdownService.destroy();
+		this.formService.destroy();
+		this.formatService.destroy();
+		this.domService.destroy();
+		this.styleService.destroy();
+
+		const index = SmartyAddress.instances.indexOf(this);
+		if (index > -1) {
+			SmartyAddress.instances.splice(index, 1);
+		}
+	}
 }

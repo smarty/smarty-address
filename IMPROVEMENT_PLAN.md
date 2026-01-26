@@ -6,115 +6,9 @@ This document outlines the issues identified during code review and the plan to 
 
 ---
 
-## High Priority
-
-### 1. Add Cleanup/Destroy Method
-
-**Problem:** Event listeners and MutationObservers are never removed, causing memory leaks when instances are created/destroyed dynamically.
-
-**Files to modify:**
-- `src/services/DropdownService.ts`
-- `src/services/BaseService.ts`
-- `src/index.ts`
-
-**Implementation:**
-
-1. Add cleanup tracking to `DropdownService`:
-   ```typescript
-   private cleanupFunctions: (() => void)[] = [];
-   ```
-
-2. Store references to all event listeners and observers during setup:
-   ```typescript
-   const scrollHandler = () => dynamicStylingHandler();
-   window.addEventListener("scroll", scrollHandler);
-   this.cleanupFunctions.push(() => window.removeEventListener("scroll", scrollHandler));
-   ```
-
-3. Add `destroy()` method to `DropdownService`:
-   ```typescript
-   destroy(): void {
-       this.cleanupFunctions.forEach(fn => fn());
-       this.cleanupFunctions = [];
-       this.dropdownWrapperElement?.remove();
-       this.customStylesElement?.remove();
-   }
-   ```
-
-4. Add abstract `destroy()` to `BaseService` with default no-op
-
-5. Add `destroy()` to `SmartyAddress` class that calls destroy on all services
-
-6. Remove instance from `SmartyAddress.instances` array on destroy
-
-**Tests to add:**
-- Verify event listeners are removed after destroy
-- Verify DOM elements are removed after destroy
-- Verify instance is removed from static instances array
-
----
-
-### 2. Fix Async Initialization Pattern
-
-**Problem:** Constructor calls async `init()` without awaiting, so users have no way to know when initialization completes.
-
-**Files to modify:**
-- `src/index.ts`
-
-**Implementation:**
-
-Use a factory pattern with a private constructor:
-
-```typescript
-static async create(config: SmartyAddressConfig): Promise<SmartyAddress> {
-    const instance = new SmartyAddress(config);
-    await instance.init(config);
-    return instance;
-}
-
-private constructor(config: SmartyAddressConfig) {
-    // Service instantiation (synchronous only)
-    // Remove this.init(config) call from constructor
-}
-```
-
-This ensures users must use `await SmartyAddress.create(config)` and cannot accidentally use the instance before it's ready.
-
-**Tests to add:**
-- Verify `create()` resolves after DOM is ready
-- Verify form population works immediately after `create()` resolves
-
----
-
-### 3. Add Null Safety to API Response Parsing
-
-**Problem:** If API returns `{ suggestions: null }`, downstream code will fail.
-
-**Files to modify:**
-- `src/services/ApiService.ts`
-
-**Implementation:**
-
-```typescript
-private async parseResponse(response: Response): Promise<AutocompleteSuggestion[]> {
-    if (response.ok) {
-        const data = (await response.json()) as { suggestions?: AutocompleteSuggestion[] | null };
-        return data.suggestions ?? [];
-    }
-    // ... error handling
-}
-```
-
-**Tests to add:**
-- Test with `{ suggestions: null }`
-- Test with `{ suggestions: undefined }`
-- Test with `{}` (missing suggestions key)
-
----
-
 ## Medium Priority
 
-### 4. Extract DropdownService Concerns
+### 1. Extract DropdownService Concerns
 
 **Problem:** DropdownService is 809 lines with multiple responsibilities.
 
@@ -150,7 +44,7 @@ private async parseResponse(response: Response): Promise<AutocompleteSuggestion[
 
 ---
 
-### 5. Make Retry Parameters Configurable
+### 2. Make Retry Parameters Configurable
 
 **Problem:** 5-second retry window (50 attempts × 100ms) is hardcoded.
 
@@ -183,34 +77,7 @@ private async parseResponse(response: Response): Promise<AutocompleteSuggestion[
 
 ---
 
-### 6. Fix Global Document Event Listener
-
-**Problem:** Each instance adds a global `mouseup` listener that's never removed.
-
-**Files to modify:**
-- `src/services/DropdownService.ts`
-
-**Implementation:**
-
-```typescript
-private handleDocumentMouseUp = () => {
-    this.isInteractingWithDropdown = false;
-};
-
-private configureDropdownInteractions(): void {
-    // ... existing code ...
-    document.addEventListener("mouseup", this.handleDocumentMouseUp);
-    this.cleanupFunctions.push(() =>
-        document.removeEventListener("mouseup", this.handleDocumentMouseUp)
-    );
-}
-```
-
-**Note:** This fix is part of the cleanup/destroy implementation (#1).
-
----
-
-### 7. Add Integration Tests
+### 3. Add Integration Tests
 
 **Problem:** No tests for full user interaction flows.
 
@@ -247,7 +114,7 @@ private configureDropdownInteractions(): void {
 
 ## Low Priority
 
-### 8. Improve Type Safety in normalizeConfig
+### 4. Improve Type Safety in normalizeConfig
 
 **Problem:** Double cast bypasses TypeScript.
 
@@ -280,7 +147,7 @@ export function normalizeConfig(config: SmartyAddressConfig): NormalizedSmartyAd
 
 ---
 
-### 9. SSR Compatibility
+### 5. SSR Compatibility
 
 **Problem:** Static initializer injects styles on class load.
 
@@ -313,7 +180,7 @@ constructor(config: SmartyAddressConfig) {
 
 ---
 
-### 10. Fix Minor Type Issues
+### 6. Fix Minor Type Issues
 
 **Files to modify:**
 - `src/services/StyleService.ts:26` - Change `styles: {}` to `styles: Record<string, string>`
@@ -326,11 +193,9 @@ constructor(config: SmartyAddressConfig) {
 
 | Phase | Tasks | Description |
 |-------|-------|-------------|
-| 1 | #1 (Cleanup), #2 (Async init), #3 (Null safety) | High priority fixes |
-| 2 | #6 (Global listener), #10 (Minor types) | Quick wins (included in #1) |
-| 3 | #5 (Retry config), #7 (Integration tests) | Configuration & testing |
-| 4 | #4 (Extract services) | Larger refactor |
-| 5 | #8 (Type safety), #9 (SSR) | Polish |
+| 1 | #2 (Retry config), #3 (Integration tests) | Configuration & testing |
+| 2 | #1 (Extract services) | Larger refactor |
+| 3 | #4 (Type safety), #5 (SSR), #6 (Minor types) | Polish |
 
 Since this is pre-launch, all changes can be implemented directly without deprecation periods or backward compatibility shims.
 
@@ -338,9 +203,9 @@ Since this is pre-launch, all changes can be implemented directly without deprec
 
 ## Success Criteria
 
-- [ ] No memory leaks when creating/destroying instances
-- [ ] Initialization completes before user interaction is possible
-- [ ] API response edge cases handled gracefully
+- [x] No memory leaks when creating/destroying instances
+- [x] Initialization completes before user interaction is possible
+- [x] API response edge cases handled gracefully
 - [ ] All new code has test coverage
 - [ ] No TypeScript `any` or unsafe casts in modified code
 - [ ] README documents the factory pattern usage

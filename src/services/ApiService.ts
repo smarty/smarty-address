@@ -176,8 +176,8 @@ export class ApiService extends BaseService {
 
 	private async parseResponse(response: Response): Promise<AutocompleteSuggestion[]> {
 		if (response.ok) {
-			const { suggestions } = (await response.json()) as { suggestions: AutocompleteSuggestion[] };
-			return suggestions;
+			const data = (await response.json()) as { suggestions?: AutocompleteSuggestion[] | null };
+			return data.suggestions ?? [];
 		}
 
 		const errorResponse = (await response.json()) as { errors: ApiErrorResponse[] };

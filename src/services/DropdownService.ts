@@ -29,9 +29,31 @@ export class DropdownService extends BaseService {
 	private autocompleteSuggestionResults: UiAutocompleteSuggestionItem[] = [];
 	private secondaryAutocompleteSuggestionResults: UiAutocompleteSuggestionItem[] = [];
 
+	private cleanupFunctions: (() => void)[] = [];
+	private mutationObserver: MutationObserver | null = null;
+
 	constructor(instanceId: number) {
 		super();
 		this.instanceId = instanceId;
+	}
+
+	destroy(): void {
+		this.cleanupFunctions.forEach((fn) => fn());
+		this.cleanupFunctions = [];
+
+		if (this.mutationObserver) {
+			this.mutationObserver.disconnect();
+			this.mutationObserver = null;
+		}
+
+		this.dropdownWrapperElement?.remove();
+		this.customStylesElement?.remove();
+
+		this.dropdownWrapperElement = null;
+		this.dropdownElement = null;
+		this.autocompleteSuggestionsElement = null;
+		this.customStylesElement = null;
+		this.announcementElement = null;
 	}
 
 	init(config: NormalizedSmartyAddressConfig): void {
@@ -85,16 +107,27 @@ export class DropdownService extends BaseService {
 		this.announcementElement = elements.announcementElement as HTMLElement;
 	}
 
+	private handleDocumentMouseUp = (): void => {
+		this.isInteractingWithDropdown = false;
+	};
+
 	private configureDropdownInteractions(): void {
 		if (!this.dropdownElement) return;
 
 		this.dropdownElement.id = this.getDropdownId();
-		this.dropdownElement.addEventListener("mousedown", () => {
+
+		const mousedownHandler = () => {
 			this.isInteractingWithDropdown = true;
-		});
-		document.addEventListener("mouseup", () => {
-			this.isInteractingWithDropdown = false;
-		});
+		};
+		this.dropdownElement.addEventListener("mousedown", mousedownHandler);
+		this.cleanupFunctions.push(() =>
+			this.dropdownElement?.removeEventListener("mousedown", mousedownHandler),
+		);
+
+		document.addEventListener("mouseup", this.handleDocumentMouseUp);
+		this.cleanupFunctions.push(() =>
+			document.removeEventListener("mouseup", this.handleDocumentMouseUp),
+		);
 	}
 
 	private async setupSearchInput(): Promise<void> {
@@ -463,6 +496,12 @@ export class DropdownService extends BaseService {
 		searchInputElement.addEventListener("input", onInput);
 		searchInputElement.addEventListener("keydown", onKeydown);
 		searchInputElement.addEventListener("focusout", onFocusOut);
+
+		this.cleanupFunctions.push(() => {
+			searchInputElement.removeEventListener("input", onInput);
+			searchInputElement.removeEventListener("keydown", onKeydown);
+			searchInputElement.removeEventListener("focusout", onFocusOut);
+		});
 	}
 
 	updateTheme(newTheme: string[], previousTheme: string[]): void {
@@ -577,15 +616,25 @@ export class DropdownService extends BaseService {
 		return `${CSS_PREFIXES.autocompleteSuggestion}${this.instanceId}_${index}`;
 	}
 
-	configureDynamicStyling(dynamicStylingHandler: Function, searchInputElement: HTMLElement): void {
+	configureDynamicStyling(dynamicStylingHandler: () => void, searchInputElement: HTMLElement): void {
 		dynamicStylingHandler();
-		window.addEventListener("scroll", () => dynamicStylingHandler());
-		window.addEventListener("resize", () => dynamicStylingHandler());
+
+		const scrollHandler = () => dynamicStylingHandler();
+		const resizeHandler = () => dynamicStylingHandler();
+
+		window.addEventListener("scroll", scrollHandler);
+		window.addEventListener("resize", resizeHandler);
+
+		this.cleanupFunctions.push(() => {
+			window.removeEventListener("scroll", scrollHandler);
+			window.removeEventListener("resize", resizeHandler);
+		});
+
 		this.observeAncestorStyleChanges(searchInputElement, dynamicStylingHandler);
 	}
 
-	private observeAncestorStyleChanges(element: HTMLElement, callback: Function): void {
-		const observer = new MutationObserver(() => callback());
+	private observeAncestorStyleChanges(element: HTMLElement, callback: () => void): void {
+		this.mutationObserver = new MutationObserver(() => callback());
 		const options: MutationObserverInit = {
 			attributes: true,
 			attributeFilter: ["style", "class"],
@@ -593,12 +642,12 @@ export class DropdownService extends BaseService {
 
 		let current: HTMLElement | null = element;
 		while (current && current !== document.body) {
-			observer.observe(current, options);
+			this.mutationObserver.observe(current, options);
 			current = current.parentElement;
 		}
 
 		if (document.body) {
-			observer.observe(document.body, options);
+			this.mutationObserver.observe(document.body, options);
 		}
 	}
 

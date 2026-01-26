@@ -28,6 +28,10 @@ export abstract class BaseService {
 		// Default no-op, override in subclasses that need initialization
 	}
 
+	destroy() {
+		// Default no-op, override in subclasses that need cleanup
+	}
+
 	protected get apiService(): ApiService {
 		if (!this.services.apiService) throw new Error("ApiService not initialized");
 		return this.services.apiService;
