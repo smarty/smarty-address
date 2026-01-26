@@ -21,7 +21,7 @@ npm install @smarty-integrations-sandbox/smarty-address
 <script type="module">
   import SmartyAddress from "@smarty-integrations-sandbox/smarty-address";
 
-  new SmartyAddress({
+  const autocomplete = await SmartyAddress.create({
     embeddedKey: "your-smarty-embedded-key",
     streetSelector: "#street",
     citySelector: "#city",
@@ -101,7 +101,7 @@ API filter options also accept international alternatives:
 Hooks let you respond to events and customize behavior:
 
 ```javascript
-new SmartyAddress({
+const autocomplete = await SmartyAddress.create({
   embeddedKey: "your-key",
   streetSelector: "#street",
 
@@ -140,25 +140,25 @@ Four built-in themes are available:
 import SmartyAddress from "@smarty-integrations-sandbox/smarty-address";
 
 // Default theme (adapts to input colors)
-new SmartyAddress({
+const autocomplete = await SmartyAddress.create({
   theme: SmartyAddress.themes.default,
   // ...
 });
 
 // Light theme
-new SmartyAddress({
+const autocomplete = await SmartyAddress.create({
   theme: SmartyAddress.themes.light,
   // ...
 });
 
 // Dark theme
-new SmartyAddress({
+const autocomplete = await SmartyAddress.create({
   theme: SmartyAddress.themes.dark,
   // ...
 });
 
 // No styling (bring your own CSS)
-new SmartyAddress({
+const autocomplete = await SmartyAddress.create({
   theme: SmartyAddress.themes.none,
   // ...
 });
@@ -169,7 +169,7 @@ new SmartyAddress({
 Themes are arrays of CSS class names applied to the plugin components. Each class defines CSS variables that control the plugin's appearance (see `assets/styles/` for examples). Create a custom theme by providing your own array:
 
 ```javascript
-new SmartyAddress({
+const autocomplete = await SmartyAddress.create({
   theme: ["my-dropdown-theme", "my-color-scheme"],
   // ...
 });
@@ -178,7 +178,7 @@ new SmartyAddress({
 You can also extend a built-in theme:
 
 ```javascript
-new SmartyAddress({
+const autocomplete = await SmartyAddress.create({
   theme: [...SmartyAddress.themes.dark, "my-custom-overrides"],
   // ...
 });
@@ -186,10 +186,10 @@ new SmartyAddress({
 
 ## Multiple Instances
 
-Create multiple autocomplete inputs on the same page by instantiating `SmartyAddress` multiple times:
+Create multiple autocomplete inputs on the same page by creating multiple `SmartyAddress` instances:
 
 ```javascript
-const shippingAutocomplete = new SmartyAddress({
+const shippingAutocomplete = await SmartyAddress.create({
   embeddedKey: "your-key",
   searchInputSelector: "#shipping-address",
   streetSelector: "#shipping-street",
@@ -198,7 +198,7 @@ const shippingAutocomplete = new SmartyAddress({
   zipcodeSelector: "#shipping-zip",
 });
 
-const billingAutocomplete = new SmartyAddress({
+const billingAutocomplete = await SmartyAddress.create({
   embeddedKey: "your-key",
   searchInputSelector: "#billing-address",
   streetSelector: "#billing-street",
@@ -209,6 +209,22 @@ const billingAutocomplete = new SmartyAddress({
 ```
 
 Each instance operates independently with isolated state.
+
+## Cleanup
+
+When you no longer need an autocomplete instance (e.g., when navigating away in a single-page application), call `destroy()` to clean up event listeners and DOM elements:
+
+```javascript
+const autocomplete = await SmartyAddress.create({
+  embeddedKey: "your-key",
+  streetSelector: "#street",
+});
+
+// Later, when done with the autocomplete:
+autocomplete.destroy();
+```
+
+This removes all event listeners, disconnects observers, and removes injected DOM elements to prevent memory leaks.
 
 ## Service Overrides
 
@@ -225,7 +241,7 @@ class CustomFormService extends SmartyAddress.services.FormService {
   // Override methods to customize form population
 }
 
-new SmartyAddress({
+const autocomplete = await SmartyAddress.create({
   embeddedKey: "your-key",
   streetSelector: "#street",
   services: {
@@ -253,6 +269,18 @@ All services extend `BaseService` which provides:
 - Typed protected getters (e.g., `this.apiService`, `this.formService`) to access other services
 
 ## API Reference
+
+### Static Methods
+
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `SmartyAddress.create` | `(config: SmartyAddressConfig) => Promise<SmartyAddress>` | Creates and initializes a new autocomplete instance |
+
+### Instance Methods
+
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `destroy` | `() => void` | Removes all event listeners, observers, and DOM elements |
 
 ### Static Properties
 

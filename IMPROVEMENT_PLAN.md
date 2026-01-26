@@ -208,4 +208,4 @@ Since this is pre-launch, all changes can be implemented directly without deprec
 - [x] API response edge cases handled gracefully
 - [ ] All new code has test coverage
 - [ ] No TypeScript `any` or unsafe casts in modified code
-- [ ] README documents the factory pattern usage
+- [x] README documents the factory pattern usage
