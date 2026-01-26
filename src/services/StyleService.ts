@@ -111,8 +111,8 @@ export class StyleService extends BaseService {
 			"--smartyAddress__surfaceInverseExtremeColor": derivedColors.hoverMix,
 			"--smartyAddress__surfaceBasePrimaryInverseColor": inputTextColor,
 			"--smartyAddress__textAccentColor": derivedColors.accent,
-			"--smartyAddress__logoDarkDisplay": derivedColors.useBlueLogo ? "block" : "none",
-			"--smartyAddress__logoLightDisplay": derivedColors.useBlueLogo ? "none" : "block",
+			"--smartyAddress__logoDarkDisplay": derivedColors.shouldUseBlueLogo ? "block" : "none",
+			"--smartyAddress__logoLightDisplay": derivedColors.shouldUseBlueLogo ? "none" : "block",
 			"--smartyAddress__largeShadow1": "0 12px 24px 0 rgba(4, 34, 75, 0.10)",
 			"--smartyAddress__largeShadow2": "0 20px 40px 0 rgba(21, 27, 35, 0.06)",
 		};
@@ -127,7 +127,7 @@ export class StyleService extends BaseService {
 		tertiary: string;
 		hoverMix: string;
 		accent: string;
-		useBlueLogo: boolean;
+		shouldUseBlueLogo: boolean;
 	} {
 		const isLightMode = lightness > 50;
 		const lightnessOffset = isLightMode ? -10 : 10;
@@ -137,7 +137,7 @@ export class StyleService extends BaseService {
 			tertiary: `hsl(${hue} ${saturation}% ${lightness + lightnessOffset * 2}%)`,
 			hoverMix: isLightMode ? "#000" : "#fff",
 			accent: isLightMode ? "#0066ff" : "#6699ff",
-			useBlueLogo: lightness > 75,
+			shouldUseBlueLogo: lightness > 75,
 		};
 	}
 }

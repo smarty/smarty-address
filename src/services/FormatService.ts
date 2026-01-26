@@ -1,12 +1,12 @@
 import { BaseService } from "./BaseService";
-import { AddressSuggestion } from "../interfaces";
+import { AutocompleteSuggestion } from "../interfaces";
 
 export class FormatService extends BaseService {
-	getFormattedAddressSuggestion(
-		suggestion: AddressSuggestion,
+	getFormattedAutocompleteSuggestion(
+		autocompleteSuggestion: AutocompleteSuggestion,
 		isSecondary: boolean = false,
 	): string {
-		const { street_line, secondary = "", city, state, zipcode } = suggestion;
+		const { street_line, secondary = "", city, state, zipcode } = autocompleteSuggestion;
 		const streetText = isSecondary ? "…" : street_line;
 		const secondaryText = secondary.length ? ` ${secondary}` : secondary;
 

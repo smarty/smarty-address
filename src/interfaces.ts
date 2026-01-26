@@ -64,8 +64,8 @@ export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 	preferZipCodes?: string[];
 
 	services?: ServiceClassOverrides;
-	onAddressSelected?: (address: AddressSuggestion) => void;
-	onSuggestionsReceived?: (suggestions: AddressSuggestion[]) => AddressSuggestion[];
+	onAddressSelected?: (address: AutocompleteSuggestion) => void;
+	onAutocompleteSuggestionsReceived?: (suggestions: AutocompleteSuggestion[]) => AutocompleteSuggestion[];
 	onDropdownOpen?: () => void;
 	onDropdownClose?: () => void;
 }
@@ -81,13 +81,13 @@ export interface NormalizedSmartyAddressConfig extends DefaultSmartyAddressConfi
 	postalCodeSelector?: string;
 
 	services?: ServiceClassOverrides;
-	onAddressSelected?: (address: AddressSuggestion) => void;
-	onSuggestionsReceived?: (suggestions: AddressSuggestion[]) => AddressSuggestion[];
+	onAddressSelected?: (address: AutocompleteSuggestion) => void;
+	onAutocompleteSuggestionsReceived?: (suggestions: AutocompleteSuggestion[]) => AutocompleteSuggestion[];
 	onDropdownOpen?: () => void;
 	onDropdownClose?: () => void;
 }
 
-export interface AddressSuggestion {
+export interface AutocompleteSuggestion {
 	street_line: string;
 	secondary?: string;
 	city: string;

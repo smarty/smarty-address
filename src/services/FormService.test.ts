@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { FormService } from "./FormService";
-import { AddressSuggestion } from "../interfaces";
+import { AutocompleteSuggestion } from "../interfaces";
 
 describe("FormService", () => {
 	let service: FormService;
@@ -12,7 +12,7 @@ describe("FormService", () => {
 	});
 
 	describe("getStreetFormValue", () => {
-		const baseAddress: AddressSuggestion = {
+		const baseAddress: AutocompleteSuggestion = {
 			street_line: "123 Main St",
 			secondary: "Apt 5",
 			city: "Denver",

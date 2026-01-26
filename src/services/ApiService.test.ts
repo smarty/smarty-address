@@ -1,5 +1,5 @@
 import { ApiService, unknownError, API_PARAM_MAP } from "./ApiService";
-import { AddressSuggestion, ApiConfig } from "../interfaces";
+import { AutocompleteSuggestion, ApiConfig } from "../interfaces";
 
 describe("ApiService", () => {
 	let service: ApiService;
@@ -9,7 +9,7 @@ describe("ApiService", () => {
 	});
 
 	describe("getMatchingResult", () => {
-		const createSuggestion = (street: string, secondary: string = ""): AddressSuggestion => ({
+		const createAutocompleteSuggestion = (street: string, secondary: string = ""): AutocompleteSuggestion => ({
 			street_line: street,
 			secondary,
 			city: "Denver",
@@ -19,60 +19,60 @@ describe("ApiService", () => {
 		});
 
 		it("should find matching result by street_line", () => {
-			const suggestions = [createSuggestion("123 Main St"), createSuggestion("456 Oak Ave")];
-			const selected = createSuggestion("123 Main St");
+			const autocompleteSuggestions = [createAutocompleteSuggestion("123 Main St"), createAutocompleteSuggestion("456 Oak Ave")];
+			const selected = createAutocompleteSuggestion("123 Main St");
 
-			const result = service.getMatchingResult(suggestions, selected);
+			const result = service.getMatchingResult(autocompleteSuggestions, selected);
 			expect(result?.street_line).toBe("123 Main St");
 		});
 
 		it("should return undefined when no match found", () => {
-			const suggestions = [createSuggestion("123 Main St"), createSuggestion("456 Oak Ave")];
-			const selected = createSuggestion("789 Pine Rd");
+			const autocompleteSuggestions = [createAutocompleteSuggestion("123 Main St"), createAutocompleteSuggestion("456 Oak Ave")];
+			const selected = createAutocompleteSuggestion("789 Pine Rd");
 
-			const result = service.getMatchingResult(suggestions, selected);
+			const result = service.getMatchingResult(autocompleteSuggestions, selected);
 			expect(result).toBeUndefined();
 		});
 
 		it("should trim whitespace when comparing street_line", () => {
-			const suggestions = [createSuggestion("  123 Main St  ")];
-			const selected = createSuggestion("123 Main St");
+			const autocompleteSuggestions = [createAutocompleteSuggestion("  123 Main St  ")];
+			const selected = createAutocompleteSuggestion("123 Main St");
 
-			const result = service.getMatchingResult(suggestions, selected);
+			const result = service.getMatchingResult(autocompleteSuggestions, selected);
 			expect(result).toBeDefined();
 		});
 
 		it("should match when suggestion secondary includes selected secondary", () => {
-			const suggestions = [
+			const autocompleteSuggestions = [
 				{
-					...createSuggestion("123 Main St"),
+					...createAutocompleteSuggestion("123 Main St"),
 					secondary: "Apt 1, Apt 2, Apt 3",
 				},
 			];
-			const selected = createSuggestion("123 Main St", "Apt 2");
+			const selected = createAutocompleteSuggestion("123 Main St", "Apt 2");
 
-			const result = service.getMatchingResult(suggestions, selected);
+			const result = service.getMatchingResult(autocompleteSuggestions, selected);
 			expect(result).toBeDefined();
 		});
 
 		it("should not match when secondaries do not overlap", () => {
-			const suggestions = [createSuggestion("123 Main St", "Apt 1")];
-			const selected = createSuggestion("123 Main St", "Apt 5");
+			const autocompleteSuggestions = [createAutocompleteSuggestion("123 Main St", "Apt 1")];
+			const selected = createAutocompleteSuggestion("123 Main St", "Apt 5");
 
-			const result = service.getMatchingResult(suggestions, selected);
+			const result = service.getMatchingResult(autocompleteSuggestions, selected);
 			expect(result).toBeUndefined();
 		});
 
 		it("should handle empty suggestions array", () => {
-			const selected = createSuggestion("123 Main St");
+			const selected = createAutocompleteSuggestion("123 Main St");
 
 			const result = service.getMatchingResult([], selected);
 			expect(result).toBeUndefined();
 		});
 
 		it("should handle undefined secondary in selected address", () => {
-			const suggestions = [createSuggestion("123 Main St", "Apt 1")];
-			const selected: AddressSuggestion = {
+			const autocompleteSuggestions = [createAutocompleteSuggestion("123 Main St", "Apt 1")];
+			const selected: AutocompleteSuggestion = {
 				street_line: "123 Main St",
 				secondary: undefined,
 				city: "Denver",
@@ -81,7 +81,7 @@ describe("ApiService", () => {
 				country: "US",
 			};
 
-			const result = service.getMatchingResult(suggestions, selected);
+			const result = service.getMatchingResult(autocompleteSuggestions, selected);
 			expect(result).toBeDefined();
 		});
 	});
@@ -137,14 +137,14 @@ describe("ApiService", () => {
 		});
 	});
 
-	describe("getAutocompleteApiResults", () => {
+	describe("fetchAutocompleteResults", () => {
 		const apiConfig: ApiConfig = {
 			embeddedKey: "test-key",
 			autocompleteApiUrl: "https://api.example.com/lookup",
 		};
 
 		it("should return suggestions on successful response", async () => {
-			const mockSuggestions: AddressSuggestion[] = [
+			const mockAutocompleteSuggestions: AutocompleteSuggestion[] = [
 				{
 					street_line: "123 Main St",
 					city: "Denver",
@@ -156,17 +156,17 @@ describe("ApiService", () => {
 
 			const mockFetch = jest.fn().mockResolvedValue({
 				ok: true,
-				json: () => Promise.resolve({ suggestions: mockSuggestions }),
+				json: () => Promise.resolve({ suggestions: mockAutocompleteSuggestions }),
 			});
 
-			const result = await service.getAutocompleteApiResults(
+			const result = await service.fetchAutocompleteResults(
 				apiConfig,
 				"123 Main",
 				null,
 				mockFetch,
 			);
 
-			expect(result).toEqual(mockSuggestions);
+			expect(result).toEqual(mockAutocompleteSuggestions);
 			expect(mockFetch).toHaveBeenCalledTimes(1);
 		});
 
@@ -176,7 +176,7 @@ describe("ApiService", () => {
 				json: () => Promise.resolve({ suggestions: [] }),
 			});
 
-			await service.getAutocompleteApiResults(apiConfig, "456 Oak", null, mockFetch);
+			await service.fetchAutocompleteResults(apiConfig, "456 Oak", null, mockFetch);
 
 			const calledUrl = mockFetch.mock.calls[0][0];
 			expect(calledUrl).toContain("search=456+Oak");
@@ -188,7 +188,7 @@ describe("ApiService", () => {
 				json: () => Promise.resolve({ suggestions: [] }),
 			});
 
-			await service.getAutocompleteApiResults(apiConfig, "test", null, mockFetch);
+			await service.fetchAutocompleteResults(apiConfig, "test", null, mockFetch);
 
 			const calledUrl = mockFetch.mock.calls[0][0];
 			expect(calledUrl).toContain("auth-id=test-key");
@@ -202,7 +202,7 @@ describe("ApiService", () => {
 			});
 
 			await expect(
-				service.getAutocompleteApiResults(apiConfig, "test", null, mockFetch),
+				service.fetchAutocompleteResults(apiConfig, "test", null, mockFetch),
 			).rejects.toThrow("authenticationRequired");
 		});
 
@@ -210,7 +210,7 @@ describe("ApiService", () => {
 			const mockFetch = jest.fn().mockRejectedValue(new Error("Network error"));
 
 			await expect(
-				service.getAutocompleteApiResults(apiConfig, "test", null, mockFetch),
+				service.fetchAutocompleteResults(apiConfig, "test", null, mockFetch),
 			).rejects.toThrow(unknownError.name);
 		});
 
@@ -227,7 +227,7 @@ describe("ApiService", () => {
 				json: () => Promise.resolve({ suggestions: [] }),
 			});
 
-			await service.getAutocompleteApiResults(configWithParams, "test", null, mockFetch);
+			await service.fetchAutocompleteResults(configWithParams, "test", null, mockFetch);
 
 			const calledUrl = mockFetch.mock.calls[0][0];
 			expect(calledUrl).toContain("max_results=10");
@@ -236,7 +236,7 @@ describe("ApiService", () => {
 		});
 
 		it("should include selected address when provided", async () => {
-			const selectedAddress: AddressSuggestion = {
+			const selectedAddress: AutocompleteSuggestion = {
 				street_line: "123 Main St",
 				secondary: "Apt 1",
 				entries: 5,
@@ -251,7 +251,7 @@ describe("ApiService", () => {
 				json: () => Promise.resolve({ suggestions: [] }),
 			});
 
-			await service.getAutocompleteApiResults(apiConfig, "123 Main", selectedAddress, mockFetch);
+			await service.fetchAutocompleteResults(apiConfig, "123 Main", selectedAddress, mockFetch);
 
 			const calledUrl = mockFetch.mock.calls[0][0];
 			expect(calledUrl).toContain("selected=");

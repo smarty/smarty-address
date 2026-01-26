@@ -1,5 +1,5 @@
 import { BaseService } from "./BaseService";
-import { AddressSuggestion, ApiConfig, NormalizedSmartyAddressConfig } from "../interfaces";
+import { AutocompleteSuggestion, ApiConfig, NormalizedSmartyAddressConfig } from "../interfaces";
 import { APP_VERSION } from "../constants";
 
 export interface ApiErrorResponse {
@@ -7,8 +7,8 @@ export interface ApiErrorResponse {
 	message: string;
 }
 
-export interface FetchSuggestionsCallbacks {
-	onSuccess: (suggestions: AddressSuggestion[], searchString: string) => void;
+export interface FetchAutocompleteSuggestionsCallbacks {
+	onSuccess: (suggestions: AutocompleteSuggestion[], searchString: string) => void;
 	onError: (errorMessage: string) => void;
 }
 
@@ -65,7 +65,7 @@ const formatSelectedAddress = ({
 	city,
 	state,
 	zipcode,
-}: AddressSuggestion): string => {
+}: AutocompleteSuggestion): string => {
 	const addressComponents = [street_line, secondary, `(${entries})`, city, state, zipcode];
 	return addressComponents.filter(Boolean).join(" ");
 };
@@ -94,50 +94,50 @@ export class ApiService extends BaseService {
 		} as ApiConfig;
 	}
 
-	async fetchAddressSuggestions(
+	async fetchAutocompleteSuggestions(
 		searchString: string,
-		callbacks: FetchSuggestionsCallbacks,
+		callbacks: FetchAutocompleteSuggestionsCallbacks,
 	): Promise<void> {
 		await this.fetchWithCallbacks(callbacks, searchString, async (apiConfig) => {
-			return this.getAutocompleteApiResults(apiConfig, searchString);
+			return this.fetchAutocompleteResults(apiConfig, searchString);
 		});
 	}
 
-	async fetchSecondaryAddressSuggestions(
+	async fetchSecondaryAutocompleteSuggestions(
 		searchString: string,
-		selectedAddress: AddressSuggestion,
-		callbacks: FetchSuggestionsCallbacks,
+		selectedAddress: AutocompleteSuggestion,
+		callbacks: FetchAutocompleteSuggestionsCallbacks,
 	): Promise<void> {
 		await this.fetchWithCallbacks(callbacks, searchString, async (apiConfig) => {
-			const primarySuggestions = await this.getAutocompleteApiResults(apiConfig, searchString);
-			const newSelectedAddress = this.getMatchingResult(primarySuggestions, selectedAddress);
+			const primaryAutocompleteSuggestions = await this.fetchAutocompleteResults(apiConfig, searchString);
+			const newSelectedAddress = this.getMatchingResult(primaryAutocompleteSuggestions, selectedAddress);
 			return newSelectedAddress
-				? await this.getAutocompleteApiResults(apiConfig, searchString, newSelectedAddress)
+				? await this.fetchAutocompleteResults(apiConfig, searchString, newSelectedAddress)
 				: [];
 		});
 	}
 
 	private async fetchWithCallbacks(
-		callbacks: FetchSuggestionsCallbacks,
+		callbacks: FetchAutocompleteSuggestionsCallbacks,
 		searchString: string,
-		fetchFn: (apiConfig: ApiConfig) => Promise<AddressSuggestion[]>,
+		fetchFn: (apiConfig: ApiConfig) => Promise<AutocompleteSuggestion[]>,
 	): Promise<void> {
 		try {
 			const apiConfig = this.getApiConfig();
-			const suggestions = await fetchFn(apiConfig);
-			callbacks.onSuccess(suggestions, searchString);
+			const autocompleteSuggestions = await fetchFn(apiConfig);
+			callbacks.onSuccess(autocompleteSuggestions, searchString);
 		} catch (error) {
 			const errorMessage = error instanceof Error ? error.message : String(error);
 			callbacks.onError(errorMessage);
 		}
 	}
 
-	async getAutocompleteApiResults(
+	async fetchAutocompleteResults(
 		apiConfig: ApiConfig,
 		searchString: string,
-		selectedAddress: AddressSuggestion | null = null,
+		selectedAddress: AutocompleteSuggestion | null = null,
 		fetchFn: typeof fetch = fetch,
-	): Promise<AddressSuggestion[]> {
+	): Promise<AutocompleteSuggestion[]> {
 		try {
 			const requestData = this.buildRequestData(apiConfig, searchString, selectedAddress);
 			const params = new URLSearchParams(requestData);
@@ -152,7 +152,7 @@ export class ApiService extends BaseService {
 	private buildRequestData(
 		apiConfig: ApiConfig,
 		searchString: string,
-		selectedAddress: AddressSuggestion | null,
+		selectedAddress: AutocompleteSuggestion | null,
 	): Record<string, string> {
 		const requestData: Record<string, string> = {
 			"auth-id": apiConfig.embeddedKey,
@@ -172,9 +172,9 @@ export class ApiService extends BaseService {
 		return requestData;
 	}
 
-	private async parseResponse(response: Response): Promise<AddressSuggestion[]> {
+	private async parseResponse(response: Response): Promise<AutocompleteSuggestion[]> {
 		if (response.ok) {
-			const { suggestions } = (await response.json()) as { suggestions: AddressSuggestion[] };
+			const { suggestions } = (await response.json()) as { suggestions: AutocompleteSuggestion[] };
 			return suggestions;
 		}
 
@@ -196,13 +196,13 @@ export class ApiService extends BaseService {
 	}
 
 	getMatchingResult(
-		primarySuggestions: AddressSuggestion[],
-		selectedAddress: AddressSuggestion,
-	): AddressSuggestion | undefined {
-		const matchingResult = primarySuggestions.find((suggestion) => {
+		primaryAutocompleteSuggestions: AutocompleteSuggestion[],
+		selectedAddress: AutocompleteSuggestion,
+	): AutocompleteSuggestion | undefined {
+		const matchingResult = primaryAutocompleteSuggestions.find((autocompleteSuggestion) => {
 			return (
-				suggestion.street_line.trim() === selectedAddress.street_line.trim() &&
-				suggestion.secondary?.includes(selectedAddress.secondary?.trim() ?? "")
+				autocompleteSuggestion.street_line.trim() === selectedAddress.street_line.trim() &&
+				autocompleteSuggestion.secondary?.includes(selectedAddress.secondary?.trim() ?? "")
 			);
 		});
 

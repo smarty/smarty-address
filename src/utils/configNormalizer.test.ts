@@ -170,14 +170,14 @@ describe("configNormalizer", () => {
 
 		it("should preserve callback functions", () => {
 			const onAddressSelected = jest.fn();
-			const onSuggestionsReceived = jest.fn();
+			const onAutocompleteSuggestionsReceived = jest.fn();
 			const onDropdownOpen = jest.fn();
 			const onDropdownClose = jest.fn();
 
 			const config: SmartyAddressConfig = {
 				...baseConfig,
 				onAddressSelected,
-				onSuggestionsReceived,
+				onAutocompleteSuggestionsReceived,
 				onDropdownOpen,
 				onDropdownClose,
 			};
@@ -185,7 +185,7 @@ describe("configNormalizer", () => {
 			const normalized = normalizeConfig(config);
 
 			expect(normalized.onAddressSelected).toBe(onAddressSelected);
-			expect(normalized.onSuggestionsReceived).toBe(onSuggestionsReceived);
+			expect(normalized.onAutocompleteSuggestionsReceived).toBe(onAutocompleteSuggestionsReceived);
 			expect(normalized.onDropdownOpen).toBe(onDropdownOpen);
 			expect(normalized.onDropdownClose).toBe(onDropdownClose);
 		});

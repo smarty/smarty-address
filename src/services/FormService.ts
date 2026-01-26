@@ -1,5 +1,5 @@
 import { BaseService } from "./BaseService";
-import { AddressSuggestion, NormalizedSmartyAddressConfig } from "../interfaces";
+import { AutocompleteSuggestion, NormalizedSmartyAddressConfig } from "../interfaces";
 import { STATE_ABBREVIATIONS } from "../constants/stateAbbreviations";
 
 export class FormService extends BaseService {
@@ -73,7 +73,7 @@ export class FormService extends BaseService {
 			administrativeAreaInputElement: HTMLInputElement | null;
 			postalCodeInputElement: HTMLInputElement | null;
 		},
-		address: AddressSuggestion,
+		address: AutocompleteSuggestion,
 	): string {
 		const {
 			streetInputElement,
@@ -99,7 +99,7 @@ export class FormService extends BaseService {
 		return includeSecondary ? `${address.street_line}, ${address.secondary}` : address.street_line;
 	}
 
-	private formatSingleFieldAddress(address: AddressSuggestion, isTextarea: boolean): string {
+	private formatSingleFieldAddress(address: AutocompleteSuggestion, isTextarea: boolean): string {
 		const cityStateZip = this.formatCityStateZip(address);
 
 		if (isTextarea) {
@@ -115,12 +115,12 @@ export class FormService extends BaseService {
 		return parts.join(", ");
 	}
 
-	private formatCityStateZip(address: AddressSuggestion): string {
+	private formatCityStateZip(address: AutocompleteSuggestion): string {
 		const cityState = [address.city, address.state].filter(Boolean).join(", ");
 		return address.zipcode ? `${cityState} ${address.zipcode}` : cityState;
 	}
 
-	populateFormWithAddress(selectedAddress: AddressSuggestion) {
+	populateFormWithAddress(selectedAddress: AutocompleteSuggestion) {
 		const elements = {
 			streetInputElement: this.domService.findDomElement(this.streetSelector),
 			secondaryInputElement: this.domService.findDomElement(

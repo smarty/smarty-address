@@ -54,8 +54,8 @@ export class ColorService extends BaseService {
 		const red = imageData[0] ?? 0;
 		const green = imageData[1] ?? 0;
 		const blue = imageData[2] ?? 0;
-		const aByte = imageData[3] ?? 255;
-		const alpha = Math.round((aByte / 255) * 1000) / 1000;
+		const alphaByte = imageData[3] ?? 255;
+		const alpha = Math.round((alphaByte / 255) * 1000) / 1000;
 
 		return { red, green, blue, alpha };
 	}

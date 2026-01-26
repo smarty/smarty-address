@@ -1,5 +1,5 @@
 export const themeStyles = {
-	".smartyAddress__suggestionsWrapperElement": {
+	".smartyAddress__autocompleteSuggestionsWrapperElement": {
 		top: "var(--smartyAddress__dropdownPositionTop)",
 		left: "var(--smartyAddress__dropdownPositionLeft)",
 		position: "var(--smartyAddress__wrapperPosition)",
@@ -35,7 +35,7 @@ export const themeStyles = {
 		"border-top": "none",
 	},
 
-	".smartyAddress__suggestionsElement": {
+	".smartyAddress__autocompleteSuggestionsElement": {
 		margin: "var(--smartyAddress__spacingNone)",
 		padding: "var(--smartyAddress__spacingNone)",
 		"overflow-y": "var(--smartyAddress__dropdownOverflowY)",
@@ -45,14 +45,14 @@ export const themeStyles = {
 		"scrollbar-width": "var(--smartyAddress__scrollbarWidth)",
 	},
 
-	".smartyAddress__suggestion": {
+	".smartyAddress__autocompleteSuggestion": {
 		cursor: "var(--smartyAddress__cursorStyle)",
 		padding: "var(--smartyAddress__spacingMedium3)",
 		color: "var(--smartyAddress__textBasePrimaryColor)",
 		"background-color": "var(--smartyAddress__surfaceBasePrimaryColor)",
 	},
 
-	".smartyAddress__secondarySuggestion": {
+	".smartyAddress__secondaryAutocompleteSuggestion": {
 		cursor: "var(--smartyAddress__cursorStyle)",
 		padding: "var(--smartyAddress__spacingMedium3)",
 		"padding-left": "var(--smartyAddress__spacingLarge3)",
@@ -65,7 +65,7 @@ export const themeStyles = {
 		"justify-content": "var(--smartyAddress__suggestionJustifyContent)",
 	},
 
-	".smartyAddress__suggestion:hover, .smartyAddress__suggestion[aria-selected='true'], .smartyAddress__secondarySuggestion:hover, .smartyAddress__secondarySuggestion[aria-selected='true']":
+	".smartyAddress__autocompleteSuggestion:hover, .smartyAddress__autocompleteSuggestion[aria-selected='true'], .smartyAddress__secondaryAutocompleteSuggestion:hover, .smartyAddress__secondaryAutocompleteSuggestion[aria-selected='true']":
 		{
 			"background-color": "var(--smartyAddress__surfaceBaseSecondaryColor)",
 		},
@@ -80,7 +80,7 @@ export const themeStyles = {
 		color: "var(--smartyAddress__textBaseSecondaryColor)",
 	},
 
-	".smartyAddress__suggestionEntries": {
+	".smartyAddress__autocompleteSuggestionEntries": {
 		color: "var(--smartyAddress__textAccentColor, #0066ff)",
 		"white-space": "var(--smartyAddress__suggestionWhitespace)",
 	},

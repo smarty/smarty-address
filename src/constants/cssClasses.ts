@@ -3,16 +3,16 @@ export const CSS_CLASSES = {
 	matchedText: "smartyAddress__matchedText",
 	smartyLogoDark: "smartyAddress__smartyLogoDark",
 	smartyLogoLight: "smartyAddress__smartyLogoLight",
-	suggestionsElement: "smartyAddress__suggestionsElement",
+	autocompleteSuggestionsElement: "smartyAddress__autocompleteSuggestionsElement",
 	poweredBy: "smartyAddress__poweredBy",
 	dropdownElement: "smartyAddress__dropdownElement",
-	suggestionsWrapperElement: "smartyAddress__suggestionsWrapperElement",
+	autocompleteSuggestionsWrapperElement: "smartyAddress__autocompleteSuggestionsWrapperElement",
 	srOnly: "smartyAddress__srOnly",
 	autocompleteAddress: "smartyAddress__autocompleteAddress",
 	addressWrapper: "smartyAddress__addressWrapper",
-	suggestionEntries: "smartyAddress__suggestionEntries",
-	suggestion: "smartyAddress__suggestion",
-	secondarySuggestion: "smartyAddress__secondarySuggestion",
+	autocompleteSuggestionEntries: "smartyAddress__autocompleteSuggestionEntries",
+	autocompleteSuggestion: "smartyAddress__autocompleteSuggestion",
+	secondaryAutocompleteSuggestion: "smartyAddress__secondaryAutocompleteSuggestion",
 	colorDynamic: "smartyAddress__color_dynamic",
 	positionDynamic: "smartyAddress__position_dynamic",
 } as const;
@@ -20,5 +20,5 @@ export const CSS_CLASSES = {
 export const CSS_PREFIXES = {
 	instance: "smartyAddress__instance_",
 	dropdown: "smartyAddress__dropdown_",
-	suggestion: "smartyAddress__suggestion_",
+	autocompleteSuggestion: "smartyAddress__autocompleteSuggestion_",
 } as const;
