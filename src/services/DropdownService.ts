@@ -56,7 +56,7 @@ export class DropdownService extends BaseService {
 		await this.setupSearchInput();
 	}
 
-	private appendElementsToDocument(elements: Record<string, HTMLElement | null>): void {
+	private appendElementsToDocument(elements: Record<string, HTMLElement | Text>): void {
 		const { customStylesElement, dropdownWrapperElement } = elements;
 
 		if (dropdownWrapperElement) {
@@ -69,7 +69,7 @@ export class DropdownService extends BaseService {
 		}
 	}
 
-	private storeElementReferences(elements: Record<string, HTMLElement | null>): void {
+	private storeElementReferences(elements: Record<string, HTMLElement | Text>): void {
 		this.customStylesElement = elements.customStylesElement as HTMLStyleElement;
 		this.dropdownWrapperElement = elements.dropdownWrapperElement as HTMLElement;
 		this.dropdownElement = elements.dropdownElement as HTMLElement;

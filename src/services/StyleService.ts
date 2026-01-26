@@ -111,7 +111,7 @@ export class StyleService extends BaseService {
 		return this.convertDecimalToPercentage(delta / (1 - Math.abs(2 * midpoint - 1)));
 	}
 
-	getHslFromColorString(cssColor: CSSStyleDeclaration): HslColor {
+	getHslFromColorString(cssColor: string): HslColor {
 		const rgbaColor = this.getRgbaFromCssColor(cssColor);
 		const validRgba: RgbaColor = {
 			red: rgbaColor.red ?? 0,
@@ -122,7 +122,7 @@ export class StyleService extends BaseService {
 		return this.rgbToHsl(validRgba);
 	}
 
-	getRgbaFromCssColor(cssColor: CSSStyleDeclaration): {
+	getRgbaFromCssColor(cssColor: string): {
 		red: number;
 		green: number;
 		blue: number;

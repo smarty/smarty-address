@@ -76,7 +76,7 @@ export class DomService extends BaseService {
 		element: HTMLElement,
 		property: string,
 		getComputedStyleFn = window.getComputedStyle,
-	): CSSStyleDeclaration {
+	): string {
 		const styles = getComputedStyleFn(element);
 		return (styles as any)[property] ?? "rgba(0, 0, 0, 0)";
 	}
