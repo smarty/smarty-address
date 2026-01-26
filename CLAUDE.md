@@ -18,7 +18,7 @@ This is a TypeScript library for Smarty address autocomplete and validation. The
 
 The codebase uses ES6 classes for all services. Each service extends `BaseService` from `src/services/BaseService.ts`, which provides:
 - Cross-service dependency management via `setServices()`
-- Access to other services through `this.services`
+- Access to other services through typed protected getters (e.g., `this.apiService`, `this.formService`)
 - A default no-op `init(config)` method (override in subclasses that need initialization)
 
 Services are instantiated in the `SmartyAddress` constructor and wired together with their dependencies.
@@ -31,13 +31,15 @@ All services are located at `src/services/`:
 2. **DropdownService** (`DropdownService.ts`): Consolidated dropdown functionality including UI orchestration, state management, DOM creation, keyboard navigation, and event handling
 3. **FormService** (`FormService.ts`): Populates form fields when an address is selected
 4. **DomService** (`DomService.ts`): Generic DOM utilities for element creation, manipulation, and form value handling
-5. **StyleService** (`StyleService.ts`): Address formatting, text highlighting, CSS generation, and color conversion utilities
+5. **StyleService** (`StyleService.ts`): CSS generation, dynamic style calculation, and style block formatting
+6. **FormatService** (`FormatService.ts`): Address formatting for display and text highlighting for search matches
+7. **ColorService** (`ColorService.ts`): Color conversion utilities (RGB/HSL), CSS color parsing, and percentage conversions
 
 ### Key Patterns
 
 - All services are standard ES6 classes extending `BaseService`
 - Services that need configuration override `init(config)`
-- Services communicate via `this.services.serviceName?.method()`
+- Services communicate via typed getters (e.g., `this.apiService.method()`)
 - Multiple `SmartyAddress` instances are tracked via `instanceId` for isolation
 - Themes are CSS variable arrays defined in `src/themes.ts`
 - Configuration is merged with `defaultConfig` at instantiation
