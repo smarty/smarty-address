@@ -75,17 +75,25 @@ export class FormService extends BaseService {
 		},
 		address: AddressSuggestion,
 	): string {
-		const { streetLineInputElement, secondaryInputElement, cityInputElement, stateInputElement, zipcodeInputElement } = elements;
-		const isSingleFieldForm = !secondaryInputElement && !cityInputElement && !stateInputElement && !zipcodeInputElement;
+		const {
+			streetLineInputElement,
+			secondaryInputElement,
+			cityInputElement,
+			stateInputElement,
+			zipcodeInputElement,
+		} = elements;
+		const isSingleFieldForm =
+			!secondaryInputElement && !cityInputElement && !stateInputElement && !zipcodeInputElement;
 
 		if (isSingleFieldForm) {
-			return this.formatSingleFieldAddress(address, streetLineInputElement instanceof HTMLTextAreaElement);
+			return this.formatSingleFieldAddress(
+				address,
+				streetLineInputElement instanceof HTMLTextAreaElement,
+			);
 		}
 
 		const includeSecondary = !secondaryInputElement && address.secondary?.length;
-		return includeSecondary
-			? `${address.street_line}, ${address.secondary}`
-			: address.street_line;
+		return includeSecondary ? `${address.street_line}, ${address.secondary}` : address.street_line;
 	}
 
 	private formatSingleFieldAddress(address: AddressSuggestion, isTextarea: boolean): string {
@@ -147,10 +155,7 @@ export class FormService extends BaseService {
 			);
 		}
 		if (elements.zipcodeInputElement) {
-			this.domService.setInputValue(
-				elements.zipcodeInputElement,
-				selectedAddress.zipcode,
-			);
+			this.domService.setInputValue(elements.zipcodeInputElement, selectedAddress.zipcode);
 		}
 	}
 }

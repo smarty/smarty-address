@@ -1,5 +1,18 @@
 import { BaseService } from "./BaseService";
-import { HslColor, RgbaColor } from "../interfaces";
+
+export interface RgbaColor {
+	red: number;
+	green: number;
+	blue: number;
+	alpha: number;
+}
+
+export interface HslColor {
+	hue: number;
+	saturation: number;
+	lightness: number;
+	alpha: number;
+}
 
 export class ColorService extends BaseService {
 	convertDecimalToPercentage(decimal: number): number {

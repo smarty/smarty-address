@@ -1,8 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { DropdownService } from "./DropdownService";
-import { UiSuggestionItem } from "../interfaces";
+import { DropdownService, UiSuggestionItem } from "./DropdownService";
 
 describe("DropdownService", () => {
 	describe("getMergedSuggestions", () => {

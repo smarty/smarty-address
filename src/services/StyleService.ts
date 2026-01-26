@@ -1,6 +1,12 @@
 import { BaseService } from "./BaseService";
-import { HslColor, RgbaColor, StylesObject } from "../interfaces";
+import { HslColor, RgbaColor } from "./ColorService";
 import { CSS_CLASSES, CSS_PREFIXES } from "../constants/cssClasses";
+
+export interface StylesObject {
+	[selector: string]: {
+		[cssVar: string]: string;
+	};
+}
 
 export class StyleService extends BaseService {
 	static convertStylesObjectToCssBlock(stylesObject: StylesObject): string {
@@ -93,7 +99,8 @@ export class StyleService extends BaseService {
 		);
 		const inputTextColor = this.domService.getElementStyles(colorElement, "color");
 
-		const { hue, saturation, lightness } = this.colorService.getHslFromColorString(inputBackgroundColor);
+		const { hue, saturation, lightness } =
+			this.colorService.getHslFromColorString(inputBackgroundColor);
 		const derivedColors = this.deriveSurfaceColors(hue, saturation, lightness);
 
 		return {

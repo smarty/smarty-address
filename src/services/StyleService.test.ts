@@ -1,9 +1,8 @@
 /**
  * @jest-environment jsdom
  */
-import { StyleService } from "./StyleService";
+import { StyleService, StylesObject } from "./StyleService";
 import { ColorService } from "./ColorService";
-import { StylesObject } from "../interfaces";
 
 describe("StyleService", () => {
 	let service: StyleService;

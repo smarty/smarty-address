@@ -1,8 +1,13 @@
 import { BaseService } from "./BaseService";
-import { AddressSuggestion, SmartyAddressConfig, UiSuggestionItem } from "../interfaces";
+import { AddressSuggestion, SmartyAddressConfig } from "../interfaces";
 import { CSS_CLASSES, CSS_PREFIXES } from "../constants/cssClasses";
 import { getSmartyLogo } from "../utils/getSmartyLogo";
 import { ElementConfig } from "./DomService";
+
+export interface UiSuggestionItem {
+	address: AddressSuggestion;
+	suggestionElement: HTMLElement;
+}
 
 export class DropdownService extends BaseService {
 	private instanceId: number;
@@ -229,15 +234,11 @@ export class DropdownService extends BaseService {
 			const newSearchTerm = `${street_line} ${secondary}`;
 			this.setSelectedAddressSearchTerm(newSearchTerm);
 			searchInputElement.value = newSearchTerm;
-			this.apiService.fetchSecondaryAddressSuggestions(
-				newSearchTerm,
-				selectedAddress.address,
-				{
-					onSuccess: (suggestions, searchString) =>
-						this.formatSecondaryAddressSuggestions(suggestions, searchString),
-					onError: () => this.handleApiError(),
-				},
-			);
+			this.apiService.fetchSecondaryAddressSuggestions(newSearchTerm, selectedAddress.address, {
+				onSuccess: (suggestions, searchString) =>
+					this.formatSecondaryAddressSuggestions(suggestions, searchString),
+				onError: () => this.handleApiError(),
+			});
 			searchInputElement.focus();
 		} else {
 			this.formService.populateFormWithAddress(selectedAddress.address);
@@ -280,7 +281,12 @@ export class DropdownService extends BaseService {
 
 		const count = suggestionItems.length;
 		const announcement = `${count} unit entr${count === 1 ? "y" : "ies"} found. Use arrow keys to navigate.`;
-		this.displaySuggestions(suggestionItems, this.getMergedSuggestions(), this.getSelectedIndex() + 1, announcement);
+		this.displaySuggestions(
+			suggestionItems,
+			this.getMergedSuggestions(),
+			this.getSelectedIndex() + 1,
+			announcement,
+		);
 	}
 
 	private displaySuggestions(
@@ -311,19 +317,17 @@ export class DropdownService extends BaseService {
 	): UiSuggestionItem[] {
 		const selectedSuggestionIndex = this.getSelectedIndex();
 
-		return suggestions.map(
-			(address: AddressSuggestion, addressIndex: number): UiSuggestionItem => {
-				const suggestionId = this.getSuggestionId(baseIndex + addressIndex);
-				const elements = createElement(address, suggestionId);
-				const suggestionElement = elements[elementKey] as HTMLElement;
+		return suggestions.map((address: AddressSuggestion, addressIndex: number): UiSuggestionItem => {
+			const suggestionId = this.getSuggestionId(baseIndex + addressIndex);
+			const elements = createElement(address, suggestionId);
+			const suggestionElement = elements[elementKey] as HTMLElement;
 
-				suggestionElement.addEventListener("click", () => {
-					this.handleSelectDropdownItem(addressIndex + selectedSuggestionIndex + 1);
-				});
+			suggestionElement.addEventListener("click", () => {
+				this.handleSelectDropdownItem(addressIndex + selectedSuggestionIndex + 1);
+			});
 
-				return { address, suggestionElement };
-			},
-		);
+			return { address, suggestionElement };
+		});
 	}
 
 	handleApiError(): void {
@@ -417,9 +421,7 @@ export class DropdownService extends BaseService {
 	}
 
 	getSearchInputElement(): HTMLInputElement | null {
-		return this.domService.findDomElement(
-			this.searchInputSelector,
-		) as HTMLInputElement | null;
+		return this.domService.findDomElement(this.searchInputSelector) as HTMLInputElement | null;
 	}
 
 	getSuggestionsElement(): HTMLElement | null {
@@ -521,14 +523,8 @@ export class DropdownService extends BaseService {
 		searchString: string = "",
 		suggestionId?: string,
 	): Record<string, HTMLElement | Text> {
-		const formattedAddress = this.formatService.getFormattedAddressSuggestion(
-			suggestion,
-			true,
-		);
-		const fullAddress = this.formatService.getFormattedAddressSuggestion(
-			suggestion,
-			false,
-		);
+		const formattedAddress = this.formatService.getFormattedAddressSuggestion(suggestion, true);
+		const fullAddress = this.formatService.getFormattedAddressSuggestion(suggestion, false);
 		const highlightedParts = this.formatService.createHighlightedTextElements(
 			formattedAddress,
 			searchString,
@@ -617,15 +613,14 @@ export class DropdownService extends BaseService {
 		}
 	}
 
-	private buildAutocompleteDomElements(instanceClassname: string): Record<string, HTMLElement | Text> {
+	private buildAutocompleteDomElements(
+		instanceClassname: string,
+	): Record<string, HTMLElement | Text> {
 		const darkLogoElementClasses = [CSS_CLASSES.smartyLogoDark];
 		const lightLogoElementClasses = [CSS_CLASSES.smartyLogoLight];
 		const suggestionsElementClasses = [CSS_CLASSES.suggestionsElement];
 		const poweredByElementClasses = [CSS_CLASSES.poweredBy];
-		const dropdownElementInitialClasses = [
-			CSS_CLASSES.dropdownElement,
-			CSS_CLASSES.hidden,
-		];
+		const dropdownElementInitialClasses = [CSS_CLASSES.dropdownElement, CSS_CLASSES.hidden];
 		const dropdownWrapperElementClasses = [
 			CSS_CLASSES.suggestionsWrapperElement,
 			instanceClassname,

@@ -1,12 +1,16 @@
 import { BaseService } from "./BaseService";
-import {
-	AddressSuggestion,
-	ApiConfig,
-	ApiErrorResponse,
-	FetchSuggestionsCallbacks,
-	SmartyAddressConfig,
-} from "../interfaces";
+import { AddressSuggestion, ApiConfig, SmartyAddressConfig } from "../interfaces";
 import { APP_VERSION } from "../constants";
+
+export interface ApiErrorResponse {
+	id: number;
+	message: string;
+}
+
+export interface FetchSuggestionsCallbacks {
+	onSuccess: (suggestions: AddressSuggestion[], searchString: string) => void;
+	onError: (errorMessage: string) => void;
+}
 
 const USER_AGENT = `name:smarty-address-plugin,version:${APP_VERSION}`;
 
@@ -218,5 +222,4 @@ export class ApiService extends BaseService {
 
 		return matchedError ?? unknownError;
 	}
-
 }
