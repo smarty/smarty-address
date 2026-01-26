@@ -114,19 +114,21 @@ describe("ApiService", () => {
 			expect(result.message).toContain("rate limit");
 		});
 
-		it("should return unknown error for unrecognized status code", () => {
-			const errorResponse = { errors: [{ id: 9999, message: "Unknown" }] };
+		it("should return API error message for unrecognized status code", () => {
+			const errorResponse = { errors: [{ id: 9999, name: "some-api-error", message: "Something went wrong" }] };
 
 			const result = service.getApiError(500, errorResponse);
-			expect(result.name).toBe(unknownError.name);
-			expect(result.message).toBe(unknownError.message);
+			expect(result.name).toBe("some-api-error");
+			expect(result.message).toBe("SmartyAddress: Something went wrong");
+			expect(result.statusCode).toBe(500);
 		});
 
-		it("should return unknown error when error id does not match", () => {
+		it("should return API error message when error id does not match", () => {
 			const errorResponse = { errors: [{ id: 9999, message: "Different error" }] };
 
 			const result = service.getApiError(401, errorResponse);
-			expect(result.name).toBe(unknownError.name);
+			expect(result.name).toBe("apiError");
+			expect(result.message).toBe("SmartyAddress: Different error");
 		});
 
 		it("should handle empty errors array", () => {

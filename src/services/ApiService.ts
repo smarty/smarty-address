@@ -3,8 +3,10 @@ import { AutocompleteSuggestion, ApiConfig, NormalizedSmartyAddressConfig } from
 import { APP_VERSION } from "../constants";
 
 export interface ApiErrorResponse {
-	id: number;
-	message: string;
+	id?: number;
+	name?: string;
+	message?: string;
+	fields?: string[];
 }
 
 export interface FetchAutocompleteSuggestionsCallbacks {
@@ -220,6 +222,18 @@ export class ApiService extends BaseService {
 			return knownError.statusCode === statusCode && errorIdMatches;
 		});
 
-		return matchedError ?? unknownError;
+		if (matchedError) {
+			return matchedError;
+		}
+
+		if (firstError?.message) {
+			return {
+				name: firstError.name ?? "apiError",
+				statusCode,
+				message: `SmartyAddress: ${firstError.message}`,
+			};
+		}
+
+		return unknownError;
 	}
 }
