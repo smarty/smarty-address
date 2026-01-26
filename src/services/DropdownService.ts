@@ -1,5 +1,7 @@
 import { BaseService } from "./BaseService";
 import { AddressSuggestion, SmartyAddressConfig, UiSuggestionItem } from "../interfaces";
+import { getSmartyLogo } from "../utils/getSmartyLogo";
+import { ElementConfig } from "./DomService";
 
 export class DropdownService extends BaseService {
 	private instanceId: number;
@@ -43,7 +45,7 @@ export class DropdownService extends BaseService {
 
 	async setupDom(): Promise<void> {
 		const instanceClassname = this.styleService.getInstanceClassName(this.instanceId);
-		const elements = this.domService.buildAutocompleteDomElements(instanceClassname);
+		const elements = this.buildAutocompleteDomElements(instanceClassname);
 
 		this.appendElementsToDocument(elements);
 		this.storeElementReferences(elements);
@@ -496,15 +498,15 @@ export class DropdownService extends BaseService {
 		suggestionId?: string,
 	): Record<string, HTMLElement | Text> {
 		const { entries = 0 } = suggestion;
-		const formattedAddress = this.styleService.getFormattedAddressSuggestion(suggestion);
-		const highlightedParts = this.styleService.createHighlightedTextElements(
+		const formattedAddress = this.formatService.getFormattedAddressSuggestion(suggestion);
+		const highlightedParts = this.formatService.createHighlightedTextElements(
 			formattedAddress,
 			searchString,
 		);
 		const entriesLabel = entries > 1 ? `, ${entries} entries available` : "";
 		const ariaLabel = `${formattedAddress}${entriesLabel}`;
 
-		return this.domService.buildSuggestionElement(
+		return this.buildSuggestionElement(
 			highlightedParts,
 			JSON.stringify(suggestion),
 			ariaLabel,
@@ -518,20 +520,20 @@ export class DropdownService extends BaseService {
 		searchString: string = "",
 		suggestionId?: string,
 	): Record<string, HTMLElement | Text> {
-		const formattedAddress = this.styleService.getFormattedAddressSuggestion(
+		const formattedAddress = this.formatService.getFormattedAddressSuggestion(
 			suggestion,
 			true,
 		);
-		const fullAddress = this.styleService.getFormattedAddressSuggestion(
+		const fullAddress = this.formatService.getFormattedAddressSuggestion(
 			suggestion,
 			false,
 		);
-		const highlightedParts = this.styleService.createHighlightedTextElements(
+		const highlightedParts = this.formatService.createHighlightedTextElements(
 			formattedAddress,
 			searchString,
 		);
 
-		return this.domService.buildSecondarySuggestionElement(
+		return this.buildSecondarySuggestionElement(
 			highlightedParts,
 			JSON.stringify(suggestion),
 			fullAddress,
@@ -612,5 +614,199 @@ export class DropdownService extends BaseService {
 			dropdownWrapperElement.classList.remove(...previousTheme);
 			dropdownWrapperElement.classList.add(...newTheme);
 		}
+	}
+
+	private buildAutocompleteDomElements(instanceClassname: string): Record<string, HTMLElement | Text> {
+		const darkLogoElementClasses = ["smartyAddress__smartyLogoDark"];
+		const lightLogoElementClasses = ["smartyAddress__smartyLogoLight"];
+		const suggestionsElementClasses = ["smartyAddress__suggestionsElement"];
+		const poweredByElementClasses = ["smartyAddress__poweredBy"];
+		const dropdownElementInitialClasses = [
+			"smartyAddress__dropdownElement",
+			"smartyAddress__hidden",
+		];
+		const dropdownWrapperElementClasses = [
+			"smartyAddress__suggestionsWrapperElement",
+			instanceClassname,
+		];
+		const announcementElementClasses = ["smartyAddress__srOnly"];
+
+		const elementsMap: ElementConfig[] = [
+			{ name: "customStylesElement", elementType: "style" },
+			{
+				name: "dropdownWrapperElement",
+				elementType: "div",
+				className: dropdownWrapperElementClasses,
+				children: [
+					{
+						name: "announcementElement",
+						elementType: "div",
+						className: announcementElementClasses,
+						attributes: {
+							"aria-live": "polite",
+							"aria-atomic": "true",
+						},
+					},
+					{
+						name: "dropdownElement",
+						elementType: "div",
+						className: dropdownElementInitialClasses,
+						attributes: {
+							role: "listbox",
+							"aria-label": "Address suggestions",
+						},
+						children: [
+							{
+								name: "suggestionsElement",
+								elementType: "ul",
+								className: suggestionsElementClasses,
+							},
+							{
+								name: "poweredBySmartyElement",
+								elementType: "div",
+								className: poweredByElementClasses,
+								attributes: { "aria-hidden": "true" },
+								children: [
+									{ text: "Powered by" },
+									{
+										elementType: "img",
+										className: darkLogoElementClasses,
+										attributes: {
+											src: getSmartyLogo("#0066FF"),
+											alt: "",
+											"aria-hidden": "true",
+										},
+									},
+									{
+										elementType: "img",
+										className: lightLogoElementClasses,
+										attributes: {
+											src: getSmartyLogo("#FFFFFF"),
+											alt: "",
+											"aria-hidden": "true",
+										},
+									},
+								],
+							},
+						],
+					},
+				],
+			},
+		];
+
+		return this.domService.buildElementsFromMap(elementsMap);
+	}
+
+	private buildSuggestionElement(
+		highlightedParts: Array<{ text: string; isMatch?: boolean }>,
+		suggestionData: string,
+		ariaLabel: string,
+		entries: number = 0,
+		suggestionId?: string,
+	): Record<string, HTMLElement | Text> {
+		const addressElementClasses = ["smartyAddress__autocompleteAddress"];
+		const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
+		const entriesElementClasses = ["smartyAddress__suggestionEntries"];
+		const suggestionElementClasses = ["smartyAddress__suggestion"];
+
+		const entriesChildren: ElementConfig[] | undefined =
+			entries > 1 ? [{ text: `${entries} entries` }] : undefined;
+
+		const addressChildren: ElementConfig[] = highlightedParts.map((part) => ({
+			elementType: "span",
+			className: part.isMatch ? ["smartyAddress__matchedText"] : [],
+			children: [{ text: part.text }],
+		}));
+
+		const attributes: Record<string, string> = {
+			"data-address": suggestionData,
+			role: "option",
+			"aria-label": ariaLabel,
+		};
+		if (suggestionId) {
+			attributes.id = suggestionId;
+		}
+
+		const elementsMap: ElementConfig[] = [
+			{
+				name: "suggestionElement",
+				elementType: "li",
+				className: suggestionElementClasses,
+				attributes,
+				children: [
+					{
+						elementType: "div",
+						className: addressWrapperElementClasses,
+						children: [
+							{
+								name: "addressElement",
+								elementType: "div",
+								className: addressElementClasses,
+								children: addressChildren,
+							},
+							{
+								name: "entriesElement",
+								elementType: "div",
+								className: entriesElementClasses,
+								children: entriesChildren,
+							},
+						],
+					},
+				],
+			},
+		];
+
+		return this.domService.buildElementsFromMap(elementsMap);
+	}
+
+	private buildSecondarySuggestionElement(
+		highlightedParts: Array<{ text: string; isMatch?: boolean }>,
+		suggestionData: string,
+		ariaLabel: string,
+		suggestionId?: string,
+	): Record<string, HTMLElement | Text> {
+		const addressElementClasses = ["smartyAddress__autocompleteAddress"];
+		const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
+		const secondarySuggestionElementClasses = ["smartyAddress__secondarySuggestion"];
+
+		const addressChildren: ElementConfig[] = highlightedParts.map((part) => ({
+			elementType: "span",
+			className: part.isMatch ? ["smartyAddress__matchedText"] : [],
+			children: [{ text: part.text }],
+		}));
+
+		const attributes: Record<string, string> = {
+			"data-address": suggestionData,
+			role: "option",
+			"aria-label": ariaLabel,
+		};
+		if (suggestionId) {
+			attributes.id = suggestionId;
+		}
+
+		const elementsMap: ElementConfig[] = [
+			{
+				name: "secondarySuggestionElement",
+				elementType: "li",
+				className: secondarySuggestionElementClasses,
+				attributes,
+				children: [
+					{
+						elementType: "div",
+						className: addressWrapperElementClasses,
+						children: [
+							{
+								name: "addressElement",
+								elementType: "div",
+								className: addressElementClasses,
+								children: addressChildren,
+							},
+						],
+					},
+				],
+			},
+		];
+
+		return this.domService.buildElementsFromMap(elementsMap);
 	}
 }

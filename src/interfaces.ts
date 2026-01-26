@@ -1,6 +1,7 @@
 import type { ApiService } from "./services/ApiService";
 import type { DropdownService } from "./services/DropdownService";
 import type { FormService } from "./services/FormService";
+import type { FormatService } from "./services/FormatService";
 import type { DomService } from "./services/DomService";
 import type { StyleService } from "./services/StyleService";
 
@@ -24,6 +25,7 @@ export interface ServiceClassOverrides {
 	ApiService?: typeof ApiService;
 	DropdownService?: typeof DropdownService;
 	FormService?: typeof FormService;
+	FormatService?: typeof FormatService;
 	DomService?: typeof DomService;
 	StyleService?: typeof StyleService;
 }

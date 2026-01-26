@@ -2,6 +2,7 @@ import type { SmartyAddressConfig } from "../interfaces";
 import type { ApiService } from "./ApiService";
 import type { DropdownService } from "./DropdownService";
 import type { FormService } from "./FormService";
+import type { FormatService } from "./FormatService";
 import type { DomService } from "./DomService";
 import type { StyleService } from "./StyleService";
 
@@ -9,6 +10,7 @@ export interface ServiceDependencies {
 	apiService?: ApiService;
 	dropdownService?: DropdownService;
 	formService?: FormService;
+	formatService?: FormatService;
 	domService?: DomService;
 	styleService?: StyleService;
 }
@@ -47,5 +49,10 @@ export abstract class BaseService {
 	protected get styleService(): StyleService {
 		if (!this.services.styleService) throw new Error("StyleService not initialized");
 		return this.services.styleService;
+	}
+
+	protected get formatService(): FormatService {
+		if (!this.services.formatService) throw new Error("FormatService not initialized");
+		return this.services.formatService;
 	}
 }

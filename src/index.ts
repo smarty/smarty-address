@@ -2,6 +2,7 @@ import { DefaultSmartyAddressConfig, SmartyAddressConfig } from "./interfaces";
 import { ApiService } from "./services/ApiService";
 import { DropdownService } from "./services/DropdownService";
 import { FormService } from "./services/FormService";
+import { FormatService } from "./services/FormatService";
 import { DomService } from "./services/DomService";
 import { StyleService } from "./services/StyleService";
 import { themes } from "./themes";
@@ -26,6 +27,7 @@ export default class SmartyAddress {
 		ApiService,
 		DropdownService,
 		FormService,
+		FormatService,
 		DomService,
 		StyleService,
 	};
@@ -36,6 +38,7 @@ export default class SmartyAddress {
 	private apiService: ApiService;
 	private dropdownService: DropdownService;
 	private formService: FormService;
+	private formatService: FormatService;
 	private domService: DomService;
 	private styleService: StyleService;
 
@@ -46,11 +49,13 @@ export default class SmartyAddress {
 		const ApiServiceClass = config.services?.ApiService || ApiService;
 		const DropdownServiceClass = config.services?.DropdownService || DropdownService;
 		const FormServiceClass = config.services?.FormService || FormService;
+		const FormatServiceClass = config.services?.FormatService || FormatService;
 		const DomServiceClass = config.services?.DomService || DomService;
 		const StyleServiceClass = config.services?.StyleService || StyleService;
 
 		this.domService = new DomServiceClass();
 		this.styleService = new StyleServiceClass();
+		this.formatService = new FormatServiceClass();
 		this.apiService = new ApiServiceClass();
 		this.dropdownService = new DropdownServiceClass(this.instanceId);
 		this.formService = new FormServiceClass();
@@ -59,6 +64,7 @@ export default class SmartyAddress {
 			apiService: this.apiService,
 			dropdownService: this.dropdownService,
 			formService: this.formService,
+			formatService: this.formatService,
 			domService: this.domService,
 			styleService: this.styleService,
 		};

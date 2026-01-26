@@ -1,5 +1,11 @@
 import { BaseService } from "./BaseService";
-import { AddressSuggestion, HslColor, RgbaColor, StylesObject } from "../interfaces";
+import { HslColor, RgbaColor, StylesObject } from "../interfaces";
+import {
+	convertDecimalToPercentage,
+	getHslFromColorString,
+	getRgbaFromCssColor,
+	rgbToHsl,
+} from "../utils/colorUtils";
 
 export class StyleService extends BaseService {
 	static convertStylesObjectToCssBlock(stylesObject: StylesObject): string {
@@ -16,48 +22,6 @@ export class StyleService extends BaseService {
 		return selectorsBlock.join("");
 	}
 
-	getFormattedAddressSuggestion(
-		suggestion: AddressSuggestion,
-		isSecondary: boolean = false,
-	): string {
-		const { street_line, secondary = "", city, state, zipcode } = suggestion;
-		const streetText = isSecondary ? "…" : street_line;
-		const secondaryText = secondary.length ? ` ${secondary}` : secondary;
-
-		return `${streetText}${secondaryText}, ${city}, ${state} ${zipcode}`;
-	}
-
-	createHighlightedTextElements(
-		text: string,
-		searchString: string,
-	): Array<{ text: string; isMatch?: boolean }> {
-		if (!searchString || !searchString.trim()) {
-			return [{ text }];
-		}
-
-		const searchLower = searchString.toLowerCase().trim();
-		const textLower = text.toLowerCase();
-		const matchIndex = textLower.indexOf(searchLower);
-
-		if (matchIndex === -1) {
-			return [{ text }];
-		}
-
-		const result: Array<{ text: string; isMatch?: boolean }> = [];
-
-		if (matchIndex > 0) {
-			result.push({ text: text.slice(0, matchIndex) });
-		}
-
-		result.push({ text: text.slice(matchIndex, matchIndex + searchString.length), isMatch: true });
-
-		if (matchIndex + searchString.length < text.length) {
-			result.push({ text: text.slice(matchIndex + searchString.length) });
-		}
-
-		return result;
-	}
-
 	formatStyleBlock(selector: string, styles: {}): string {
 		const stylesString = Object.entries(styles)
 			.map(([property, value]) => `${property}: ${value};`)
@@ -70,90 +34,24 @@ export class StyleService extends BaseService {
 	}
 
 	convertDecimalToPercentage(decimal: number): number {
-		return +(decimal * 100);
+		return convertDecimalToPercentage(decimal);
 	}
 
-	rgbToHsl({ red, green, blue, alpha }: RgbaColor): HslColor {
-		const r = red / 255;
-		const g = green / 255;
-		const b = blue / 255;
-
-		const cmin = Math.min(r, g, b);
-		const cmax = Math.max(r, g, b);
-		const delta = cmax - cmin;
-		const midpoint = (cmin + cmax) / 2;
-
-		const hue = this.calculateHue(r, g, b, cmax, delta);
-		const saturation = this.calculateSaturation(delta, midpoint);
-		const lightness = this.convertDecimalToPercentage(midpoint);
-
-		return { hue, saturation, lightness, alpha };
-	}
-
-	private calculateHue(r: number, g: number, b: number, cmax: number, delta: number): number {
-		if (delta === 0) return 0;
-
-		let hue: number;
-		if (cmax === r) {
-			hue = ((g - b) / delta) % 6;
-		} else if (cmax === g) {
-			hue = (b - r) / delta + 2;
-		} else {
-			hue = (r - g) / delta + 4;
-		}
-
-		hue *= 60;
-		return hue < 0 ? hue + 360 : hue;
-	}
-
-	private calculateSaturation(delta: number, midpoint: number): number {
-		if (delta === 0) return 0;
-		return this.convertDecimalToPercentage(delta / (1 - Math.abs(2 * midpoint - 1)));
+	rgbToHsl(rgba: RgbaColor): HslColor {
+		return rgbToHsl(rgba);
 	}
 
 	getHslFromColorString(cssColor: string): HslColor {
-		const rgbaColor = this.getRgbaFromCssColor(cssColor);
-		const validRgba: RgbaColor = {
-			red: rgbaColor.red ?? 0,
-			green: rgbaColor.green ?? 0,
-			blue: rgbaColor.blue ?? 0,
-			alpha: rgbaColor.alpha ?? 1,
-		};
-		return this.rgbToHsl(validRgba);
+		return getHslFromColorString(cssColor);
 	}
 
-	getRgbaFromCssColor(cssColor: string): {
-		red: number;
-		green: number;
-		blue: number;
-		alpha: number;
-	} {
-		const canvas = document.createElement("canvas");
-		canvas.width = 1;
-		canvas.height = 1;
-		const context = canvas.getContext("2d", { willReadFrequently: true });
-
-		if (!context) {
-			return { red: 0, green: 0, blue: 0, alpha: 1 };
-		}
-
-		context.globalCompositeOperation = "copy";
-		context.fillStyle = cssColor as any;
-		context.fillRect(0, 0, 1, 1);
-
-		const imageData = context.getImageData(0, 0, 1, 1).data;
-		const red = imageData[0] ?? 0;
-		const green = imageData[1] ?? 0;
-		const blue = imageData[2] ?? 0;
-		const aByte = imageData[3] ?? 255;
-		const alpha = Math.round((aByte / 255) * 1000) / 1000;
-
-		return { red, green, blue, alpha };
+	getRgbaFromCssColor(cssColor: string): RgbaColor {
+		return getRgbaFromCssColor(cssColor);
 	}
 
 	getNearestStyledElement(element: HTMLElement, colorProperty: string): HTMLElement {
 		const colorValue = this.domService.getElementStyles(element, colorProperty);
-		const { alpha } = this.getRgbaFromCssColor(colorValue);
+		const { alpha } = getRgbaFromCssColor(colorValue);
 
 		return alpha < 0.1 && element.parentElement
 			? this.getNearestStyledElement(element.parentElement, colorProperty)
@@ -200,7 +98,7 @@ export class StyleService extends BaseService {
 		);
 		const inputTextColor = this.domService.getElementStyles(colorElement, "color");
 
-		const { hue, saturation, lightness } = this.getHslFromColorString(inputBackgroundColor);
+		const { hue, saturation, lightness } = getHslFromColorString(inputBackgroundColor);
 		const derivedColors = this.deriveSurfaceColors(hue, saturation, lightness);
 
 		return {
