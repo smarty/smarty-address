@@ -1,5 +1,6 @@
 import { BaseService } from "./BaseService";
 import { HslColor, RgbaColor, StylesObject } from "../interfaces";
+import { CSS_CLASSES, CSS_PREFIXES } from "../constants/cssClasses";
 import {
 	convertDecimalToPercentage,
 	getHslFromColorString,
@@ -30,7 +31,7 @@ export class StyleService extends BaseService {
 	}
 
 	getInstanceClassName(instanceId: number): string {
-		return `smartyAddress__instance_${instanceId}`;
+		return `${CSS_PREFIXES.instance}${instanceId}`;
 	}
 
 	convertDecimalToPercentage(decimal: number): number {
@@ -68,11 +69,11 @@ export class StyleService extends BaseService {
 		const instanceClass = this.getInstanceClassName(instanceId);
 
 		const colorsStyleBlock = this.formatStyleBlock(
-			`.smartyAddress__color_dynamic.${instanceClass}`,
+			`.${CSS_CLASSES.colorDynamic}.${instanceClass}`,
 			colorStyles,
 		);
 		const positionStyleBlock = this.formatStyleBlock(
-			`.smartyAddress__position_dynamic.${instanceClass}`,
+			`.${CSS_CLASSES.positionDynamic}.${instanceClass}`,
 			positionStyles,
 		);
 

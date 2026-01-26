@@ -1,5 +1,6 @@
 import { BaseService } from "./BaseService";
 import { AddressSuggestion, SmartyAddressConfig, UiSuggestionItem } from "../interfaces";
+import { CSS_CLASSES, CSS_PREFIXES } from "../constants/cssClasses";
 import { getSmartyLogo } from "../utils/getSmartyLogo";
 import { ElementConfig } from "./DomService";
 
@@ -412,7 +413,7 @@ export class DropdownService extends BaseService {
 	}
 
 	getDropdownId(): string {
-		return `smartyAddress__dropdown_${this.instanceId}`;
+		return `${CSS_PREFIXES.dropdown}${this.instanceId}`;
 	}
 
 	getSearchInputElement(): HTMLInputElement | null {
@@ -555,11 +556,11 @@ export class DropdownService extends BaseService {
 	}
 
 	showElement(element: HTMLElement): void {
-		element.classList.remove("smartyAddress__hidden");
+		element.classList.remove(CSS_CLASSES.hidden);
 	}
 
 	hideElement(element: HTMLElement): void {
-		element.classList.add("smartyAddress__hidden");
+		element.classList.add(CSS_CLASSES.hidden);
 	}
 
 	configureSearchInputForAutocomplete(
@@ -577,7 +578,7 @@ export class DropdownService extends BaseService {
 	}
 
 	getSuggestionId(index: number): string {
-		return `smartyAddress__suggestion_${this.instanceId}_${index}`;
+		return `${CSS_PREFIXES.suggestion}${this.instanceId}_${index}`;
 	}
 
 	configureDynamicStyling(dynamicStylingHandler: Function, searchInputElement: HTMLElement): void {
@@ -617,19 +618,19 @@ export class DropdownService extends BaseService {
 	}
 
 	private buildAutocompleteDomElements(instanceClassname: string): Record<string, HTMLElement | Text> {
-		const darkLogoElementClasses = ["smartyAddress__smartyLogoDark"];
-		const lightLogoElementClasses = ["smartyAddress__smartyLogoLight"];
-		const suggestionsElementClasses = ["smartyAddress__suggestionsElement"];
-		const poweredByElementClasses = ["smartyAddress__poweredBy"];
+		const darkLogoElementClasses = [CSS_CLASSES.smartyLogoDark];
+		const lightLogoElementClasses = [CSS_CLASSES.smartyLogoLight];
+		const suggestionsElementClasses = [CSS_CLASSES.suggestionsElement];
+		const poweredByElementClasses = [CSS_CLASSES.poweredBy];
 		const dropdownElementInitialClasses = [
-			"smartyAddress__dropdownElement",
-			"smartyAddress__hidden",
+			CSS_CLASSES.dropdownElement,
+			CSS_CLASSES.hidden,
 		];
 		const dropdownWrapperElementClasses = [
-			"smartyAddress__suggestionsWrapperElement",
+			CSS_CLASSES.suggestionsWrapperElement,
 			instanceClassname,
 		];
-		const announcementElementClasses = ["smartyAddress__srOnly"];
+		const announcementElementClasses = [CSS_CLASSES.srOnly];
 
 		const elementsMap: ElementConfig[] = [
 			{ name: "customStylesElement", elementType: "style" },
@@ -704,17 +705,17 @@ export class DropdownService extends BaseService {
 		entries: number = 0,
 		suggestionId?: string,
 	): Record<string, HTMLElement | Text> {
-		const addressElementClasses = ["smartyAddress__autocompleteAddress"];
-		const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
-		const entriesElementClasses = ["smartyAddress__suggestionEntries"];
-		const suggestionElementClasses = ["smartyAddress__suggestion"];
+		const addressElementClasses = [CSS_CLASSES.autocompleteAddress];
+		const addressWrapperElementClasses = [CSS_CLASSES.addressWrapper];
+		const entriesElementClasses = [CSS_CLASSES.suggestionEntries];
+		const suggestionElementClasses = [CSS_CLASSES.suggestion];
 
 		const entriesChildren: ElementConfig[] | undefined =
 			entries > 1 ? [{ text: `${entries} entries` }] : undefined;
 
 		const addressChildren: ElementConfig[] = highlightedParts.map((part) => ({
 			elementType: "span",
-			className: part.isMatch ? ["smartyAddress__matchedText"] : [],
+			className: part.isMatch ? [CSS_CLASSES.matchedText] : [],
 			children: [{ text: part.text }],
 		}));
 
@@ -765,13 +766,13 @@ export class DropdownService extends BaseService {
 		ariaLabel: string,
 		suggestionId?: string,
 	): Record<string, HTMLElement | Text> {
-		const addressElementClasses = ["smartyAddress__autocompleteAddress"];
-		const addressWrapperElementClasses = ["smartyAddress__addressWrapper"];
-		const secondarySuggestionElementClasses = ["smartyAddress__secondarySuggestion"];
+		const addressElementClasses = [CSS_CLASSES.autocompleteAddress];
+		const addressWrapperElementClasses = [CSS_CLASSES.addressWrapper];
+		const secondarySuggestionElementClasses = [CSS_CLASSES.secondarySuggestion];
 
 		const addressChildren: ElementConfig[] = highlightedParts.map((part) => ({
 			elementType: "span",
-			className: part.isMatch ? ["smartyAddress__matchedText"] : [],
+			className: part.isMatch ? [CSS_CLASSES.matchedText] : [],
 			children: [{ text: part.text }],
 		}));
 
