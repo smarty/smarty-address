@@ -65,9 +65,9 @@ export class FormService extends BaseService {
 		return match?.value ?? null;
 	}
 
-	getStreetLineFormValue(
+	getStreetFormValue(
 		elements: {
-			streetLineInputElement: HTMLElement | null;
+			streetInputElement: HTMLElement | null;
 			secondaryInputElement: HTMLInputElement | null;
 			cityInputElement: HTMLInputElement | null;
 			stateInputElement: HTMLInputElement | null;
@@ -76,7 +76,7 @@ export class FormService extends BaseService {
 		address: AddressSuggestion,
 	): string {
 		const {
-			streetLineInputElement,
+			streetInputElement,
 			secondaryInputElement,
 			cityInputElement,
 			stateInputElement,
@@ -88,7 +88,7 @@ export class FormService extends BaseService {
 		if (isSingleFieldForm) {
 			return this.formatSingleFieldAddress(
 				address,
-				streetLineInputElement instanceof HTMLTextAreaElement,
+				streetInputElement instanceof HTMLTextAreaElement,
 			);
 		}
 
@@ -119,7 +119,7 @@ export class FormService extends BaseService {
 
 	populateFormWithAddress(selectedAddress: AddressSuggestion) {
 		const elements = {
-			streetLineInputElement: this.domService.findDomElement(this.streetSelector),
+			streetInputElement: this.domService.findDomElement(this.streetSelector),
 			secondaryInputElement: this.domService.findDomElement(
 				this.secondarySelector,
 			) as HTMLInputElement | null,
@@ -134,10 +134,10 @@ export class FormService extends BaseService {
 			) as HTMLInputElement | null,
 		};
 
-		if (!elements?.streetLineInputElement) return;
+		if (!elements?.streetInputElement) return;
 
-		const streetLineValue = this.getStreetLineFormValue(elements, selectedAddress);
-		this.domService.setInputValue(elements.streetLineInputElement, streetLineValue);
+		const streetValue = this.getStreetFormValue(elements, selectedAddress);
+		this.domService.setInputValue(elements.streetInputElement, streetValue);
 
 		if (elements.secondaryInputElement) {
 			this.domService.setInputValue(

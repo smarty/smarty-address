@@ -9,8 +9,8 @@ describe("ApiService", () => {
 	});
 
 	describe("getMatchingResult", () => {
-		const createSuggestion = (streetLine: string, secondary: string = ""): AddressSuggestion => ({
-			street_line: streetLine,
+		const createSuggestion = (street: string, secondary: string = ""): AddressSuggestion => ({
+			street_line: street,
 			secondary,
 			city: "Denver",
 			state: "CO",

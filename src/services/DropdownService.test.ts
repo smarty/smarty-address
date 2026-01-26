@@ -5,9 +5,9 @@ import { DropdownService, UiSuggestionItem } from "./DropdownService";
 
 describe("DropdownService", () => {
 	describe("getMergedSuggestions", () => {
-		const createMockUiSuggestionItem = (streetLine: string): UiSuggestionItem => ({
+		const createMockUiSuggestionItem = (street: string): UiSuggestionItem => ({
 			address: {
-				street_line: streetLine,
+				street_line: street,
 				city: "Denver",
 				state: "CO",
 				zipcode: "80202",
