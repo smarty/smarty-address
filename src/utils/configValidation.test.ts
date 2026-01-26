@@ -1,4 +1,4 @@
-import { validateConfig, ConfigValidationError } from "./configValidation";
+import { validateConfig, ConfigValidationError } from "./appUtils";
 import { SmartyAddressConfig } from "../interfaces";
 
 describe("configValidation", () => {

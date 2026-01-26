@@ -6,8 +6,7 @@ import { FormatService } from "./services/FormatService";
 import { DomService } from "./services/DomService";
 import { StyleService } from "./services/StyleService";
 import { themes } from "./themes";
-import { defineStyles } from "./utils/appUtils";
-import { validateConfig } from "./utils/configValidation";
+import { defineStyles, validateConfig } from "./utils/appUtils";
 import { US_AUTOCOMPLETE_PRO_API_URL } from "./constants";
 
 export default class SmartyAddress {
