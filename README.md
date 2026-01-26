@@ -54,6 +54,16 @@ These selectors define where the selected address data gets populated:
 | `stateSelector` | `string` | CSS selector for state field |
 | `zipcodeSelector` | `string` | CSS selector for ZIP code field |
 
+#### International Naming
+
+For international address forms, you can use alternative names that align with Smarty's international API conventions:
+
+| US Name | International Alternative |
+|---------|--------------------------|
+| `citySelector` | `localitySelector` |
+| `stateSelector` | `administrativeAreaSelector`, `regionSelector`, `provinceSelector` |
+| `zipcodeSelector` | `postalCodeSelector`, `postcodeSelector`, `zipSelector` |
+
 ### API Options
 
 These options control the suggestions returned by the Smarty API:
@@ -71,6 +81,20 @@ These options control the suggestions returned by the Smarty API:
 | `preferRatio` | `number` | Ratio of preferred results (0-100) |
 | `preferGeolocation` | `string` | Prefer results near a geolocation |
 | `source` | `"postal" \| "all"` | Address data source |
+
+#### International Naming
+
+API filter options also accept international alternatives:
+
+| US Name | International Alternative |
+|---------|--------------------------|
+| `includeOnlyCities` | `includeOnlyLocalities` |
+| `includeOnlyStates` | `includeOnlyAdministrativeAreas` |
+| `includeOnlyZipCodes` | `includeOnlyPostalCodes` |
+| `excludeStates` | `excludeAdministrativeAreas` |
+| `preferCities` | `preferLocalities` |
+| `preferStates` | `preferAdministrativeAreas` |
+| `preferZipCodes` | `preferPostalCodes` |
 
 ## Lifecycle Hooks
 
