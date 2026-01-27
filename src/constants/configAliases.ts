@@ -47,21 +47,3 @@ export const API_FILTER_ALIASES: Record<string, string> = {
 	preferZipcodes: "preferPostalCodes",
 	preferPostcodes: "preferPostalCodes",
 };
-
-export const CANONICAL_SELECTOR_NAMES = [
-	"streetSelector",
-	"secondarySelector",
-	"localitySelector",
-	"administrativeAreaSelector",
-	"postalCodeSelector",
-] as const;
-
-export const CANONICAL_API_FILTER_NAMES = [
-	"includeOnlyLocalities",
-	"includeOnlyAdministrativeAreas",
-	"includeOnlyPostalCodes",
-	"excludeAdministrativeAreas",
-	"preferLocalities",
-	"preferAdministrativeAreas",
-	"preferPostalCodes",
-] as const;
