@@ -63,6 +63,8 @@ export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 	preferStates?: string[];
 	preferZipCodes?: string[];
 
+	domWaitTimeoutMs?: number;
+
 	services?: ServiceClassOverrides;
 	onAddressSelected?: (address: AutocompleteSuggestion) => void;
 	onAutocompleteSuggestionsReceived?: (suggestions: AutocompleteSuggestion[]) => AutocompleteSuggestion[];
@@ -79,6 +81,8 @@ export interface NormalizedSmartyAddressConfig extends DefaultSmartyAddressConfi
 	localitySelector?: string;
 	administrativeAreaSelector?: string;
 	postalCodeSelector?: string;
+
+	domWaitTimeoutMs?: number;
 
 	services?: ServiceClassOverrides;
 	onAddressSelected?: (address: AutocompleteSuggestion) => void;

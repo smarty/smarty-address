@@ -78,6 +78,42 @@ describe("DomService", () => {
 		});
 	});
 
+	describe("findDomElementWithRetry", () => {
+		it("should resolve immediately when element exists", async () => {
+			document.body.innerHTML = '<div id="existing-element"></div>';
+
+			const result = await service.findDomElementWithRetry("#existing-element");
+			expect(result).not.toBeNull();
+			expect(result?.id).toBe("existing-element");
+		});
+
+		it("should resolve when element is added dynamically", async () => {
+			const promise = service.findDomElementWithRetry("#dynamic-element", 5000);
+
+			setTimeout(() => {
+				const element = document.createElement("div");
+				element.id = "dynamic-element";
+				document.body.appendChild(element);
+			}, 50);
+
+			const result = await promise;
+			expect(result).not.toBeNull();
+			expect(result?.id).toBe("dynamic-element");
+		});
+
+		it("should return null when element never appears within timeout", async () => {
+			const result = await service.findDomElementWithRetry("#never-exists", 100);
+			expect(result).toBeNull();
+		});
+
+		it("should use default timeout when not specified", async () => {
+			document.body.innerHTML = '<div id="default-timeout"></div>';
+
+			const result = await service.findDomElementWithRetry("#default-timeout");
+			expect(result).not.toBeNull();
+		});
+	});
+
 	describe("setInputValue", () => {
 		it("should set value on input element", () => {
 			const input = document.createElement("input");

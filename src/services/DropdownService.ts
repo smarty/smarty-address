@@ -133,6 +133,7 @@ export class DropdownService extends BaseService {
 	private async setupSearchInput(): Promise<void> {
 		const searchInputElement = (await this.domService.findDomElementWithRetry(
 			this.searchInputSelector,
+			this.config?.domWaitTimeoutMs,
 		)) as HTMLInputElement | null;
 
 		if (!searchInputElement) {

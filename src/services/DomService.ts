@@ -16,15 +16,30 @@ export class DomService extends BaseService {
 
 	async findDomElementWithRetry(
 		selector: string,
-		maxAttempts: number = 50,
-		delayMs: number = 100,
+		timeoutMs: number = 5000,
 	): Promise<HTMLElement | null> {
-		const retryAfterDelay = async () => {
-			await new Promise((resolve) => setTimeout(resolve, delayMs));
-			return this.findDomElementWithRetry(selector, maxAttempts - 1, delayMs);
-		};
+		const existing = this.findDomElement(selector);
+		if (existing) return existing;
 
-		return this.findDomElement(selector) ?? (maxAttempts > 1 ? await retryAfterDelay() : null);
+		return new Promise((resolve) => {
+			const observer = new MutationObserver(() => {
+				const element = this.findDomElement(selector);
+				if (element) {
+					observer.disconnect();
+					resolve(element);
+				}
+			});
+
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true,
+			});
+
+			setTimeout(() => {
+				observer.disconnect();
+				resolve(null);
+			}, timeoutMs);
+		});
 	}
 
 	createDomElement(

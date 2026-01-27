@@ -44,36 +44,63 @@ This document outlines the issues identified during code review and the plan to 
 
 ---
 
-### 2. Make Retry Parameters Configurable
+### 2. Replace Retry Loop with MutationObserver
 
-**Problem:** 5-second retry window (50 attempts × 100ms) is hardcoded.
+**Problem:** Polling loop (50 attempts × 100ms) is inefficient for waiting on dynamically-added elements (e.g., React components).
+
+**Why MutationObserver is better:**
+- Event-driven: detects elements instantly when added (no polling delay)
+- Zero CPU usage while waiting (no setTimeout loops)
+- Standard browser API for observing DOM changes
 
 **Files to modify:**
 - `src/interfaces.ts`
 - `src/services/DomService.ts`
-- `src/services/DropdownService.ts`
 
 **Implementation:**
 
 1. Add to `SmartyAddressConfig`:
    ```typescript
-   domRetryAttempts?: number;
-   domRetryDelayMs?: number;
+   domWaitTimeoutMs?: number;  // Single timeout instead of attempts × delay
    ```
 
-2. Pass config to `DomService.init()`:
+2. Replace `findDomElementWithRetry()` in `DomService`:
    ```typescript
-   init(config: NormalizedSmartyAddressConfig) {
-       this.maxRetryAttempts = config.domRetryAttempts ?? 50;
-       this.retryDelayMs = config.domRetryDelayMs ?? 100;
+   async findDomElementWithRetry(
+       selector: string,
+       timeoutMs: number = 5000,
+   ): Promise<HTMLElement | null> {
+       const existing = this.findDomElement(selector);
+       if (existing) return existing;
+
+       return new Promise((resolve) => {
+           const observer = new MutationObserver(() => {
+               const element = this.findDomElement(selector);
+               if (element) {
+                   observer.disconnect();
+                   resolve(element);
+               }
+           });
+
+           observer.observe(document.body, {
+               childList: true,
+               subtree: true,
+           });
+
+           setTimeout(() => {
+               observer.disconnect();
+               resolve(null);
+           }, timeoutMs);
+       });
    }
    ```
 
-3. Use instance properties in `findDomElementWithRetry()`
+3. Update callers to pass `config.domWaitTimeoutMs` if provided
 
 **Tests to add:**
-- Test with custom retry values
-- Test that default values work unchanged
+- Test immediate resolution when element exists
+- Test MutationObserver triggers when element is added dynamically
+- Test timeout returns null when element never appears
 
 ---
 
