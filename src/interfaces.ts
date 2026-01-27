@@ -65,6 +65,9 @@ export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 
 	domWaitTimeoutMs?: number;
 
+	/** @internal For testing only - bypasses isTrusted check on events */
+	_testMode?: boolean;
+
 	services?: ServiceClassOverrides;
 	onAddressSelected?: (address: AutocompleteSuggestion) => void;
 	onAutocompleteSuggestionsReceived?: (suggestions: AutocompleteSuggestion[]) => AutocompleteSuggestion[];
@@ -83,6 +86,9 @@ export interface NormalizedSmartyAddressConfig extends DefaultSmartyAddressConfi
 	postalCodeSelector?: string;
 
 	domWaitTimeoutMs?: number;
+
+	/** @internal For testing only - bypasses isTrusted check on events */
+	_testMode?: boolean;
 
 	services?: ServiceClassOverrides;
 	onAddressSelected?: (address: AutocompleteSuggestion) => void;

@@ -192,7 +192,7 @@ export class DropdownService extends BaseService {
 	}
 
 	handleSearchInputOnChange(event: Event): void {
-		if (!event.isTrusted) return;
+		if (!event.isTrusted && !this.config?._testMode) return;
 
 		const searchInputValue = (event.target as HTMLInputElement)?.value;
 		const selectedAddressSearchTerm = this.getSelectedAddressSearchTerm();

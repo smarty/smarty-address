@@ -197,6 +197,7 @@ describe("ApiService", () => {
 		});
 
 		it("should throw auth error on 401 response", async () => {
+			const consoleSpy = jest.spyOn(console, "error").mockImplementation();
 			const mockFetch = jest.fn().mockResolvedValue({
 				ok: false,
 				status: 401,
@@ -206,14 +207,17 @@ describe("ApiService", () => {
 			await expect(
 				service.fetchAutocompleteResults(apiConfig, "test", null, mockFetch),
 			).rejects.toThrow("authenticationRequired");
+			consoleSpy.mockRestore();
 		});
 
 		it("should throw unknown error on network failure", async () => {
+			const consoleSpy = jest.spyOn(console, "error").mockImplementation();
 			const mockFetch = jest.fn().mockRejectedValue(new Error("Network error"));
 
 			await expect(
 				service.fetchAutocompleteResults(apiConfig, "test", null, mockFetch),
 			).rejects.toThrow(unknownError.name);
+			consoleSpy.mockRestore();
 		});
 
 		it("should map API params correctly", async () => {
