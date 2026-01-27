@@ -3,11 +3,9 @@ import { AutocompleteSuggestion, NormalizedSmartyAddressConfig } from "../interf
 import { CSS_CLASSES, CSS_PREFIXES } from "../constants/cssClasses";
 import { getSmartyLogo } from "../utils/getSmartyLogo";
 import { ElementConfig } from "./DomService";
+import { UiAutocompleteSuggestionItem } from "./DropdownStateService";
 
-export interface UiAutocompleteSuggestionItem {
-	address: AutocompleteSuggestion;
-	autocompleteSuggestionElement: HTMLElement;
-}
+export type { UiAutocompleteSuggestionItem } from "./DropdownStateService";
 
 export class DropdownService extends BaseService {
 	private instanceId: number;
@@ -20,14 +18,6 @@ export class DropdownService extends BaseService {
 	private autocompleteSuggestionsElement: HTMLElement | null = null;
 	private customStylesElement: HTMLStyleElement | null = null;
 	private announcementElement: HTMLElement | null = null;
-
-	private selectedAddressSearchTerm: string = "";
-	private _isDropdownOpen: boolean = false;
-	private isInteractingWithDropdown: boolean = false;
-	private highlightedAutocompleteSuggestionIndex: number = 0;
-	private selectedAutocompleteSuggestionIndex: number = -1;
-	private autocompleteSuggestionResults: UiAutocompleteSuggestionItem[] = [];
-	private secondaryAutocompleteSuggestionResults: UiAutocompleteSuggestionItem[] = [];
 
 	private cleanupFunctions: (() => void)[] = [];
 	private mutationObserver: MutationObserver | null = null;
@@ -68,6 +58,14 @@ export class DropdownService extends BaseService {
 		}
 
 		this.searchInputSelector = config.searchInputSelector ?? config.streetSelector ?? "";
+
+		this.keyboardNavigationService.setCallbacks({
+			onSelectItem: (index: number) => this.handleSelectDropdownItem(index),
+			onClose: () => this.closeDropdown(),
+			getAutocompleteSuggestionsElement: () => this.autocompleteSuggestionsElement,
+			updateAriaActivedescendant: (id: string | null) => this.updateAriaActivedescendant(id),
+		});
+
 		this.setupDom();
 	}
 
@@ -108,7 +106,7 @@ export class DropdownService extends BaseService {
 	}
 
 	private handleDocumentMouseUp = (): void => {
-		this.isInteractingWithDropdown = false;
+		this.dropdownStateService.setIsInteractingWithDropdown(false);
 	};
 
 	private configureDropdownInteractions(): void {
@@ -117,7 +115,7 @@ export class DropdownService extends BaseService {
 		this.dropdownElement.id = this.getDropdownId();
 
 		const mousedownHandler = () => {
-			this.isInteractingWithDropdown = true;
+			this.dropdownStateService.setIsInteractingWithDropdown(true);
 		};
 		this.dropdownElement.addEventListener("mousedown", mousedownHandler);
 		this.cleanupFunctions.push(() =>
@@ -160,7 +158,7 @@ export class DropdownService extends BaseService {
 	}
 
 	handleSearchInputFocusOut(event: FocusEvent): void {
-		if (this.isInteractingWithDropdown) return;
+		if (this.dropdownStateService.getIsInteractingWithDropdown()) return;
 
 		const relatedTarget = event.relatedTarget as Node | null;
 		const searchInputElement = this.getSearchInputElement();
@@ -173,36 +171,21 @@ export class DropdownService extends BaseService {
 	}
 
 	handleAutocompleteKeydown(event: KeyboardEvent): void {
-		const pressedKey = event.key;
-		const dropdownIsOpen = this.isDropdownOpen();
-
-		if (dropdownIsOpen) {
-			const handledKeys: Record<string, () => void> = {
-				ArrowDown: () => this.highlightNewAddress(1),
-				ArrowUp: () => this.highlightNewAddress(-1),
-				Enter: () => this.handleSelectDropdownItem(this.getHighlightedIndex()),
-				Escape: () => this.closeDropdown(),
-			};
-
-			if (handledKeys[pressedKey]) {
-				handledKeys[pressedKey]();
-				event.preventDefault();
-			}
-		}
+		this.keyboardNavigationService.handleAutocompleteKeydown(event);
 	}
 
 	handleSearchInputOnChange(event: Event): void {
 		if (!event.isTrusted && !this.config?._testMode) return;
 
 		const searchInputValue = (event.target as HTMLInputElement)?.value;
-		const selectedAddressSearchTerm = this.getSelectedAddressSearchTerm();
+		const selectedAddressSearchTerm = this.dropdownStateService.getSelectedAddressSearchTerm();
 
 		if (!searchInputValue.startsWith(selectedAddressSearchTerm)) {
-			this.setSelectedIndex(-1);
+			this.dropdownStateService.setSelectedIndex(-1);
 		}
 
-		const mergedAutocompleteSuggestions = this.getMergedAutocompleteSuggestions();
-		const currentSelectedIndex = this.getSelectedIndex();
+		const mergedAutocompleteSuggestions = this.dropdownStateService.getMergedAutocompleteSuggestions();
+		const currentSelectedIndex = this.dropdownStateService.getSelectedIndex();
 		const selectedAddress = mergedAutocompleteSuggestions[currentSelectedIndex];
 
 		if (searchInputValue.length) {
@@ -227,32 +210,11 @@ export class DropdownService extends BaseService {
 	}
 
 	highlightNewAddress(indexChange: number): number {
-		const items = this.getMergedAutocompleteSuggestions();
-		const currentIndex = this.getHighlightedIndex();
-		const newIndex = (currentIndex + indexChange + items.length) % items.length;
-
-		items.forEach((item: UiAutocompleteSuggestionItem, i: number) => {
-			item.autocompleteSuggestionElement.setAttribute("aria-selected", i === newIndex ? "true" : "false");
-		});
-
-		if (items[newIndex]) {
-			this.scrollToHighlightedAutocompleteSuggestion(
-				items[newIndex].autocompleteSuggestionElement,
-				this.autocompleteSuggestionsElement!,
-			);
-		}
-		this.setHighlightedIndex(newIndex);
-
-		if (items[newIndex]) {
-			const autocompleteSuggestionId = items[newIndex].autocompleteSuggestionElement.id;
-			this.updateAriaActivedescendant(autocompleteSuggestionId);
-		}
-
-		return newIndex;
+		return this.keyboardNavigationService.highlightNewAddress(indexChange);
 	}
 
 	handleSelectDropdownItem(addressIndex: number): void {
-		const mergedAutocompleteSuggestions = this.getMergedAutocompleteSuggestions();
+		const mergedAutocompleteSuggestions = this.dropdownStateService.getMergedAutocompleteSuggestions();
 		const selectedAddress = mergedAutocompleteSuggestions[addressIndex];
 		if (!selectedAddress) return;
 
@@ -262,11 +224,11 @@ export class DropdownService extends BaseService {
 
 		const { street_line, secondary = "", entries = 0 } = selectedAddress.address;
 		const searchInputElement = this.getSearchInputElement();
-		this.setSelectedIndex(addressIndex);
+		this.dropdownStateService.setSelectedIndex(addressIndex);
 
 		if (entries > 1 && searchInputElement) {
 			const newSearchTerm = `${street_line} ${secondary}`;
-			this.setSelectedAddressSearchTerm(newSearchTerm);
+			this.dropdownStateService.setSelectedAddressSearchTerm(newSearchTerm);
 			searchInputElement.value = newSearchTerm;
 			this.apiService.fetchSecondaryAutocompleteSuggestions(newSearchTerm, selectedAddress.address, {
 				onSuccess: (autocompleteSuggestions, searchString) =>
@@ -293,8 +255,8 @@ export class DropdownService extends BaseService {
 			"autocompleteSuggestionElement",
 		);
 
-		this.setAutocompleteSuggestions(autocompleteSuggestionItems);
-		this.setSecondaryAutocompleteSuggestions([]);
+		this.dropdownStateService.setAutocompleteSuggestions(autocompleteSuggestionItems);
+		this.dropdownStateService.setSecondaryAutocompleteSuggestions([]);
 
 		const count = autocompleteSuggestionItems.length;
 		const announcement = `${count} address${count === 1 ? "" : "es"} found. Use arrow keys to navigate.`;
@@ -302,7 +264,7 @@ export class DropdownService extends BaseService {
 	}
 
 	processSecondaryAutocompleteSuggestions(suggestions: AutocompleteSuggestion[], searchString: string): void {
-		const baseIndex = this.getAutocompleteSuggestions().length;
+		const baseIndex = this.dropdownStateService.getAutocompleteSuggestions().length;
 
 		const autocompleteSuggestionItems = this.createAutocompleteSuggestionItems(
 			suggestions,
@@ -311,14 +273,14 @@ export class DropdownService extends BaseService {
 			"secondaryAutocompleteSuggestionElement",
 		);
 
-		this.setSecondaryAutocompleteSuggestions(autocompleteSuggestionItems);
+		this.dropdownStateService.setSecondaryAutocompleteSuggestions(autocompleteSuggestionItems);
 
 		const count = autocompleteSuggestionItems.length;
 		const announcement = `${count} unit entr${count === 1 ? "y" : "ies"} found. Use arrow keys to navigate.`;
 		this.displayAutocompleteSuggestions(
 			autocompleteSuggestionItems,
-			this.getMergedAutocompleteSuggestions(),
-			this.getSelectedIndex() + 1,
+			this.dropdownStateService.getMergedAutocompleteSuggestions(),
+			this.dropdownStateService.getSelectedIndex() + 1,
 			announcement,
 		);
 	}
@@ -332,8 +294,8 @@ export class DropdownService extends BaseService {
 		this.updateDropdownContents(allItems);
 
 		if (newItems.length) {
-			this.setHighlightedIndex(initialHighlightIndex);
-			this.highlightNewAddress(0);
+			this.dropdownStateService.setHighlightedIndex(initialHighlightIndex);
+			this.keyboardNavigationService.highlightNewAddress(0);
 		}
 
 		this.announce(announcement);
@@ -349,7 +311,7 @@ export class DropdownService extends BaseService {
 		) => Record<string, HTMLElement | Text>,
 		elementKey: string,
 	): UiAutocompleteSuggestionItem[] {
-		const selectedAutocompleteSuggestionIndex = this.getSelectedIndex();
+		const selectedAutocompleteSuggestionIndex = this.dropdownStateService.getSelectedIndex();
 
 		return suggestions.map((address: AutocompleteSuggestion, addressIndex: number): UiAutocompleteSuggestionItem => {
 			const autocompleteSuggestionId = this.getAutocompleteSuggestionId(baseIndex + addressIndex);
@@ -370,7 +332,7 @@ export class DropdownService extends BaseService {
 
 	openDropdown(): void {
 		this.setAriaExpanded(true);
-		this.setDropdownOpen(true);
+		this.dropdownStateService.setDropdownOpen(true);
 		this.showDropdown();
 		if (this.config?.onDropdownOpen) {
 			this.config.onDropdownOpen();
@@ -380,8 +342,8 @@ export class DropdownService extends BaseService {
 	closeDropdown(): void {
 		this.setAriaExpanded(false);
 		this.updateAriaActivedescendant(null);
-		this.setDropdownOpen(false);
-		this.resetSelectionState();
+		this.dropdownStateService.setDropdownOpen(false);
+		this.dropdownStateService.resetSelectionState();
 		this.hideDropdown();
 		if (this.config?.onDropdownClose) {
 			this.config.onDropdownClose();
@@ -389,65 +351,59 @@ export class DropdownService extends BaseService {
 	}
 
 	getMergedAutocompleteSuggestions(): UiAutocompleteSuggestionItem[] {
-		return this.autocompleteSuggestionResults.toSpliced(
-			this.selectedAutocompleteSuggestionIndex + 1,
-			0,
-			...this.secondaryAutocompleteSuggestionResults,
-		);
+		return this.dropdownStateService.getMergedAutocompleteSuggestions();
 	}
 
 	getHighlightedIndex(): number {
-		return this.highlightedAutocompleteSuggestionIndex;
+		return this.dropdownStateService.getHighlightedIndex();
 	}
 
 	setHighlightedIndex(index: number): void {
-		this.highlightedAutocompleteSuggestionIndex = index;
+		this.dropdownStateService.setHighlightedIndex(index);
 	}
 
 	getSelectedIndex(): number {
-		return this.selectedAutocompleteSuggestionIndex;
+		return this.dropdownStateService.getSelectedIndex();
 	}
 
 	setSelectedIndex(index: number): void {
-		this.selectedAutocompleteSuggestionIndex = index;
+		this.dropdownStateService.setSelectedIndex(index);
 	}
 
 	isDropdownOpen(): boolean {
-		return this._isDropdownOpen;
+		return this.dropdownStateService.isDropdownOpen();
 	}
 
 	setDropdownOpen(open: boolean): void {
-		this._isDropdownOpen = open;
+		this.dropdownStateService.setDropdownOpen(open);
 	}
 
 	getAutocompleteSuggestions(): UiAutocompleteSuggestionItem[] {
-		return this.autocompleteSuggestionResults;
+		return this.dropdownStateService.getAutocompleteSuggestions();
 	}
 
 	setAutocompleteSuggestions(suggestions: UiAutocompleteSuggestionItem[]): void {
-		this.autocompleteSuggestionResults = suggestions;
+		this.dropdownStateService.setAutocompleteSuggestions(suggestions);
 	}
 
 	getSecondaryAutocompleteSuggestions(): UiAutocompleteSuggestionItem[] {
-		return this.secondaryAutocompleteSuggestionResults;
+		return this.dropdownStateService.getSecondaryAutocompleteSuggestions();
 	}
 
 	setSecondaryAutocompleteSuggestions(suggestions: UiAutocompleteSuggestionItem[]): void {
-		this.secondaryAutocompleteSuggestionResults = suggestions;
+		this.dropdownStateService.setSecondaryAutocompleteSuggestions(suggestions);
 	}
 
 	getSelectedAddressSearchTerm(): string {
-		return this.selectedAddressSearchTerm;
+		return this.dropdownStateService.getSelectedAddressSearchTerm();
 	}
 
 	setSelectedAddressSearchTerm(term: string): void {
-		this.selectedAddressSearchTerm = term;
+		this.dropdownStateService.setSelectedAddressSearchTerm(term);
 	}
 
 	resetSelectionState(): void {
-		this.selectedAddressSearchTerm = "";
-		this.selectedAutocompleteSuggestionIndex = -1;
-		this.highlightedAutocompleteSuggestionIndex = 0;
+		this.dropdownStateService.resetSelectionState();
 	}
 
 	getDropdownId(): string {
@@ -579,16 +535,7 @@ export class DropdownService extends BaseService {
 	}
 
 	scrollToHighlightedAutocompleteSuggestion(highlightedElement: HTMLElement, container: HTMLElement): void {
-		const elementTop = highlightedElement.offsetTop;
-		const elementBottom = elementTop + highlightedElement.offsetHeight;
-		const containerTop = container.scrollTop;
-		const containerBottom = containerTop + container.offsetHeight;
-
-		if (elementTop < containerTop) {
-			container.scrollTop = elementTop;
-		} else if (elementBottom > containerBottom) {
-			container.scrollTop = elementBottom - container.offsetHeight;
-		}
+		this.keyboardNavigationService.scrollToHighlightedAutocompleteSuggestion(highlightedElement, container);
 	}
 
 	showElement(element: HTMLElement): void {

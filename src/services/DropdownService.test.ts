@@ -2,6 +2,7 @@
  * @jest-environment jsdom
  */
 import { DropdownService, UiAutocompleteSuggestionItem } from "./DropdownService";
+import { DropdownStateService } from "./DropdownStateService";
 
 describe("DropdownService", () => {
 	describe("getMergedAutocompleteSuggestions", () => {
@@ -16,8 +17,23 @@ describe("DropdownService", () => {
 			autocompleteSuggestionElement: document.createElement("div"),
 		});
 
+		const createServiceWithDependencies = () => {
+			const dropdownService = new DropdownService(1);
+			const dropdownStateService = new DropdownStateService();
+
+			const services = {
+				dropdownService,
+				dropdownStateService,
+			};
+
+			dropdownService.setServices(services);
+			dropdownStateService.setServices(services);
+
+			return dropdownService;
+		};
+
 		it("should insert secondary suggestions after selected index", () => {
-			const service = new DropdownService(1);
+			const service = createServiceWithDependencies();
 			const primary = [
 				createMockUiAutocompleteSuggestionItem("123 Main St"),
 				createMockUiAutocompleteSuggestionItem("456 Oak Ave"),
@@ -43,7 +59,7 @@ describe("DropdownService", () => {
 		});
 
 		it("should handle empty secondary suggestions", () => {
-			const service = new DropdownService(1);
+			const service = createServiceWithDependencies();
 			const primary = [
 				createMockUiAutocompleteSuggestionItem("123 Main St"),
 				createMockUiAutocompleteSuggestionItem("456 Oak Ave"),
@@ -61,7 +77,7 @@ describe("DropdownService", () => {
 		});
 
 		it("should handle empty primary suggestions", () => {
-			const service = new DropdownService(1);
+			const service = createServiceWithDependencies();
 			const secondary = [createMockUiAutocompleteSuggestionItem("123 Main St Apt 1")];
 
 			service.setAutocompleteSuggestions([]);
@@ -75,7 +91,7 @@ describe("DropdownService", () => {
 		});
 
 		it("should insert at middle position", () => {
-			const service = new DropdownService(1);
+			const service = createServiceWithDependencies();
 			const primary = [
 				createMockUiAutocompleteSuggestionItem("123 Main St"),
 				createMockUiAutocompleteSuggestionItem("456 Oak Ave"),

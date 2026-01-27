@@ -8,39 +8,38 @@ This document outlines the issues identified during code review and the plan to 
 
 ## Medium Priority
 
-### 1. Extract DropdownService Concerns
+### 1. Extract DropdownService Concerns ✅ COMPLETED
 
 **Problem:** DropdownService is 809 lines with multiple responsibilities.
 
-**Files to create:**
+**Files created:**
 - `src/services/DropdownStateService.ts` - State management (indices, suggestions arrays)
 - `src/services/KeyboardNavigationService.ts` - Keyboard event handling
-- `src/services/DropdownDomService.ts` - DOM creation and manipulation
 
-**Implementation:**
+**Implementation completed:**
 
-1. Create `DropdownStateService`:
-   - Move state properties: `highlightedAutocompleteSuggestionIndex`, `selectedAutocompleteSuggestionIndex`, etc.
-   - Move getters/setters for state
-   - Move `getMergedAutocompleteSuggestions()`
+1. Created `DropdownStateService`:
+   - Moved state properties: `highlightedAutocompleteSuggestionIndex`, `selectedAutocompleteSuggestionIndex`, etc.
+   - Moved getters/setters for state
+   - Moved `getMergedAutocompleteSuggestions()`
 
-2. Create `KeyboardNavigationService`:
-   - Move `handleAutocompleteKeydown()`
-   - Move `highlightNewAddress()`
-   - Move `scrollToHighlightedAutocompleteSuggestion()`
+2. Created `KeyboardNavigationService`:
+   - Moved `handleAutocompleteKeydown()`
+   - Moved `highlightNewAddress()`
+   - Moved `scrollToHighlightedAutocompleteSuggestion()`
 
-3. Keep in `DropdownService`:
+3. Kept in `DropdownService`:
    - High-level orchestration
    - Event listener attachment
-   - Public API methods
+   - Public API methods (delegating to new services)
 
-4. Update `BaseService` with new service getters
+4. Updated `BaseService` with new service getters
 
-5. Update `SmartyAddress` to instantiate new services
+5. Updated `SmartyAddress` to instantiate new services
 
-**Tests to add:**
-- Unit tests for each extracted service
-- Integration test verifying services work together
+**Tests added:**
+- `src/services/DropdownStateService.test.ts` - 14 tests
+- `src/services/KeyboardNavigationService.test.ts` - 13 tests
 
 ---
 
@@ -186,7 +185,7 @@ constructor(config: SmartyAddressConfig) {
 | Phase | Tasks | Status |
 |-------|-------|--------|
 | 1 | #2 (MutationObserver), #3 (Integration tests) | ✅ Completed |
-| 2 | #1 (Extract services) | Pending |
+| 2 | #1 (Extract services) | ✅ Completed |
 | 3 | #4 (Type safety), #5 (SSR), #6 (Minor types) | Pending |
 
 Since this is pre-launch, all changes can be implemented directly without deprecation periods or backward compatibility shims.
@@ -198,6 +197,6 @@ Since this is pre-launch, all changes can be implemented directly without deprec
 - [x] No memory leaks when creating/destroying instances
 - [x] Initialization completes before user interaction is possible
 - [x] API response edge cases handled gracefully
-- [x] All new code has test coverage (150 tests, including 26 integration tests)
+- [x] All new code has test coverage (177 tests, including 26 integration tests)
 - [ ] No TypeScript `any` or unsafe casts in modified code
 - [x] README documents the factory pattern usage

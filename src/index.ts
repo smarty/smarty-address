@@ -7,9 +7,11 @@ import { normalizeConfig } from "./utils/configNormalizer";
 import { ApiService } from "./services/ApiService";
 import { ColorService } from "./services/ColorService";
 import { DropdownService } from "./services/DropdownService";
+import { DropdownStateService } from "./services/DropdownStateService";
 import { FormService } from "./services/FormService";
 import { FormatService } from "./services/FormatService";
 import { DomService } from "./services/DomService";
+import { KeyboardNavigationService } from "./services/KeyboardNavigationService";
 import { StyleService } from "./services/StyleService";
 import { themes } from "./themes";
 import { defineStyles, validateConfig } from "./utils/appUtils";
@@ -32,9 +34,11 @@ export default class SmartyAddress {
 		ApiService,
 		ColorService,
 		DropdownService,
+		DropdownStateService,
 		FormService,
 		FormatService,
 		DomService,
+		KeyboardNavigationService,
 		StyleService,
 	};
 
@@ -44,9 +48,11 @@ export default class SmartyAddress {
 	private apiService: ApiService;
 	private colorService: ColorService;
 	private dropdownService: DropdownService;
+	private dropdownStateService: DropdownStateService;
 	private formService: FormService;
 	private formatService: FormatService;
 	private domService: DomService;
+	private keyboardNavigationService: KeyboardNavigationService;
 	private styleService: StyleService;
 
 	static async create(config: SmartyAddressConfig): Promise<SmartyAddress> {
@@ -62,9 +68,11 @@ export default class SmartyAddress {
 		const ApiServiceClass = config.services?.ApiService || ApiService;
 		const ColorServiceClass = config.services?.ColorService || ColorService;
 		const DropdownServiceClass = config.services?.DropdownService || DropdownService;
+		const DropdownStateServiceClass = config.services?.DropdownStateService || DropdownStateService;
 		const FormServiceClass = config.services?.FormService || FormService;
 		const FormatServiceClass = config.services?.FormatService || FormatService;
 		const DomServiceClass = config.services?.DomService || DomService;
+		const KeyboardNavigationServiceClass = config.services?.KeyboardNavigationService || KeyboardNavigationService;
 		const StyleServiceClass = config.services?.StyleService || StyleService;
 
 		this.colorService = new ColorServiceClass();
@@ -72,6 +80,8 @@ export default class SmartyAddress {
 		this.styleService = new StyleServiceClass();
 		this.formatService = new FormatServiceClass();
 		this.apiService = new ApiServiceClass();
+		this.dropdownStateService = new DropdownStateServiceClass();
+		this.keyboardNavigationService = new KeyboardNavigationServiceClass();
 		this.dropdownService = new DropdownServiceClass(this.instanceId);
 		this.formService = new FormServiceClass();
 
@@ -79,9 +89,11 @@ export default class SmartyAddress {
 			apiService: this.apiService,
 			colorService: this.colorService,
 			dropdownService: this.dropdownService,
+			dropdownStateService: this.dropdownStateService,
 			formService: this.formService,
 			formatService: this.formatService,
 			domService: this.domService,
+			keyboardNavigationService: this.keyboardNavigationService,
 			styleService: this.styleService,
 		};
 
@@ -106,9 +118,11 @@ export default class SmartyAddress {
 		this.apiService.destroy();
 		this.colorService.destroy();
 		this.dropdownService.destroy();
+		this.dropdownStateService.destroy();
 		this.formService.destroy();
 		this.formatService.destroy();
 		this.domService.destroy();
+		this.keyboardNavigationService.destroy();
 		this.styleService.destroy();
 
 		const index = SmartyAddress.instances.indexOf(this);

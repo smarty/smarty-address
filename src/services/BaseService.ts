@@ -2,18 +2,22 @@ import type { SmartyAddressConfig } from "../interfaces";
 import type { ApiService } from "./ApiService";
 import type { ColorService } from "./ColorService";
 import type { DropdownService } from "./DropdownService";
+import type { DropdownStateService } from "./DropdownStateService";
 import type { FormService } from "./FormService";
 import type { FormatService } from "./FormatService";
 import type { DomService } from "./DomService";
+import type { KeyboardNavigationService } from "./KeyboardNavigationService";
 import type { StyleService } from "./StyleService";
 
 export interface ServiceDependencies {
 	apiService?: ApiService;
 	colorService?: ColorService;
 	dropdownService?: DropdownService;
+	dropdownStateService?: DropdownStateService;
 	formService?: FormService;
 	formatService?: FormatService;
 	domService?: DomService;
+	keyboardNavigationService?: KeyboardNavigationService;
 	styleService?: StyleService;
 }
 
@@ -35,11 +39,6 @@ export abstract class BaseService {
 	protected get apiService(): ApiService {
 		if (!this.services.apiService) throw new Error("ApiService not initialized");
 		return this.services.apiService;
-	}
-
-	protected get dropdownService(): DropdownService {
-		if (!this.services.dropdownService) throw new Error("DropdownService not initialized");
-		return this.services.dropdownService;
 	}
 
 	protected get formService(): FormService {
@@ -65,5 +64,17 @@ export abstract class BaseService {
 	protected get colorService(): ColorService {
 		if (!this.services.colorService) throw new Error("ColorService not initialized");
 		return this.services.colorService;
+	}
+
+	protected get dropdownStateService(): DropdownStateService {
+		if (!this.services.dropdownStateService)
+			throw new Error("DropdownStateService not initialized");
+		return this.services.dropdownStateService;
+	}
+
+	protected get keyboardNavigationService(): KeyboardNavigationService {
+		if (!this.services.keyboardNavigationService)
+			throw new Error("KeyboardNavigationService not initialized");
+		return this.services.keyboardNavigationService;
 	}
 }

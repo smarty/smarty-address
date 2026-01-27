@@ -1,9 +1,11 @@
 import type { ApiService } from "./services/ApiService";
 import type { ColorService } from "./services/ColorService";
 import type { DropdownService } from "./services/DropdownService";
+import type { DropdownStateService } from "./services/DropdownStateService";
 import type { FormService } from "./services/FormService";
 import type { FormatService } from "./services/FormatService";
 import type { DomService } from "./services/DomService";
+import type { KeyboardNavigationService } from "./services/KeyboardNavigationService";
 import type { StyleService } from "./services/StyleService";
 
 export interface ApiConfig {
@@ -27,9 +29,11 @@ export interface ServiceClassOverrides {
 	ApiService?: typeof ApiService;
 	ColorService?: typeof ColorService;
 	DropdownService?: typeof DropdownService;
+	DropdownStateService?: typeof DropdownStateService;
 	FormService?: typeof FormService;
 	FormatService?: typeof FormatService;
 	DomService?: typeof DomService;
+	KeyboardNavigationService?: typeof KeyboardNavigationService;
 	StyleService?: typeof StyleService;
 }
 
