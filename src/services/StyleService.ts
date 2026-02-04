@@ -9,12 +9,16 @@ export interface StylesObject {
 }
 
 export class StyleService extends BaseService {
+	private static readonly LIGHT_MODE_BREAKPOINT = 50;
+	private static readonly LIGHTNESS_OFFSET = 10;
+	private static readonly ACCENT_BLUE = "#0066ff";
+	private static readonly ACCENT_LIGHT_BLUE = "#6699ff";
+	private static readonly BLUE_LOGO_LIGHTNESS_BREAKPOINT = 75;
+
 	static convertStylesObjectToCssBlock(stylesObject: StylesObject): string {
 		const selectorsBlock = Object.entries(stylesObject).map(([selector, selectorStyles]) => {
 			const stylesBlock = Object.entries(selectorStyles)
-				.map(([key, value]) => {
-					return `${key}: ${value};`;
-				})
+				.map(([key, value]) => `${key}: ${value};`)
 				.join("\n\t");
 
 			return `\n${selector} {\n\t${stylesBlock}\n}`;
@@ -129,15 +133,17 @@ export class StyleService extends BaseService {
 		accent: string;
 		shouldUseBlueLogo: boolean;
 	} {
-		const isLightMode = lightness > 50;
-		const lightnessOffset = isLightMode ? -10 : 10;
+		const isLightMode = lightness > StyleService.LIGHT_MODE_BREAKPOINT;
+		const lightnessOffset = isLightMode
+			? -StyleService.LIGHTNESS_OFFSET
+			: StyleService.LIGHTNESS_OFFSET;
 
 		return {
 			secondary: `hsl(${hue} ${saturation}% ${lightness + lightnessOffset}%)`,
 			tertiary: `hsl(${hue} ${saturation}% ${lightness + lightnessOffset * 2}%)`,
 			hoverMix: isLightMode ? "#000" : "#fff",
-			accent: isLightMode ? "#0066ff" : "#6699ff",
-			shouldUseBlueLogo: lightness > 75,
+			accent: isLightMode ? StyleService.ACCENT_BLUE : StyleService.ACCENT_LIGHT_BLUE,
+			shouldUseBlueLogo: lightness > StyleService.BLUE_LOGO_LIGHTNESS_BREAKPOINT,
 		};
 	}
 }

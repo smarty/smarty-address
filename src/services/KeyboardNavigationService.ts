@@ -19,18 +19,18 @@ export class KeyboardNavigationService extends BaseService {
 		const pressedKey = event.key;
 		const dropdownIsOpen = this.dropdownStateService.isDropdownOpen();
 
-		if (dropdownIsOpen) {
-			const handledKeys: Record<string, () => void> = {
-				ArrowDown: () => this.highlightNewAddress(1),
-				ArrowUp: () => this.highlightNewAddress(-1),
-				Enter: () => this.callbacks?.onSelectItem(this.dropdownStateService.getHighlightedIndex()),
-				Escape: () => this.callbacks?.onClose(),
-			};
+		if (!dropdownIsOpen) return;
 
-			if (handledKeys[pressedKey]) {
-				handledKeys[pressedKey]();
-				event.preventDefault();
-			}
+		const handledKeys: Record<string, () => void> = {
+			ArrowDown: () => this.highlightNewAddress(1),
+			ArrowUp: () => this.highlightNewAddress(-1),
+			Enter: () => this.callbacks?.onSelectItem(this.dropdownStateService.getHighlightedIndex()),
+			Escape: () => this.callbacks?.onClose(),
+		};
+
+		if (handledKeys[pressedKey]) {
+			handledKeys[pressedKey]();
+			event.preventDefault();
 		}
 	}
 

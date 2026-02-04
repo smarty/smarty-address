@@ -72,7 +72,8 @@ export default class SmartyAddress {
 		const FormServiceClass = config.services?.FormService || FormService;
 		const FormatServiceClass = config.services?.FormatService || FormatService;
 		const DomServiceClass = config.services?.DomService || DomService;
-		const KeyboardNavigationServiceClass = config.services?.KeyboardNavigationService || KeyboardNavigationService;
+		const KeyboardNavigationServiceClass =
+			config.services?.KeyboardNavigationService || KeyboardNavigationService;
 		const StyleServiceClass = config.services?.StyleService || StyleService;
 
 		this.colorService = new ColorServiceClass();

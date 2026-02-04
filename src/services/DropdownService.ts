@@ -189,24 +189,24 @@ export class DropdownService extends BaseService {
 		const currentSelectedIndex = this.dropdownStateService.getSelectedIndex();
 		const selectedAddress = mergedAutocompleteSuggestions[currentSelectedIndex];
 
-		if (searchInputValue.length) {
-			if (currentSelectedIndex > -1 && selectedAddress) {
-				this.apiService.fetchSecondaryAutocompleteSuggestions(
-					searchInputValue,
-					selectedAddress.address,
-					{
-						onSuccess: (autocompleteSuggestions, searchString) =>
-							this.processSecondaryAutocompleteSuggestions(autocompleteSuggestions, searchString),
-						onError: () => this.handleApiError(),
-					},
-				);
-			} else {
-				this.apiService.fetchAutocompleteSuggestions(searchInputValue, {
+		if (!searchInputValue.length) return;
+
+		if (currentSelectedIndex > -1 && selectedAddress) {
+			this.apiService.fetchSecondaryAutocompleteSuggestions(
+				searchInputValue,
+				selectedAddress.address,
+				{
 					onSuccess: (autocompleteSuggestions, searchString) =>
-						this.processAutocompleteSuggestions(autocompleteSuggestions, searchString),
+						this.processSecondaryAutocompleteSuggestions(autocompleteSuggestions, searchString),
 					onError: () => this.handleApiError(),
-				});
-			}
+				},
+			);
+		} else {
+			this.apiService.fetchAutocompleteSuggestions(searchInputValue, {
+				onSuccess: (autocompleteSuggestions, searchString) =>
+					this.processAutocompleteSuggestions(autocompleteSuggestions, searchString),
+				onError: () => this.handleApiError(),
+			});
 		}
 	}
 
@@ -252,10 +252,9 @@ export class DropdownService extends BaseService {
 		suggestions: AutocompleteSuggestion[],
 		searchString: string,
 	): void {
-		let filteredAutocompleteSuggestions = suggestions;
-		if (this.config?.onAutocompleteSuggestionsReceived) {
-			filteredAutocompleteSuggestions = this.config.onAutocompleteSuggestionsReceived(suggestions);
-		}
+		const filteredAutocompleteSuggestions = this.config?.onAutocompleteSuggestionsReceived
+			? this.config.onAutocompleteSuggestionsReceived(suggestions)
+			: suggestions;
 
 		const autocompleteSuggestionItems = this.createAutocompleteSuggestionItems(
 			filteredAutocompleteSuggestions,
@@ -453,12 +452,12 @@ export class DropdownService extends BaseService {
 
 	updateAriaActivedescendant(autocompleteSuggestionId: string | null): void {
 		const searchInputElement = this.getSearchInputElement();
-		if (searchInputElement) {
-			if (autocompleteSuggestionId) {
-				searchInputElement.setAttribute("aria-activedescendant", autocompleteSuggestionId);
-			} else {
-				searchInputElement.removeAttribute("aria-activedescendant");
-			}
+		if (!searchInputElement) return;
+
+		if (autocompleteSuggestionId) {
+			searchInputElement.setAttribute("aria-activedescendant", autocompleteSuggestionId);
+		} else {
+			searchInputElement.removeAttribute("aria-activedescendant");
 		}
 	}
 

@@ -46,6 +46,15 @@ All services are located at `src/services/`:
 - Configuration is merged with `defaultConfig` at instantiation
 - Avoid code comments; prefer self-documenting code with clear naming
 
+### Coding Style
+
+- **Early returns over nesting**: Use guard clauses (`if (!condition) return;`) instead of wrapping method bodies in conditionals
+- **Immutable patterns**: Prefer `const` with ternary over `let` with conditional reassignment
+- **Extract complex conditions**: Multi-part boolean expressions should be named variables (e.g., `const isConfigMissing = !x || !y;`)
+- **Name domain-specific magic numbers**: Extract as constants (e.g., `LIGHT_MODE_BREAKPOINT = 50`), but keep universally understood values inline (`"#000"`, `"#fff"`)
+- **Push back on subjective feedback**: Not all review suggestions require action; defend choices with rationale when appropriate
+- **Investigate before fixing "bugs"**: What looks like a bug may be intentional; understand full context before changing
+
 ### Customization Options
 
 Users can customize the library in two ways:

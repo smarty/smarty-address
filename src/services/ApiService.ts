@@ -111,8 +111,14 @@ export class ApiService extends BaseService {
 		callbacks: FetchAutocompleteSuggestionsCallbacks,
 	): Promise<void> {
 		await this.fetchWithCallbacks(callbacks, searchString, async (apiConfig) => {
-			const primaryAutocompleteSuggestions = await this.fetchAutocompleteResults(apiConfig, searchString);
-			const newSelectedAddress = this.getMatchingResult(primaryAutocompleteSuggestions, selectedAddress);
+			const primaryAutocompleteSuggestions = await this.fetchAutocompleteResults(
+				apiConfig,
+				searchString,
+			);
+			const newSelectedAddress = this.getMatchingResult(
+				primaryAutocompleteSuggestions,
+				selectedAddress,
+			);
 			return newSelectedAddress
 				? await this.fetchAutocompleteResults(apiConfig, searchString, newSelectedAddress)
 				: [];

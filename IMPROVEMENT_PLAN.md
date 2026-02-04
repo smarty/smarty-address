@@ -13,6 +13,7 @@ This document outlines the issues identified during code review and the plan to 
 **Problem:** DropdownService is 809 lines with multiple responsibilities.
 
 **Files created:**
+
 - `src/services/DropdownStateService.ts` - State management (indices, suggestions arrays)
 - `src/services/KeyboardNavigationService.ts` - Keyboard event handling
 
@@ -38,6 +39,7 @@ This document outlines the issues identified during code review and the plan to 
 5. Updated `SmartyAddress` to instantiate new services
 
 **Tests added:**
+
 - `src/services/DropdownStateService.test.ts` - 14 tests
 - `src/services/KeyboardNavigationService.test.ts` - 13 tests
 
@@ -48,16 +50,19 @@ This document outlines the issues identified during code review and the plan to 
 **Problem:** Polling loop (50 attempts × 100ms) is inefficient for waiting on dynamically-added elements (e.g., React components).
 
 **Why MutationObserver is better:**
+
 - Event-driven: detects elements instantly when added (no polling delay)
 - Zero CPU usage while waiting (no setTimeout loops)
 - Standard browser API for observing DOM changes
 
 **Files modified:**
+
 - `src/interfaces.ts` - Added `domWaitTimeoutMs?: number`
 - `src/services/DomService.ts` - Replaced polling loop with MutationObserver
 - `src/services/DropdownService.ts` - Updated to pass config timeout
 
 **Tests added:**
+
 - `src/services/DomService.test.ts` - 4 new tests for MutationObserver behavior
 
 ---
@@ -67,12 +72,14 @@ This document outlines the issues identified during code review and the plan to 
 **Problem:** No tests for full user interaction flows.
 
 **Files created:**
+
 - `src/__tests__/integration/userFlow.test.ts` - 6 tests
 - `src/__tests__/integration/keyboardNavigation.test.ts` - 7 tests
 - `src/__tests__/integration/formPopulation.test.ts` - 9 tests
 - `src/__tests__/integration/multipleInstances.test.ts` - 4 tests
 
 **Additional changes:**
+
 - Added `_testMode?: boolean` to config to bypass `event.isTrusted` check for programmatic events
 - Created `jest.setup.ts` with canvas mock for jsdom environment
 - Updated `jest.config.js` to use setup file
@@ -110,27 +117,31 @@ This document outlines the issues identified during code review and the plan to 
 **Problem:** Double cast bypasses TypeScript.
 
 **Files to modify:**
+
 - `src/utils/configNormalizer.ts`
 
 **Implementation:**
 
 ```typescript
 export function normalizeConfig(config: SmartyAddressConfig): NormalizedSmartyAddressConfig {
-    const normalized: Partial<NormalizedSmartyAddressConfig> = {};
+	const normalized: Partial<NormalizedSmartyAddressConfig> = {};
 
-    // Type-safe property assignment
-    normalized.embeddedKey = config.embeddedKey;
-    normalized.streetSelector = config.streetSelector;
-    normalized.autocompleteApiUrl = config.autocompleteApiUrl;
-    normalized.theme = config.theme;
+	// Type-safe property assignment
+	normalized.embeddedKey = config.embeddedKey;
+	normalized.streetSelector = config.streetSelector;
+	normalized.autocompleteApiUrl = config.autocompleteApiUrl;
+	normalized.theme = config.theme;
 
-    // Handle selector aliases
-    normalized.localitySelector = config.localitySelector ?? config.citySelector;
-    normalized.administrativeAreaSelector =
-        config.administrativeAreaSelector ?? config.stateSelector ?? config.regionSelector ?? config.provinceSelector;
-    // ... etc
+	// Handle selector aliases
+	normalized.localitySelector = config.localitySelector ?? config.citySelector;
+	normalized.administrativeAreaSelector =
+		config.administrativeAreaSelector ??
+		config.stateSelector ??
+		config.regionSelector ??
+		config.provinceSelector;
+	// ... etc
 
-    return normalized as NormalizedSmartyAddressConfig;
+	return normalized as NormalizedSmartyAddressConfig;
 }
 ```
 
@@ -143,6 +154,7 @@ export function normalizeConfig(config: SmartyAddressConfig): NormalizedSmartyAd
 **Problem:** Static initializer injects styles on class load.
 
 **Files to modify:**
+
 - `src/index.ts`
 - `src/utils/appUtils.ts`
 
@@ -157,6 +169,7 @@ static {
 ```
 
 Or defer to first instantiation:
+
 ```typescript
 private static stylesInitialized = false;
 
@@ -174,6 +187,7 @@ constructor(config: SmartyAddressConfig) {
 ### 6. Fix Minor Type Issues
 
 **Files to modify:**
+
 - `src/services/StyleService.ts:26` - Change `styles: {}` to `styles: Record<string, string>`
 - `src/interfaces.ts:98` - Change `Record<string, any>` to `Record<string, unknown>`
 - `src/services/FormService.ts:140` - Remove unnecessary optional chaining
@@ -182,11 +196,11 @@ constructor(config: SmartyAddressConfig) {
 
 ## Implementation Order
 
-| Phase | Tasks | Status |
-|-------|-------|--------|
-| 1 | #2 (MutationObserver), #3 (Integration tests) | ✅ Completed |
-| 2 | #1 (Extract services) | ✅ Completed |
-| 3 | #4 (Type safety), #5 (SSR), #6 (Minor types) | Pending |
+| Phase | Tasks                                         | Status       |
+| ----- | --------------------------------------------- | ------------ |
+| 1     | #2 (MutationObserver), #3 (Integration tests) | ✅ Completed |
+| 2     | #1 (Extract services)                         | ✅ Completed |
+| 3     | #4 (Type safety), #5 (SSR), #6 (Minor types)  | Pending      |
 
 Since this is pre-launch, all changes can be implemented directly without deprecation periods or backward compatibility shims.
 

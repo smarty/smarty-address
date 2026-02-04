@@ -6,7 +6,9 @@ import { DropdownStateService } from "./DropdownStateService";
 
 describe("DropdownService", () => {
 	describe("getMergedAutocompleteSuggestions", () => {
-		const createMockUiAutocompleteSuggestionItem = (street: string): UiAutocompleteSuggestionItem => ({
+		const createMockUiAutocompleteSuggestionItem = (
+			street: string,
+		): UiAutocompleteSuggestionItem => ({
 			address: {
 				street_line: street,
 				city: "Denver",

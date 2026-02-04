@@ -16,19 +16,21 @@ export class ConfigValidationError extends Error {
 export const validateConfig = (config: NormalizedSmartyAddressConfig): void => {
 	const errors: string[] = [];
 
-	if (
+	const isEmbeddedKeyMissing =
 		!config.embeddedKey ||
 		typeof config.embeddedKey !== "string" ||
-		config.embeddedKey.trim() === ""
-	) {
+		config.embeddedKey.trim() === "";
+
+	if (isEmbeddedKeyMissing) {
 		errors.push("embeddedKey is required");
 	}
 
-	if (
+	const isStreetSelectorMissing =
 		!config.streetSelector ||
 		typeof config.streetSelector !== "string" ||
-		config.streetSelector.trim() === ""
-	) {
+		config.streetSelector.trim() === "";
+
+	if (isStreetSelectorMissing) {
 		errors.push("streetSelector is required");
 	}
 

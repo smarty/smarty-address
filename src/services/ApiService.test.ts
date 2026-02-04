@@ -9,7 +9,10 @@ describe("ApiService", () => {
 	});
 
 	describe("getMatchingResult", () => {
-		const createAutocompleteSuggestion = (street: string, secondary: string = ""): AutocompleteSuggestion => ({
+		const createAutocompleteSuggestion = (
+			street: string,
+			secondary: string = "",
+		): AutocompleteSuggestion => ({
 			street_line: street,
 			secondary,
 			city: "Denver",
@@ -19,7 +22,10 @@ describe("ApiService", () => {
 		});
 
 		it("should find matching result by street_line", () => {
-			const autocompleteSuggestions = [createAutocompleteSuggestion("123 Main St"), createAutocompleteSuggestion("456 Oak Ave")];
+			const autocompleteSuggestions = [
+				createAutocompleteSuggestion("123 Main St"),
+				createAutocompleteSuggestion("456 Oak Ave"),
+			];
 			const selected = createAutocompleteSuggestion("123 Main St");
 
 			const result = service.getMatchingResult(autocompleteSuggestions, selected);
@@ -27,7 +33,10 @@ describe("ApiService", () => {
 		});
 
 		it("should return undefined when no match found", () => {
-			const autocompleteSuggestions = [createAutocompleteSuggestion("123 Main St"), createAutocompleteSuggestion("456 Oak Ave")];
+			const autocompleteSuggestions = [
+				createAutocompleteSuggestion("123 Main St"),
+				createAutocompleteSuggestion("456 Oak Ave"),
+			];
 			const selected = createAutocompleteSuggestion("789 Pine Rd");
 
 			const result = service.getMatchingResult(autocompleteSuggestions, selected);
@@ -115,7 +124,9 @@ describe("ApiService", () => {
 		});
 
 		it("should return API error message for unrecognized status code", () => {
-			const errorResponse = { errors: [{ id: 9999, name: "some-api-error", message: "Something went wrong" }] };
+			const errorResponse = {
+				errors: [{ id: 9999, name: "some-api-error", message: "Something went wrong" }],
+			};
 
 			const result = service.getApiError(500, errorResponse);
 			expect(result.name).toBe("some-api-error");
@@ -161,12 +172,7 @@ describe("ApiService", () => {
 				json: () => Promise.resolve({ suggestions: mockAutocompleteSuggestions }),
 			});
 
-			const result = await service.fetchAutocompleteResults(
-				apiConfig,
-				"123 Main",
-				null,
-				mockFetch,
-			);
+			const result = await service.fetchAutocompleteResults(apiConfig, "123 Main", null, mockFetch);
 
 			expect(result).toEqual(mockAutocompleteSuggestions);
 			expect(mockFetch).toHaveBeenCalledTimes(1);

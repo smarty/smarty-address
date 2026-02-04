@@ -74,7 +74,9 @@ export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
 
 	services?: ServiceClassOverrides;
 	onAddressSelected?: (address: AutocompleteSuggestion) => void;
-	onAutocompleteSuggestionsReceived?: (suggestions: AutocompleteSuggestion[]) => AutocompleteSuggestion[];
+	onAutocompleteSuggestionsReceived?: (
+		suggestions: AutocompleteSuggestion[],
+	) => AutocompleteSuggestion[];
 	onDropdownOpen?: () => void;
 	onDropdownClose?: () => void;
 }
@@ -96,7 +98,9 @@ export interface NormalizedSmartyAddressConfig extends DefaultSmartyAddressConfi
 
 	services?: ServiceClassOverrides;
 	onAddressSelected?: (address: AutocompleteSuggestion) => void;
-	onAutocompleteSuggestionsReceived?: (suggestions: AutocompleteSuggestion[]) => AutocompleteSuggestion[];
+	onAutocompleteSuggestionsReceived?: (
+		suggestions: AutocompleteSuggestion[],
+	) => AutocompleteSuggestion[];
 	onDropdownOpen?: () => void;
 	onDropdownClose?: () => void;
 }
