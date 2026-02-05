@@ -26,5 +26,5 @@ export function normalizeConfig(config: SmartyAddressConfig): NormalizedSmartyAd
 		normalized[key] = value;
 	}
 
-	return normalized as NormalizedSmartyAddressConfig;
+	return normalized as unknown as NormalizedSmartyAddressConfig;
 }
