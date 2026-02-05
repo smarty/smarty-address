@@ -59,7 +59,7 @@ export class DropdownService extends BaseService {
 
 		this.searchInputSelector = config.searchInputSelector ?? config.streetSelector ?? "";
 
-		this.keyboardNavigationService.setCallbacks({
+		this.getService("keyboardNavigationService").setCallbacks({
 			onSelectItem: (index: number) => this.handleSelectDropdownItem(index),
 			onClose: () => this.closeDropdown(),
 			getAutocompleteSuggestionsElement: () => this.autocompleteSuggestionsElement,
@@ -70,7 +70,9 @@ export class DropdownService extends BaseService {
 	}
 
 	async setupDom(): Promise<void> {
-		const instanceClassname = this.styleService.getInstanceClassName(this.instanceId);
+		const instanceClassname = this.getService("styleService").getInstanceClassName(
+			this.instanceId,
+		);
 		const elements = this.buildAutocompleteDomElements(instanceClassname);
 
 		this.appendElementsToDocument(elements);
@@ -106,7 +108,7 @@ export class DropdownService extends BaseService {
 	}
 
 	private handleDocumentMouseUp = (): void => {
-		this.dropdownStateService.setIsInteractingWithDropdown(false);
+		this.getService("dropdownStateService").setIsInteractingWithDropdown(false);
 	};
 
 	private configureDropdownInteractions(): void {
@@ -115,7 +117,7 @@ export class DropdownService extends BaseService {
 		this.dropdownElement.id = this.getDropdownId();
 
 		const mousedownHandler = () => {
-			this.dropdownStateService.setIsInteractingWithDropdown(true);
+			this.getService("dropdownStateService").setIsInteractingWithDropdown(true);
 		};
 		this.dropdownElement.addEventListener("mousedown", mousedownHandler);
 		this.cleanupFunctions.push(() =>
@@ -129,7 +131,7 @@ export class DropdownService extends BaseService {
 	}
 
 	private async setupSearchInput(): Promise<void> {
-		const searchInputElement = (await this.domService.findDomElementWithRetry(
+		const searchInputElement = (await this.getService("domService").findDomElementWithRetry(
 			this.searchInputSelector,
 			this.config?.domWaitTimeoutMs,
 		)) as HTMLInputElement | null;
@@ -143,12 +145,12 @@ export class DropdownService extends BaseService {
 
 		this.attachEventListeners(
 			(e) => this.handleSearchInputOnChange(e),
-			(e) => this.handleAutocompleteKeydown(e),
+			(e) => this.getService("keyboardNavigationService").handleAutocompleteKeydown(e),
 			(e) => this.handleSearchInputFocusOut(e),
 		);
 
 		const dynamicStylingHandler = () =>
-			this.styleService.updateDynamicStyles(
+			this.getService("styleService").updateDynamicStyles(
 				this.customStylesElement as HTMLStyleElement,
 				searchInputElement,
 				this.instanceId,
@@ -158,7 +160,7 @@ export class DropdownService extends BaseService {
 	}
 
 	handleSearchInputFocusOut(event: FocusEvent): void {
-		if (this.dropdownStateService.getIsInteractingWithDropdown()) return;
+		if (this.getService("dropdownStateService").getIsInteractingWithDropdown()) return;
 
 		const relatedTarget = event.relatedTarget as Node | null;
 		const searchInputElement = this.getSearchInputElement();
@@ -170,29 +172,26 @@ export class DropdownService extends BaseService {
 		}
 	}
 
-	handleAutocompleteKeydown(event: KeyboardEvent): void {
-		this.keyboardNavigationService.handleAutocompleteKeydown(event);
-	}
-
 	handleSearchInputOnChange(event: Event): void {
 		if (!event.isTrusted && !this.config?._testMode) return;
 
+		const stateService = this.getService("dropdownStateService");
 		const searchInputValue = (event.target as HTMLInputElement)?.value;
-		const selectedAddressSearchTerm = this.dropdownStateService.getSelectedAddressSearchTerm();
+		const selectedAddressSearchTerm = stateService.getSelectedAddressSearchTerm();
 
 		if (!searchInputValue.startsWith(selectedAddressSearchTerm)) {
-			this.dropdownStateService.setSelectedIndex(-1);
+			stateService.setSelectedIndex(-1);
 		}
 
-		const mergedAutocompleteSuggestions =
-			this.dropdownStateService.getMergedAutocompleteSuggestions();
-		const currentSelectedIndex = this.dropdownStateService.getSelectedIndex();
+		const mergedAutocompleteSuggestions = stateService.getMergedAutocompleteSuggestions();
+		const currentSelectedIndex = stateService.getSelectedIndex();
 		const selectedAddress = mergedAutocompleteSuggestions[currentSelectedIndex];
 
 		if (!searchInputValue.length) return;
 
+		const apiService = this.getService("apiService");
 		if (currentSelectedIndex > -1 && selectedAddress) {
-			this.apiService.fetchSecondaryAutocompleteSuggestions(
+			apiService.fetchSecondaryAutocompleteSuggestions(
 				searchInputValue,
 				selectedAddress.address,
 				{
@@ -202,7 +201,7 @@ export class DropdownService extends BaseService {
 				},
 			);
 		} else {
-			this.apiService.fetchAutocompleteSuggestions(searchInputValue, {
+			apiService.fetchAutocompleteSuggestions(searchInputValue, {
 				onSuccess: (autocompleteSuggestions, searchString) =>
 					this.processAutocompleteSuggestions(autocompleteSuggestions, searchString),
 				onError: () => this.handleApiError(),
@@ -210,13 +209,9 @@ export class DropdownService extends BaseService {
 		}
 	}
 
-	highlightNewAddress(indexChange: number): number {
-		return this.keyboardNavigationService.highlightNewAddress(indexChange);
-	}
-
 	handleSelectDropdownItem(addressIndex: number): void {
-		const mergedAutocompleteSuggestions =
-			this.dropdownStateService.getMergedAutocompleteSuggestions();
+		const stateService = this.getService("dropdownStateService");
+		const mergedAutocompleteSuggestions = stateService.getMergedAutocompleteSuggestions();
 		const selectedAddress = mergedAutocompleteSuggestions[addressIndex];
 		if (!selectedAddress) return;
 
@@ -226,13 +221,13 @@ export class DropdownService extends BaseService {
 
 		const { street_line, secondary = "", entries = 0 } = selectedAddress.address;
 		const searchInputElement = this.getSearchInputElement();
-		this.dropdownStateService.setSelectedIndex(addressIndex);
+		stateService.setSelectedIndex(addressIndex);
 
 		if (entries > 1 && searchInputElement) {
 			const newSearchTerm = `${street_line} ${secondary}`;
-			this.dropdownStateService.setSelectedAddressSearchTerm(newSearchTerm);
+			stateService.setSelectedAddressSearchTerm(newSearchTerm);
 			searchInputElement.value = newSearchTerm;
-			this.apiService.fetchSecondaryAutocompleteSuggestions(
+			this.getService("apiService").fetchSecondaryAutocompleteSuggestions(
 				newSearchTerm,
 				selectedAddress.address,
 				{
@@ -243,7 +238,7 @@ export class DropdownService extends BaseService {
 			);
 			searchInputElement.focus();
 		} else {
-			this.formService.populateFormWithAddress(selectedAddress.address);
+			this.getService("formService").populateFormWithAddress(selectedAddress.address);
 			this.closeDropdown();
 		}
 	}
@@ -263,8 +258,9 @@ export class DropdownService extends BaseService {
 			"autocompleteSuggestionElement",
 		);
 
-		this.dropdownStateService.setAutocompleteSuggestions(autocompleteSuggestionItems);
-		this.dropdownStateService.setSecondaryAutocompleteSuggestions([]);
+		const stateService = this.getService("dropdownStateService");
+		stateService.setAutocompleteSuggestions(autocompleteSuggestionItems);
+		stateService.setSecondaryAutocompleteSuggestions([]);
 
 		const count = autocompleteSuggestionItems.length;
 		const announcement = `${count} address${count === 1 ? "" : "es"} found. Use arrow keys to navigate.`;
@@ -280,7 +276,8 @@ export class DropdownService extends BaseService {
 		suggestions: AutocompleteSuggestion[],
 		searchString: string,
 	): void {
-		const baseIndex = this.dropdownStateService.getAutocompleteSuggestions().length;
+		const stateService = this.getService("dropdownStateService");
+		const baseIndex = stateService.getAutocompleteSuggestions().length;
 
 		const autocompleteSuggestionItems = this.createAutocompleteSuggestionItems(
 			suggestions,
@@ -289,14 +286,14 @@ export class DropdownService extends BaseService {
 			"secondaryAutocompleteSuggestionElement",
 		);
 
-		this.dropdownStateService.setSecondaryAutocompleteSuggestions(autocompleteSuggestionItems);
+		stateService.setSecondaryAutocompleteSuggestions(autocompleteSuggestionItems);
 
 		const count = autocompleteSuggestionItems.length;
 		const announcement = `${count} unit entr${count === 1 ? "y" : "ies"} found. Use arrow keys to navigate.`;
 		this.displayAutocompleteSuggestions(
 			autocompleteSuggestionItems,
-			this.dropdownStateService.getMergedAutocompleteSuggestions(),
-			this.dropdownStateService.getSelectedIndex() + 1,
+			stateService.getMergedAutocompleteSuggestions(),
+			stateService.getSelectedIndex() + 1,
 			announcement,
 		);
 	}
@@ -310,8 +307,8 @@ export class DropdownService extends BaseService {
 		this.updateDropdownContents(allItems);
 
 		if (newItems.length) {
-			this.dropdownStateService.setHighlightedIndex(initialHighlightIndex);
-			this.keyboardNavigationService.highlightNewAddress(0);
+			this.getService("dropdownStateService").setHighlightedIndex(initialHighlightIndex);
+			this.getService("keyboardNavigationService").highlightNewAddress(0);
 		}
 
 		this.announce(announcement);
@@ -327,7 +324,8 @@ export class DropdownService extends BaseService {
 		) => Record<string, HTMLElement | Text>,
 		elementKey: string,
 	): UiAutocompleteSuggestionItem[] {
-		const selectedAutocompleteSuggestionIndex = this.dropdownStateService.getSelectedIndex();
+		const selectedAutocompleteSuggestionIndex =
+			this.getService("dropdownStateService").getSelectedIndex();
 
 		return suggestions.map(
 			(address: AutocompleteSuggestion, addressIndex: number): UiAutocompleteSuggestionItem => {
@@ -350,7 +348,7 @@ export class DropdownService extends BaseService {
 
 	openDropdown(): void {
 		this.setAriaExpanded(true);
-		this.dropdownStateService.setDropdownOpen(true);
+		this.getService("dropdownStateService").setDropdownOpen(true);
 		this.showDropdown();
 		if (this.config?.onDropdownOpen) {
 			this.config.onDropdownOpen();
@@ -360,32 +358,13 @@ export class DropdownService extends BaseService {
 	closeDropdown(): void {
 		this.setAriaExpanded(false);
 		this.updateAriaActivedescendant(null);
-		this.dropdownStateService.setDropdownOpen(false);
-		this.dropdownStateService.resetSelectionState();
+		const stateService = this.getService("dropdownStateService");
+		stateService.setDropdownOpen(false);
+		stateService.resetSelectionState();
 		this.hideDropdown();
 		if (this.config?.onDropdownClose) {
 			this.config.onDropdownClose();
 		}
-	}
-
-	getMergedAutocompleteSuggestions(): UiAutocompleteSuggestionItem[] {
-		return this.dropdownStateService.getMergedAutocompleteSuggestions();
-	}
-
-	setSelectedIndex(index: number): void {
-		this.dropdownStateService.setSelectedIndex(index);
-	}
-
-	setAutocompleteSuggestions(suggestions: UiAutocompleteSuggestionItem[]): void {
-		this.dropdownStateService.setAutocompleteSuggestions(suggestions);
-	}
-
-	setSecondaryAutocompleteSuggestions(suggestions: UiAutocompleteSuggestionItem[]): void {
-		this.dropdownStateService.setSecondaryAutocompleteSuggestions(suggestions);
-	}
-
-	resetSelectionState(): void {
-		this.dropdownStateService.resetSelectionState();
 	}
 
 	getDropdownId(): string {
@@ -393,7 +372,9 @@ export class DropdownService extends BaseService {
 	}
 
 	getSearchInputElement(): HTMLInputElement | null {
-		return this.domService.findDomElement(this.searchInputSelector) as HTMLInputElement | null;
+		return this.getService("domService").findDomElement(
+			this.searchInputSelector,
+		) as HTMLInputElement | null;
 	}
 
 	showDropdown(): void {
@@ -466,21 +447,26 @@ export class DropdownService extends BaseService {
 		searchString: string = "",
 		autocompleteSuggestionId?: string,
 	): Record<string, HTMLElement | Text> {
+		const formatService = this.getService("formatService");
 		const { entries = 0 } = autocompleteSuggestion;
 		const formattedAddress =
-			this.formatService.getFormattedAutocompleteSuggestion(autocompleteSuggestion);
-		const highlightedParts = this.formatService.createHighlightedTextElements(
+			formatService.getFormattedAutocompleteSuggestion(autocompleteSuggestion);
+		const highlightedParts = formatService.createHighlightedTextElements(
 			formattedAddress,
 			searchString,
 		);
 		const entriesLabel = entries > 1 ? `, ${entries} entries available` : "";
 		const ariaLabel = `${formattedAddress}${entriesLabel}`;
 
-		return this.buildAutocompleteSuggestionElement(
+		return this.buildSuggestionElement(
 			highlightedParts,
 			JSON.stringify(autocompleteSuggestion),
 			ariaLabel,
-			entries,
+			{
+				elementName: "autocompleteSuggestionElement",
+				cssClass: CSS_CLASSES.autocompleteSuggestion,
+				entries,
+			},
 			autocompleteSuggestionId,
 		);
 	}
@@ -490,34 +476,29 @@ export class DropdownService extends BaseService {
 		searchString: string = "",
 		autocompleteSuggestionId?: string,
 	): Record<string, HTMLElement | Text> {
-		const formattedAddress = this.formatService.getFormattedAutocompleteSuggestion(
+		const formatService = this.getService("formatService");
+		const formattedAddress = formatService.getFormattedAutocompleteSuggestion(
 			autocompleteSuggestion,
 			true,
 		);
-		const fullAddress = this.formatService.getFormattedAutocompleteSuggestion(
+		const fullAddress = formatService.getFormattedAutocompleteSuggestion(
 			autocompleteSuggestion,
 			false,
 		);
-		const highlightedParts = this.formatService.createHighlightedTextElements(
+		const highlightedParts = formatService.createHighlightedTextElements(
 			formattedAddress,
 			searchString,
 		);
 
-		return this.buildSecondaryAutocompleteSuggestionElement(
+		return this.buildSuggestionElement(
 			highlightedParts,
 			JSON.stringify(autocompleteSuggestion),
 			fullAddress,
+			{
+				elementName: "secondaryAutocompleteSuggestionElement",
+				cssClass: CSS_CLASSES.secondaryAutocompleteSuggestion,
+			},
 			autocompleteSuggestionId,
-		);
-	}
-
-	scrollToHighlightedAutocompleteSuggestion(
-		highlightedElement: HTMLElement,
-		container: HTMLElement,
-	): void {
-		this.keyboardNavigationService.scrollToHighlightedAutocompleteSuggestion(
-			highlightedElement,
-			container,
 		);
 	}
 
@@ -673,24 +654,16 @@ export class DropdownService extends BaseService {
 			},
 		];
 
-		return this.domService.buildElementsFromMap(elementsMap);
+		return this.getService("domService").buildElementsFromMap(elementsMap);
 	}
 
-	private buildAutocompleteSuggestionElement(
+	private buildSuggestionElement(
 		highlightedParts: Array<{ text: string; isMatch?: boolean }>,
-		autocompleteSuggestionData: string,
+		suggestionData: string,
 		ariaLabel: string,
-		entries: number = 0,
-		autocompleteSuggestionId?: string,
+		config: { elementName: string; cssClass: string; entries?: number },
+		suggestionId?: string,
 	): Record<string, HTMLElement | Text> {
-		const addressElementClasses = [CSS_CLASSES.autocompleteAddress];
-		const addressWrapperElementClasses = [CSS_CLASSES.addressWrapper];
-		const entriesElementClasses = [CSS_CLASSES.autocompleteSuggestionEntries];
-		const autocompleteSuggestionElementClasses = [CSS_CLASSES.autocompleteSuggestion];
-
-		const entriesChildren: ElementConfig[] | undefined =
-			entries > 1 ? [{ text: `${entries} entries` }] : undefined;
-
 		const addressChildren: ElementConfig[] = highlightedParts.map((part) => ({
 			elementType: "span",
 			className: part.isMatch ? [CSS_CLASSES.matchedText] : [],
@@ -698,96 +671,49 @@ export class DropdownService extends BaseService {
 		}));
 
 		const attributes: Record<string, string> = {
-			"data-address": autocompleteSuggestionData,
+			"data-address": suggestionData,
 			role: "option",
 			"aria-label": ariaLabel,
 		};
-		if (autocompleteSuggestionId) {
-			attributes.id = autocompleteSuggestionId;
+		if (suggestionId) {
+			attributes.id = suggestionId;
+		}
+
+		const wrapperChildren: ElementConfig[] = [
+			{
+				name: "addressElement",
+				elementType: "div",
+				className: [CSS_CLASSES.autocompleteAddress],
+				children: addressChildren,
+			},
+		];
+
+		const entries = config.entries ?? 0;
+		if (entries > 1) {
+			wrapperChildren.push({
+				name: "entriesElement",
+				elementType: "div",
+				className: [CSS_CLASSES.autocompleteSuggestionEntries],
+				children: [{ text: `${entries} entries` }],
+			});
 		}
 
 		const elementsMap: ElementConfig[] = [
 			{
-				name: "autocompleteSuggestionElement",
+				name: config.elementName,
 				elementType: "li",
-				className: autocompleteSuggestionElementClasses,
+				className: [config.cssClass],
 				attributes,
 				children: [
 					{
 						elementType: "div",
-						className: addressWrapperElementClasses,
-						children: [
-							{
-								name: "addressElement",
-								elementType: "div",
-								className: addressElementClasses,
-								children: addressChildren,
-							},
-							{
-								name: "entriesElement",
-								elementType: "div",
-								className: entriesElementClasses,
-								children: entriesChildren,
-							},
-						],
+						className: [CSS_CLASSES.addressWrapper],
+						children: wrapperChildren,
 					},
 				],
 			},
 		];
 
-		return this.domService.buildElementsFromMap(elementsMap);
-	}
-
-	private buildSecondaryAutocompleteSuggestionElement(
-		highlightedParts: Array<{ text: string; isMatch?: boolean }>,
-		autocompleteSuggestionData: string,
-		ariaLabel: string,
-		autocompleteSuggestionId?: string,
-	): Record<string, HTMLElement | Text> {
-		const addressElementClasses = [CSS_CLASSES.autocompleteAddress];
-		const addressWrapperElementClasses = [CSS_CLASSES.addressWrapper];
-		const secondaryAutocompleteSuggestionElementClasses = [
-			CSS_CLASSES.secondaryAutocompleteSuggestion,
-		];
-
-		const addressChildren: ElementConfig[] = highlightedParts.map((part) => ({
-			elementType: "span",
-			className: part.isMatch ? [CSS_CLASSES.matchedText] : [],
-			children: [{ text: part.text }],
-		}));
-
-		const attributes: Record<string, string> = {
-			"data-address": autocompleteSuggestionData,
-			role: "option",
-			"aria-label": ariaLabel,
-		};
-		if (autocompleteSuggestionId) {
-			attributes.id = autocompleteSuggestionId;
-		}
-
-		const elementsMap: ElementConfig[] = [
-			{
-				name: "secondaryAutocompleteSuggestionElement",
-				elementType: "li",
-				className: secondaryAutocompleteSuggestionElementClasses,
-				attributes,
-				children: [
-					{
-						elementType: "div",
-						className: addressWrapperElementClasses,
-						children: [
-							{
-								name: "addressElement",
-								elementType: "div",
-								className: addressElementClasses,
-								children: addressChildren,
-							},
-						],
-					},
-				],
-			},
-		];
-
-		return this.domService.buildElementsFromMap(elementsMap);
+		return this.getService("domService").buildElementsFromMap(elementsMap);
 	}
 }

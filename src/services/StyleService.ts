@@ -1,5 +1,4 @@
 import { BaseService } from "./BaseService";
-import { HslColor, RgbaColor } from "./ColorService";
 import { CSS_CLASSES, CSS_PREFIXES } from "../constants/cssClasses";
 
 export interface StylesObject {
@@ -38,25 +37,9 @@ export class StyleService extends BaseService {
 		return `${CSS_PREFIXES.instance}${instanceId}`;
 	}
 
-	convertDecimalToPercentage(decimal: number): number {
-		return this.colorService.convertDecimalToPercentage(decimal);
-	}
-
-	rgbToHsl(rgba: RgbaColor): HslColor {
-		return this.colorService.rgbToHsl(rgba);
-	}
-
-	getHslFromColorString(cssColor: string): HslColor {
-		return this.colorService.getHslFromColorString(cssColor);
-	}
-
-	getRgbaFromCssColor(cssColor: string): RgbaColor {
-		return this.colorService.getRgbaFromCssColor(cssColor);
-	}
-
 	getNearestStyledElement(element: HTMLElement, colorProperty: string): HTMLElement {
-		const colorValue = this.domService.getElementStyles(element, colorProperty);
-		const { alpha } = this.colorService.getRgbaFromCssColor(colorValue);
+		const colorValue = this.getService("domService").getElementStyles(element, colorProperty);
+		const { alpha } = this.getService("colorService").getRgbaFromCssColor(colorValue);
 
 		return alpha < 0.1 && element.parentElement
 			? this.getNearestStyledElement(element.parentElement, colorProperty)
@@ -94,17 +77,19 @@ export class StyleService extends BaseService {
 	}
 
 	private calculateColorStyles(element: HTMLElement): Record<string, string> {
+		const domService = this.getService("domService");
+		const colorService = this.getService("colorService");
 		const backgroundColorElement = this.getNearestStyledElement(element, "backgroundColor");
 		const colorElement = this.getNearestStyledElement(element, "color");
 
-		const inputBackgroundColor = this.domService.getElementStyles(
+		const inputBackgroundColor = domService.getElementStyles(
 			backgroundColorElement,
 			"backgroundColor",
 		);
-		const inputTextColor = this.domService.getElementStyles(colorElement, "color");
+		const inputTextColor = domService.getElementStyles(colorElement, "color");
 
 		const { hue, saturation, lightness } =
-			this.colorService.getHslFromColorString(inputBackgroundColor);
+			colorService.getHslFromColorString(inputBackgroundColor);
 		const derivedColors = this.deriveSurfaceColors(hue, saturation, lightness);
 
 		return {

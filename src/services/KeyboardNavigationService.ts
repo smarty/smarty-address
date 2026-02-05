@@ -17,14 +17,15 @@ export class KeyboardNavigationService extends BaseService {
 
 	handleAutocompleteKeydown(event: KeyboardEvent): void {
 		const pressedKey = event.key;
-		const dropdownIsOpen = this.dropdownStateService.isDropdownOpen();
+		const stateService = this.getService("dropdownStateService");
+		const dropdownIsOpen = stateService.isDropdownOpen();
 
 		if (!dropdownIsOpen) return;
 
 		const handledKeys: Record<string, () => void> = {
 			ArrowDown: () => this.highlightNewAddress(1),
 			ArrowUp: () => this.highlightNewAddress(-1),
-			Enter: () => this.callbacks?.onSelectItem(this.dropdownStateService.getHighlightedIndex()),
+			Enter: () => this.callbacks?.onSelectItem(stateService.getHighlightedIndex()),
 			Escape: () => this.callbacks?.onClose(),
 		};
 
@@ -35,8 +36,9 @@ export class KeyboardNavigationService extends BaseService {
 	}
 
 	highlightNewAddress(indexChange: number): number {
-		const items = this.dropdownStateService.getMergedAutocompleteSuggestions();
-		const currentIndex = this.dropdownStateService.getHighlightedIndex();
+		const stateService = this.getService("dropdownStateService");
+		const items = stateService.getMergedAutocompleteSuggestions();
+		const currentIndex = stateService.getHighlightedIndex();
 		const newIndex = (currentIndex + indexChange + items.length) % items.length;
 
 		items.forEach((item: UiAutocompleteSuggestionItem, i: number) => {
@@ -53,7 +55,7 @@ export class KeyboardNavigationService extends BaseService {
 				suggestionsElement,
 			);
 		}
-		this.dropdownStateService.setHighlightedIndex(newIndex);
+		stateService.setHighlightedIndex(newIndex);
 
 		if (items[newIndex]) {
 			const suggestionId = items[newIndex].autocompleteSuggestionElement.id;
