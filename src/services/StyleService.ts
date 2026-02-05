@@ -27,7 +27,7 @@ export class StyleService extends BaseService {
 		return selectorsBlock.join("");
 	}
 
-	formatStyleBlock(selector: string, styles: {}): string {
+	formatStyleBlock(selector: string, styles: Record<string, string>): string {
 		const stylesString = Object.entries(styles)
 			.map(([property, value]) => `${property}: ${value};`)
 			.join("\n");

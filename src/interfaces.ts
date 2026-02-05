@@ -113,5 +113,5 @@ export interface AutocompleteSuggestion {
 	zipcode: string;
 	country: string;
 	entries?: number;
-	metadata?: Record<string, any>;
+	metadata?: Record<string, unknown>;
 }

@@ -137,7 +137,7 @@ export class FormService extends BaseService {
 			) as HTMLInputElement | null,
 		};
 
-		if (!elements?.streetInputElement) return;
+		if (!elements.streetInputElement) return;
 
 		const streetValue = this.getStreetFormValue(elements, selectedAddress);
 		this.domService.setInputValue(elements.streetInputElement, streetValue);

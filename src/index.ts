@@ -25,7 +25,9 @@ export default class SmartyAddress {
 	};
 
 	static {
-		defineStyles();
+		if (typeof document !== "undefined") {
+			defineStyles();
+		}
 	}
 
 	static themes = themes;
