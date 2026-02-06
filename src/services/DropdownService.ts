@@ -228,7 +228,8 @@ export class DropdownService extends BaseService {
 		const searchInputElement = this.getSearchInputElement();
 		this.dropdownStateService.setSelectedIndex(addressIndex);
 
-		if (entries > 1 && searchInputElement) {
+		const hasSecondaries = entries > 1;
+		if (hasSecondaries && searchInputElement) {
 			const newSearchTerm = `${street_line} ${secondary}`;
 			this.dropdownStateService.setSelectedAddressSearchTerm(newSearchTerm);
 			searchInputElement.value = newSearchTerm;
