@@ -268,7 +268,7 @@ export class DropdownService extends BaseService {
 		this.dropdownStateService.setSecondaryAutocompleteSuggestions([]);
 
 		const count = autocompleteSuggestionItems.length;
-		const announcement = `${count} address${count === 1 ? "" : "es"} found. Use arrow keys to navigate.`;
+		const announcement = `${count} address${count === 1 ? "" : "es"} found.${count > 1 ? " Use the arrow keys to move through the results." : ""}`;
 		this.displayAutocompleteSuggestions(
 			autocompleteSuggestionItems,
 			autocompleteSuggestionItems,
@@ -293,7 +293,7 @@ export class DropdownService extends BaseService {
 		this.dropdownStateService.setSecondaryAutocompleteSuggestions(autocompleteSuggestionItems);
 
 		const count = autocompleteSuggestionItems.length;
-		const announcement = `${count} unit entr${count === 1 ? "y" : "ies"} found. Use arrow keys to navigate.`;
+		const announcement = `${count} unit entr${count === 1 ? "y" : "ies"} found.${count > 1 ? " Use the arrow keys to move through the results." : ""}`;
 		this.displayAutocompleteSuggestions(
 			autocompleteSuggestionItems,
 			this.dropdownStateService.getMergedAutocompleteSuggestions(),
