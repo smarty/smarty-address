@@ -67,26 +67,17 @@ export default class SmartyAddress {
 		SmartyAddress.instances.push(this);
 		this.instanceId = SmartyAddress.instances.length;
 
-		const ApiServiceClass = config.services?.ApiService || ApiService;
-		const ColorServiceClass = config.services?.ColorService || ColorService;
-		const DropdownServiceClass = config.services?.DropdownService || DropdownService;
-		const DropdownStateServiceClass = config.services?.DropdownStateService || DropdownStateService;
-		const FormServiceClass = config.services?.FormService || FormService;
-		const FormatServiceClass = config.services?.FormatService || FormatService;
-		const DomServiceClass = config.services?.DomService || DomService;
-		const KeyboardNavigationServiceClass =
-			config.services?.KeyboardNavigationService || KeyboardNavigationService;
-		const StyleServiceClass = config.services?.StyleService || StyleService;
+		const svc = { ...SmartyAddress.services, ...config.services };
 
-		this.colorService = new ColorServiceClass();
-		this.domService = new DomServiceClass();
-		this.styleService = new StyleServiceClass();
-		this.formatService = new FormatServiceClass();
-		this.apiService = new ApiServiceClass();
-		this.dropdownStateService = new DropdownStateServiceClass();
-		this.keyboardNavigationService = new KeyboardNavigationServiceClass();
-		this.dropdownService = new DropdownServiceClass(this.instanceId);
-		this.formService = new FormServiceClass();
+		this.colorService = new svc.ColorService();
+		this.domService = new svc.DomService();
+		this.styleService = new svc.StyleService();
+		this.formatService = new svc.FormatService();
+		this.apiService = new svc.ApiService();
+		this.dropdownStateService = new svc.DropdownStateService();
+		this.keyboardNavigationService = new svc.KeyboardNavigationService();
+		this.dropdownService = new svc.DropdownService(this.instanceId);
+		this.formService = new svc.FormService();
 
 		const services = {
 			apiService: this.apiService,

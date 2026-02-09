@@ -121,18 +121,19 @@ export class FormService extends BaseService {
 	}
 
 	populateFormWithAddress(selectedAddress: AutocompleteSuggestion) {
+		const domService = this.getService("domService");
 		const elements = {
-			streetInputElement: this.domService.findDomElement(this.streetSelector),
-			secondaryInputElement: this.domService.findDomElement(
+			streetInputElement: domService.findDomElement(this.streetSelector),
+			secondaryInputElement: domService.findDomElement(
 				this.secondarySelector,
 			) as HTMLInputElement | null,
-			localityInputElement: this.domService.findDomElement(
+			localityInputElement: domService.findDomElement(
 				this.localitySelector,
 			) as HTMLInputElement | null,
-			administrativeAreaInputElement: this.domService.findDomElement(
+			administrativeAreaInputElement: domService.findDomElement(
 				this.administrativeAreaSelector,
 			) as HTMLInputElement | null,
-			postalCodeInputElement: this.domService.findDomElement(
+			postalCodeInputElement: domService.findDomElement(
 				this.postalCodeSelector,
 			) as HTMLInputElement | null,
 		};
@@ -140,25 +141,25 @@ export class FormService extends BaseService {
 		if (!elements.streetInputElement) return;
 
 		const streetValue = this.getStreetFormValue(elements, selectedAddress);
-		this.domService.setInputValue(elements.streetInputElement, streetValue);
+		domService.setInputValue(elements.streetInputElement, streetValue);
 
 		if (elements.secondaryInputElement) {
-			this.domService.setInputValue(
+			domService.setInputValue(
 				elements.secondaryInputElement,
 				selectedAddress.secondary ?? "",
 			);
 		}
 		if (elements.localityInputElement) {
-			this.domService.setInputValue(elements.localityInputElement, selectedAddress.city);
+			domService.setInputValue(elements.localityInputElement, selectedAddress.city);
 		}
 		if (elements.administrativeAreaInputElement) {
-			this.domService.setInputValue(
+			domService.setInputValue(
 				elements.administrativeAreaInputElement,
 				this.getStateValueForInput(elements.administrativeAreaInputElement, selectedAddress.state),
 			);
 		}
 		if (elements.postalCodeInputElement) {
-			this.domService.setInputValue(elements.postalCodeInputElement, selectedAddress.zipcode);
+			domService.setInputValue(elements.postalCodeInputElement, selectedAddress.zipcode);
 		}
 	}
 }
