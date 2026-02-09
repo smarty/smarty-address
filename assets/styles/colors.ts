@@ -1,12 +1,11 @@
 export const colorStyles = {
 	".smartyAddress__color_dark": {
-		// TODO: update theme with the correct colors
-		"--smartyAddress__textBasePrimaryColor": "#eee",
-		// TODO: figure out how to compute the accent color
+		"--smartyAddress__textBasePrimaryColor": "#fff",
+		"--smartyAddress__textBaseSecondaryColor": "#e6e9ed",
 		"--smartyAddress__textAccentColor": "#6699ff",
 
 		"--smartyAddress__surfaceBasePrimaryColor": "#111",
-		"--smartyAddress__surfaceBaseSecondaryColor": "#333",
+		"--smartyAddress__surfaceBaseSecondaryColor": "#383e48",
 		"--smartyAddress__surfaceBaseTertiaryColor": "#666",
 		"--smartyAddress__surfaceBasePrimaryInverseColor": "#eee",
 
@@ -20,13 +19,12 @@ export const colorStyles = {
 		"--smartyAddress__largeShadow2": "0 20px 40px 0 rgba(21, 27, 35, 0.06)",
 	},
 	".smartyAddress__color_light": {
-		// TODO: update theme with the correct colors
-		"--smartyAddress__textBasePrimaryColor": "#333",
-		"--smartyAddress__textBaseSecondaryColor": "#777",
+		"--smartyAddress__textBasePrimaryColor": "#000",
+		"--smartyAddress__textBaseSecondaryColor": "#49505b",
 		"--smartyAddress__textAccentColor": "#0066ff",
 
 		"--smartyAddress__surfaceBasePrimaryColor": "#fcfcfc",
-		"--smartyAddress__surfaceBaseSecondaryColor": "#f3f3f3",
+		"--smartyAddress__surfaceBaseSecondaryColor": "#ebebeb",
 		"--smartyAddress__surfaceBaseTertiaryColor": "#eeeeee",
 		"--smartyAddress__surfaceBasePrimaryInverseColor": "#333",
 

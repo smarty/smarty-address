@@ -1,4 +1,4 @@
-export const themes: { [index: string]: string[] } = {
+export const themes = {
 	default: [
 		"smartyAddress__base_default",
 		"smartyAddress__color_dynamic",

@@ -1,62 +1,127 @@
-import { DefaultSmartyAddressConfig, SmartyAddressConfig } from "./interfaces";
-import { apiService } from "./services/ApiService";
-import { initService } from "./utils/serviceFactory";
+import {
+	DefaultSmartyAddressConfig,
+	SmartyAddressConfig,
+	NormalizedSmartyAddressConfig,
+} from "./interfaces";
+import { normalizeConfig } from "./utils/configNormalizer";
+import { ApiService } from "./services/ApiService";
+import { ColorService } from "./services/ColorService";
+import { DropdownService } from "./services/DropdownService";
+import { DropdownStateService } from "./services/DropdownStateService";
+import { FormService } from "./services/FormService";
+import { FormatService } from "./services/FormatService";
+import { DomService } from "./services/DomService";
+import { KeyboardNavigationService } from "./services/KeyboardNavigationService";
+import { StyleService } from "./services/StyleService";
 import { themes } from "./themes";
-import { defineStyles } from "./utils/appUtils";
+import { defineStyles, validateConfig } from "./utils/appUtils";
 import { US_AUTOCOMPLETE_PRO_API_URL } from "./constants";
-import { autocompleteUiService } from "./services/AutocompleteUiService";
-import { addressFormUiService } from "./services/AddressFormUiService";
-// TODO: Update readme
-// TODO: Update tsconfig.json
-// TODO: Add ability to destroy an instance of SmartyAddress (and remove all associated elements from DOM)
-// TODO: Make styles dynamically configurable (e.g. what if I want to change the theme dynamically after the page has loaded?)
-// TODO: Add prettier
-// TODO: Add testing
-// TODO: Update code to use international names for address fields, variable names, etc. (e.g. postal code instead of zipcode)
-// TODO: Add "backoff" for autocomplete results (add config option to make this customizable)
-// TODO: Add config option for "min characters" before api request is sent
-// TODO: Add ShadCdn to test site (see https://ui.shadcn.com/)
-// TODO: Handle populating select lists (e.g. for "state")
 
 export default class SmartyAddress {
 	static defaultConfig: DefaultSmartyAddressConfig = {
+		embeddedKey: "",
 		theme: themes.default,
-		services: {
-			autocompleteUiService,
-			addressFormUiService,
-			apiService,
-		},
 		autocompleteApiUrl: US_AUTOCOMPLETE_PRO_API_URL,
 	};
+
 	static {
-		defineStyles();
+		if (typeof document !== "undefined") {
+			defineStyles();
+		}
 	}
+
+	static themes = themes;
+
+	static services = {
+		ApiService,
+		ColorService,
+		DropdownService,
+		DropdownStateService,
+		FormService,
+		FormatService,
+		DomService,
+		KeyboardNavigationService,
+		StyleService,
+	};
 
 	private static instances: SmartyAddress[] = [];
-	private instanceId;
+	private instanceId: number;
 
-	// TODO: update "config" type/interface to be more specific
-	// TODO: Verify config is valid before setting up services
-	constructor(config: SmartyAddressConfig) {
-		SmartyAddress.instances.push(this);
-		this.instanceId = SmartyAddress.instances.length;
-		this.init(config);
+	private apiService: ApiService;
+	private colorService: ColorService;
+	private dropdownService: DropdownService;
+	private dropdownStateService: DropdownStateService;
+	private formService: FormService;
+	private formatService: FormatService;
+	private domService: DomService;
+	private keyboardNavigationService: KeyboardNavigationService;
+	private styleService: StyleService;
+
+	static async create(config: SmartyAddressConfig): Promise<SmartyAddress> {
+		const instance = new SmartyAddress(config);
+		await instance.init(config);
+		return instance;
 	}
 
-	init = async (config: SmartyAddressConfig) => {
-		config = {
-			...SmartyAddress.defaultConfig,
-			...config,
+	private constructor(config: SmartyAddressConfig) {
+		SmartyAddress.instances.push(this);
+		this.instanceId = SmartyAddress.instances.length;
+
+		const svc = { ...SmartyAddress.services, ...config.services };
+
+		this.colorService = new svc.ColorService();
+		this.domService = new svc.DomService();
+		this.styleService = new svc.StyleService();
+		this.formatService = new svc.FormatService();
+		this.apiService = new svc.ApiService();
+		this.dropdownStateService = new svc.DropdownStateService();
+		this.keyboardNavigationService = new svc.KeyboardNavigationService();
+		this.dropdownService = new svc.DropdownService(this.instanceId);
+		this.formService = new svc.FormService();
+
+		const services = {
+			apiService: this.apiService,
+			colorService: this.colorService,
+			dropdownService: this.dropdownService,
+			dropdownStateService: this.dropdownStateService,
+			formService: this.formService,
+			formatService: this.formatService,
+			domService: this.domService,
+			keyboardNavigationService: this.keyboardNavigationService,
+			styleService: this.styleService,
 		};
-		this.setupServices(config);
+
+		Object.values(services).forEach((service) => service.setServices(services));
+	}
+
+	private init = async (config: SmartyAddressConfig): Promise<void> => {
+		const normalizedConfig = normalizeConfig(config);
+		const mergedConfig: NormalizedSmartyAddressConfig = {
+			...SmartyAddress.defaultConfig,
+			...normalizedConfig,
+		};
+
+		validateConfig(mergedConfig);
+
+		this.apiService.init(mergedConfig);
+		this.dropdownService.init(mergedConfig);
+		this.formService.init(mergedConfig);
 	};
 
-	setupServices = (config: SmartyAddressConfig) => {
-		Object.entries(config.services).forEach(([name, serviceDefinition]) => {
-			const serviceMethods = initService(name, serviceDefinition, this.instanceId);
-			if (serviceMethods.init) {
-				serviceMethods.init(config);
-			}
-		});
-	};
+	destroy(): void {
+		this.apiService.destroy();
+		this.colorService.destroy();
+		this.dropdownService.destroy();
+		this.dropdownStateService.destroy();
+		this.formService.destroy();
+		this.formatService.destroy();
+		this.domService.destroy();
+		this.keyboardNavigationService.destroy();
+		this.styleService.destroy();
+
+		const index = SmartyAddress.instances.indexOf(this);
+		if (index > -1) {
+			SmartyAddress.instances.splice(index, 1);
+		}
+	}
 }

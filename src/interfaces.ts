@@ -1,21 +1,111 @@
-export interface DefaultSmartyAddressConfig {
-	services: ServiceDefinitionMap;
-	theme: string[];
+import type { ApiService } from "./services/ApiService";
+import type { ColorService } from "./services/ColorService";
+import type { DropdownService } from "./services/DropdownService";
+import type { DropdownStateService } from "./services/DropdownStateService";
+import type { FormService } from "./services/FormService";
+import type { FormatService } from "./services/FormatService";
+import type { DomService } from "./services/DomService";
+import type { KeyboardNavigationService } from "./services/KeyboardNavigationService";
+import type { StyleService } from "./services/StyleService";
+
+export interface ApiConfig {
+	embeddedKey: string;
 	autocompleteApiUrl: string;
+	maxResults?: number;
+
+	includeOnlyLocalities?: string[];
+	includeOnlyAdministrativeAreas?: string[];
+	includeOnlyPostalCodes?: string[];
+	excludeAdministrativeAreas?: string[];
+	preferLocalities?: string[];
+	preferAdministrativeAreas?: string[];
+	preferPostalCodes?: string[];
+	preferRatio?: number;
+	preferGeolocation?: string;
+	source?: "postal" | "all";
+}
+
+export interface ServiceClassOverrides {
+	ApiService?: typeof ApiService;
+	ColorService?: typeof ColorService;
+	DropdownService?: typeof DropdownService;
+	DropdownStateService?: typeof DropdownStateService;
+	FormService?: typeof FormService;
+	FormatService?: typeof FormatService;
+	DomService?: typeof DomService;
+	KeyboardNavigationService?: typeof KeyboardNavigationService;
+	StyleService?: typeof StyleService;
+}
+
+export interface DefaultSmartyAddressConfig extends ApiConfig {
+	theme: string[];
 }
 
 export interface SmartyAddressConfig extends DefaultSmartyAddressConfig {
-	// TODO: Talk to Jeffrey and Adam about correct naming of fields/properties
 	embeddedKey: string;
-	searchInputSelector: string;
-	streetLineSelector?: string;
+	streetSelector: string;
+
+	searchInputSelector?: string;
 	secondarySelector?: string;
+	localitySelector?: string;
+	administrativeAreaSelector?: string;
+	postalCodeSelector?: string;
+
 	citySelector?: string;
 	stateSelector?: string;
 	zipcodeSelector?: string;
+	regionSelector?: string;
+	provinceSelector?: string;
+	postcodeSelector?: string;
+	zipSelector?: string;
+
+	includeOnlyCities?: string[];
+	includeOnlyStates?: string[];
+	includeOnlyZipCodes?: string[];
+	excludeStates?: string[];
+	preferCities?: string[];
+	preferStates?: string[];
+	preferZipCodes?: string[];
+
+	domWaitTimeoutMs?: number;
+
+	/** @internal For testing only - bypasses isTrusted check on events */
+	_testMode?: boolean;
+
+	services?: ServiceClassOverrides;
+	onAddressSelected?: (address: AutocompleteSuggestion) => void;
+	onAutocompleteSuggestionsReceived?: (
+		suggestions: AutocompleteSuggestion[],
+	) => AutocompleteSuggestion[];
+	onDropdownOpen?: () => void;
+	onDropdownClose?: () => void;
 }
 
-export interface AddressSuggestion {
+export interface NormalizedSmartyAddressConfig extends DefaultSmartyAddressConfig {
+	embeddedKey: string;
+	streetSelector: string;
+
+	searchInputSelector?: string;
+	secondarySelector?: string;
+	localitySelector?: string;
+	administrativeAreaSelector?: string;
+	postalCodeSelector?: string;
+
+	domWaitTimeoutMs?: number;
+
+	/** @internal For testing only - bypasses isTrusted check on events */
+	_testMode?: boolean;
+
+	services?: ServiceClassOverrides;
+	onAddressSelected?: (address: AutocompleteSuggestion) => void;
+	onAutocompleteSuggestionsReceived?: (
+		suggestions: AutocompleteSuggestion[],
+	) => AutocompleteSuggestion[];
+	onDropdownOpen?: () => void;
+	onDropdownClose?: () => void;
+}
+
+export interface AutocompleteSuggestion {
 	street_line: string;
 	secondary?: string;
 	city: string;
@@ -23,112 +113,5 @@ export interface AddressSuggestion {
 	zipcode: string;
 	country: string;
 	entries?: number;
-	metadata?: Record<string, any>;
-}
-
-export interface StylesObject {
-	[selector: string]: {
-		[cssVar: string]: string;
-	};
-}
-
-export interface ApiErrorResponse {
-	id: number;
-	message: string;
-}
-
-// TODO: Revisit the abstract/basic stateObject interfaces.
-export interface AbstractStateObject {
-	[index: string]: any;
-}
-
-export interface ServiceMethodsObject {
-	[name: string]: WrappedServiceMethod;
-}
-export interface ServicesObject {
-	[name: string]: ServiceMethodsObject;
-}
-export interface ServiceMethod {
-	(props: ServiceMethodProps, customProps?: any): void;
-}
-export interface WrappedServiceMethod {
-	(customProps?: any): void;
-}
-
-export interface ServiceMethodProps {
-	state: AbstractStateObject;
-	setState: { (name: string, newState: unknown): void };
-	services: ServicesObject;
-	utils: { [name: string]: (...props: unknown[]) => unknown };
-}
-
-export interface AutocompleteUiServiceMethod extends ServiceMethod {
-	(props: AutocompleteUiServiceMethodProps, customProps?: any): void;
-}
-
-export interface AutocompleteUiServiceMethodProps extends ServiceMethodProps {
-	utils: AutocompleteUiServiceUtils;
-}
-
-export interface ServiceDefinition {
-	initialState: AbstractStateObject;
-	serviceMethods: { [name: string]: ServiceMethod };
-	utils?: ServiceDefinitionUtils;
-}
-
-export interface ServiceDefinitionUtils {
-	[name: string]: (...args: unknown[]) => unknown;
-}
-
-export interface AutocompleteUiServiceUtils extends ServiceDefinitionUtils {
-	updateThemeClass: (
-		newTheme: string[],
-		previousTheme: string[],
-		dropdownWrapperElement: HTMLElement,
-	) => void;
-	getInstanceClassName: (instanceId: number) => string;
-	buildAutocompleteDomElements: (instanceClassname: string) => Record<string, HTMLElement>;
-}
-
-export interface AutocompleteUiServiceDefinition extends ServiceDefinition {
-	initialState: {
-		theme: string;
-		searchInputElement: HTMLInputElement;
-
-		dropdownWrapperElement: HTMLElement;
-		dropdownElement: HTMLElement;
-		suggestionsElement: HTMLElement;
-		poweredBySmartyElement: HTMLElement;
-
-		highlightedSuggestionIndex: number;
-		selectedSuggestionIndex: number;
-		// TODO: Be more specific with what type of object is expected here (e.g. AddressSuggestion)
-		addressSuggestionResults: object[];
-		secondaryAddressSuggestionResults: object[];
-		customStylesElement: HTMLElement;
-	};
-	utils: AutocompleteUiServiceUtils;
-}
-
-export interface ServiceDefinitionMap {
-	[name: string]: ServiceDefinition;
-}
-
-export interface UiSuggestionItem {
-	address: AddressSuggestion;
-	suggestionElement: HTMLElement;
-}
-
-export interface RgbaColor {
-	red: number;
-	green: number;
-	blue: number;
-	alpha: number;
-}
-
-export interface HslColor {
-	hue: number;
-	saturation: number;
-	lightness: number;
-	alpha: number;
+	metadata?: Record<string, unknown>;
 }
