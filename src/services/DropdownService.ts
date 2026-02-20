@@ -21,6 +21,7 @@ export class DropdownService extends BaseService {
 
 	private cleanupFunctions: (() => void)[] = [];
 	private mutationObserver: MutationObserver | null = null;
+	private dynamicStylingHandler: (() => void) | null = null;
 
 	constructor(instanceId: number) {
 		super();
@@ -44,6 +45,7 @@ export class DropdownService extends BaseService {
 		this.autocompleteSuggestionsElement = null;
 		this.customStylesElement = null;
 		this.announcementElement = null;
+		this.dynamicStylingHandler = null;
 	}
 
 	init(config: NormalizedSmartyAddressConfig): void {
@@ -149,14 +151,14 @@ export class DropdownService extends BaseService {
 			(e) => this.handleSearchInputFocusOut(e),
 		);
 
-		const dynamicStylingHandler = () =>
+		this.dynamicStylingHandler = () =>
 			this.getService("styleService").updateDynamicStyles(
 				this.customStylesElement as HTMLStyleElement,
 				searchInputElement,
 				this.instanceId,
 			);
 
-		this.configureDynamicStyling(dynamicStylingHandler, searchInputElement);
+		this.configureDynamicStyling(this.dynamicStylingHandler, searchInputElement);
 	}
 
 	handleSearchInputFocusOut(event: FocusEvent): void {
@@ -348,6 +350,7 @@ export class DropdownService extends BaseService {
 	}
 
 	openDropdown(): void {
+		this.dynamicStylingHandler?.();
 		this.setAriaExpanded(true);
 		this.getService("dropdownStateService").setDropdownOpen(true);
 		this.showDropdown();
