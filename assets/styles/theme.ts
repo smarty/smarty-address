@@ -60,12 +60,30 @@ export const themeStyles = {
 		"background-color": "var(--smartyAddress__surfaceBasePrimaryColor)",
 	},
 
+	".smartyAddress__showAllSecondaries": {
+		cursor: "var(--smartyAddress__cursorStyle)",
+		padding: "var(--smartyAddress__spacingMedium3)",
+		"padding-left": "var(--smartyAddress__spacingLarge3)",
+		color: "var(--smartyAddress__textAccentColor, #0066ff)",
+		"background-color": "var(--smartyAddress__surfaceBasePrimaryColor)",
+	},
+
+	".smartyAddress__entriesChevron": {
+		height: "var(--smartyAddress__chevronHeight)",
+		transform: "var(--smartyAddress__chevronRotation)",
+		transition: "var(--smartyAddress__chevronTransition)",
+	},
+
+	".smartyAddress__entriesChevronUp": {
+		transform: "var(--smartyAddress__chevronRotationExpanded)",
+	},
+
 	".smartyAddress__addressWrapper": {
 		display: "var(--smartyAddress__suggestionDisplay)",
 		"justify-content": "var(--smartyAddress__suggestionJustifyContent)",
 	},
 
-	".smartyAddress__autocompleteSuggestion:hover, .smartyAddress__autocompleteSuggestion[aria-selected='true'], .smartyAddress__secondaryAutocompleteSuggestion:hover, .smartyAddress__secondaryAutocompleteSuggestion[aria-selected='true']":
+	".smartyAddress__autocompleteSuggestion:hover, .smartyAddress__autocompleteSuggestion[aria-selected='true'], .smartyAddress__secondaryAutocompleteSuggestion:hover, .smartyAddress__secondaryAutocompleteSuggestion[aria-selected='true'], .smartyAddress__showAllSecondaries:hover, .smartyAddress__showAllSecondaries[aria-selected='true']":
 		{
 			"background-color": "var(--smartyAddress__surfaceBaseSecondaryColor)",
 		},
@@ -81,6 +99,9 @@ export const themeStyles = {
 	},
 
 	".smartyAddress__autocompleteSuggestionEntries": {
+		display: "var(--smartyAddress__entriesDisplay)",
+		"align-items": "var(--smartyAddress__entriesAlignItems)",
+		gap: "var(--smartyAddress__entriesGap)",
 		color: "var(--smartyAddress__textAccentColor, #0066ff)",
 		"white-space": "var(--smartyAddress__suggestionWhitespace)",
 	},

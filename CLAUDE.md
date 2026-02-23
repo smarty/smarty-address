@@ -43,6 +43,7 @@ All services are located at `src/services/`:
 - Services communicate via typed getters (e.g., `this.apiService.method()`)
 - Multiple `SmartyAddress` instances are tracked via `instanceId` for isolation
 - Themes are CSS variable arrays defined in `src/themes.ts`
+- **All CSS property values in `assets/styles/theme.ts` must use CSS variables** (`var(--smartyAddress__...)`) — never hardcode raw values. CSS variables are defined across files in `assets/styles/`: `base.ts` (defaults unlikely to be overridden), `colors.ts`, `spacing.ts`, `misc.ts` (typography, positioning). Create new variables in the appropriate file so themes have total control of styling
 - Configuration is merged with `defaultConfig` at instantiation
 - Avoid code comments; prefer self-documenting code with clear naming
 
@@ -54,6 +55,12 @@ All services are located at `src/services/`:
 - **Name domain-specific magic numbers**: Extract as constants (e.g., `LIGHT_MODE_BREAKPOINT = 50`), but keep universally understood values inline (`"#000"`, `"#fff"`)
 - **Push back on subjective feedback**: Not all review suggestions require action; defend choices with rationale when appropriate
 - **Investigate before fixing "bugs"**: What looks like a bug may be intentional; understand full context before changing
+
+### Figma
+
+- **Design file**: https://www.figma.com/design/IB5XGNtn3HWQhxkVxC9upF/Product-UX-Projects
+- The mockups use large values (e.g. 32px text, 1200px frames). Do NOT assume a 2x scale factor — always confirm before deriving CSS values proportionally from Figma dimensions.
+- After making UI changes based on Figma designs, use Playwright to visually verify the result in the browser before considering the task done.
 
 ### Customization Options
 

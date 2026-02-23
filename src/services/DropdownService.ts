@@ -1,9 +1,10 @@
 import { BaseService } from "./BaseService";
 import { AutocompleteSuggestion, NormalizedSmartyAddressConfig } from "../interfaces";
 import { CSS_CLASSES, CSS_PREFIXES } from "../constants/cssClasses";
+import { getChevronSvg } from "../utils/getChevronIcon";
 import { getSmartyLogo } from "../utils/getSmartyLogo";
 import { ElementConfig } from "./DomService";
-import { UiAutocompleteSuggestionItem } from "./DropdownStateService";
+import { INITIAL_VISIBLE_SECONDARIES, UiAutocompleteSuggestionItem } from "./DropdownStateService";
 
 export type { UiAutocompleteSuggestionItem } from "./DropdownStateService";
 
@@ -72,9 +73,7 @@ export class DropdownService extends BaseService {
 	}
 
 	async setupDom(): Promise<void> {
-		const instanceClassname = this.getService("styleService").getInstanceClassName(
-			this.instanceId,
-		);
+		const instanceClassname = this.getService("styleService").getInstanceClassName(this.instanceId);
 		const elements = this.buildAutocompleteDomElements(instanceClassname);
 
 		this.appendElementsToDocument(elements);
@@ -193,15 +192,11 @@ export class DropdownService extends BaseService {
 
 		const apiService = this.getService("apiService");
 		if (currentSelectedIndex > -1 && selectedAddress) {
-			apiService.fetchSecondaryAutocompleteSuggestions(
-				searchInputValue,
-				selectedAddress.address,
-				{
-					onSuccess: (autocompleteSuggestions, searchString) =>
-						this.processSecondaryAutocompleteSuggestions(autocompleteSuggestions, searchString),
-					onError: () => this.handleApiError(),
-				},
-			);
+			apiService.fetchSecondaryAutocompleteSuggestions(searchInputValue, selectedAddress.address, {
+				onSuccess: (autocompleteSuggestions, searchString) =>
+					this.processSecondaryAutocompleteSuggestions(autocompleteSuggestions, searchString),
+				onError: () => this.handleApiError(),
+			});
 		} else {
 			apiService.fetchAutocompleteSuggestions(searchInputValue, {
 				onSuccess: (autocompleteSuggestions, searchString) =>
@@ -216,6 +211,11 @@ export class DropdownService extends BaseService {
 		const mergedAutocompleteSuggestions = stateService.getMergedAutocompleteSuggestions();
 		const selectedAddress = mergedAutocompleteSuggestions[addressIndex];
 		if (!selectedAddress) return;
+
+		if (selectedAddress.isShowAllControl) {
+			this.expandAllSecondaries();
+			return;
+		}
 
 		if (this.config?.onAddressSelected) {
 			this.config.onAddressSelected(selectedAddress.address);
@@ -290,6 +290,13 @@ export class DropdownService extends BaseService {
 		);
 
 		stateService.setSecondaryAutocompleteSuggestions(autocompleteSuggestionItems);
+		stateService.setSecondariesExpanded(false);
+
+		const showAllItem =
+			autocompleteSuggestionItems.length > INITIAL_VISIBLE_SECONDARIES
+				? this.createShowAllElement(autocompleteSuggestionItems.length)
+				: null;
+		stateService.setShowAllItem(showAllItem);
 
 		const count = autocompleteSuggestionItems.length;
 		const announcement = `${count} unit entr${count === 1 ? "y" : "ies"} found.${count > 1 ? " Use the arrow keys to move through the results." : ""}`;
@@ -299,6 +306,9 @@ export class DropdownService extends BaseService {
 			stateService.getSelectedIndex() + 1,
 			announcement,
 		);
+
+		this.scrollSelectedPrimaryToTop();
+		this.flipChevronUp(stateService);
 	}
 
 	private displayAutocompleteSuggestions(
@@ -459,7 +469,7 @@ export class DropdownService extends BaseService {
 			formattedAddress,
 			searchString,
 		);
-		const entriesLabel = entries > 1 ? `, ${entries} entries available` : "";
+		const entriesLabel = entries > 1 ? `, ${entries} units available` : "";
 		const ariaLabel = `${formattedAddress}${entriesLabel}`;
 
 		return this.buildSuggestionElement(
@@ -581,6 +591,79 @@ export class DropdownService extends BaseService {
 		}
 	}
 
+	private createShowAllElement(totalCount: number): UiAutocompleteSuggestionItem {
+		const elementsMap: ElementConfig[] = [
+			{
+				name: "showAllElement",
+				elementType: "li",
+				className: [CSS_CLASSES.showAllSecondaries],
+				attributes: {
+					role: "option",
+					"aria-label": "Show all units",
+				},
+				children: [
+					{
+						elementType: "div",
+						className: [CSS_CLASSES.addressWrapper],
+						children: [{ text: `\u2026 Show all ${totalCount}` }],
+					},
+				],
+			},
+		];
+
+		const elements = this.getService("domService").buildElementsFromMap(elementsMap);
+		const showAllElement = elements.showAllElement as HTMLElement;
+
+		showAllElement.addEventListener("click", () => this.expandAllSecondaries());
+
+		return {
+			address: { street_line: "", city: "", state: "", zipcode: "", country: "" },
+			autocompleteSuggestionElement: showAllElement,
+			isShowAllControl: true,
+		};
+	}
+
+	private expandAllSecondaries(): void {
+		const stateService = this.getService("dropdownStateService");
+		stateService.setSecondariesExpanded(true);
+		stateService.setShowAllItem(null);
+
+		this.flipChevronUp(stateService);
+		this.updateDropdownContents(stateService.getMergedAutocompleteSuggestions());
+		this.getService("keyboardNavigationService").highlightNewAddress(0);
+
+		const count = stateService.getSecondaryAutocompleteSuggestions().length;
+		this.announce(`Showing all ${count} units.`);
+	}
+
+	private flipChevronUp(
+		stateService: ReturnType<typeof this.getService<"dropdownStateService">>,
+	): void {
+		const merged = stateService.getMergedAutocompleteSuggestions();
+		const selectedItem = merged[stateService.getSelectedIndex()];
+		const chevron = selectedItem?.autocompleteSuggestionElement.querySelector(
+			`.${CSS_CLASSES.entriesChevron}`,
+		);
+		if (chevron) chevron.classList.add(CSS_CLASSES.entriesChevronUp);
+	}
+
+	private scrollSelectedPrimaryToTop(): void {
+		const stateService = this.getService("dropdownStateService");
+		const merged = stateService.getMergedAutocompleteSuggestions();
+		const selectedIndex = stateService.getSelectedIndex();
+		const selectedItem = merged[selectedIndex];
+
+		if (!selectedItem || !this.autocompleteSuggestionsElement) return;
+
+		const container = this.autocompleteSuggestionsElement;
+		if (typeof container.scrollTo === "function") {
+			container.scrollTo({
+				top: selectedItem.autocompleteSuggestionElement.offsetTop,
+				behavior: "smooth",
+			});
+		}
+	}
+
 	private buildAutocompleteDomElements(
 		instanceClassname: string,
 	): Record<string, HTMLElement | Text> {
@@ -698,7 +781,15 @@ export class DropdownService extends BaseService {
 				name: "entriesElement",
 				elementType: "div",
 				className: [CSS_CLASSES.autocompleteSuggestionEntries],
-				children: [{ text: `${entries} entries` }],
+				children: [
+					{ text: `+${entries} units` },
+					{
+						name: "chevronElement",
+						elementType: "span",
+						className: [CSS_CLASSES.entriesChevron],
+						attributes: { "aria-hidden": "true" },
+					},
+				],
 			});
 		}
 
@@ -718,6 +809,12 @@ export class DropdownService extends BaseService {
 			},
 		];
 
-		return this.getService("domService").buildElementsFromMap(elementsMap);
+		const elements = this.getService("domService").buildElementsFromMap(elementsMap);
+
+		if (elements.chevronElement instanceof HTMLElement) {
+			elements.chevronElement.innerHTML = getChevronSvg();
+		}
+
+		return elements;
 	}
 }

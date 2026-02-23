@@ -1,7 +1,11 @@
 /**
  * @jest-environment jsdom
  */
-import { DropdownStateService, UiAutocompleteSuggestionItem } from "./DropdownStateService";
+import {
+	DropdownStateService,
+	INITIAL_VISIBLE_SECONDARIES,
+	UiAutocompleteSuggestionItem,
+} from "./DropdownStateService";
 
 describe("DropdownStateService", () => {
 	const createMockUiAutocompleteSuggestionItem = (
@@ -28,6 +32,8 @@ describe("DropdownStateService", () => {
 			expect(service.getIsInteractingWithDropdown()).toBe(false);
 			expect(service.getAutocompleteSuggestions()).toEqual([]);
 			expect(service.getSecondaryAutocompleteSuggestions()).toEqual([]);
+			expect(service.isSecondariesExpanded()).toBe(false);
+			expect(service.getShowAllItem()).toBeNull();
 		});
 
 		it("should set and get dropdown open state", () => {
@@ -92,12 +98,16 @@ describe("DropdownStateService", () => {
 			service.setSelectedAddressSearchTerm("123 Main St");
 			service.setSelectedIndex(2);
 			service.setHighlightedIndex(5);
+			service.setSecondariesExpanded(true);
+			service.setShowAllItem(createMockUiAutocompleteSuggestionItem("show all"));
 
 			service.resetSelectionState();
 
 			expect(service.getSelectedAddressSearchTerm()).toBe("");
 			expect(service.getSelectedIndex()).toBe(-1);
 			expect(service.getHighlightedIndex()).toBe(0);
+			expect(service.isSecondariesExpanded()).toBe(false);
+			expect(service.getShowAllItem()).toBeNull();
 		});
 	});
 
@@ -193,6 +203,100 @@ describe("DropdownStateService", () => {
 			expect(result[1].address.street_line).toBe("456 Oak Ave");
 			expect(result[2].address.street_line).toBe("456 Oak Ave Apt 1");
 			expect(result[3].address.street_line).toBe("789 Pine Rd");
+		});
+
+		it("should include showAllItem when set and not expanded", () => {
+			const service = new DropdownStateService();
+			const primary = [createMockUiAutocompleteSuggestionItem("123 Main St")];
+			const secondaries = Array.from({ length: 8 }, (_, i) =>
+				createMockUiAutocompleteSuggestionItem(`Apt ${i + 1}`),
+			);
+			const showAllItem = createMockUiAutocompleteSuggestionItem("show all");
+
+			service.setAutocompleteSuggestions(primary);
+			service.setSecondaryAutocompleteSuggestions(secondaries);
+			service.setSelectedIndex(0);
+			service.setShowAllItem(showAllItem);
+
+			const result = service.getMergedAutocompleteSuggestions();
+
+			expect(result.length).toBe(1 + INITIAL_VISIBLE_SECONDARIES + 1);
+			expect(result[result.length - 1]).toBe(showAllItem);
+		});
+
+		it("should not include showAllItem when expanded", () => {
+			const service = new DropdownStateService();
+			const primary = [createMockUiAutocompleteSuggestionItem("123 Main St")];
+			const secondaries = Array.from({ length: 8 }, (_, i) =>
+				createMockUiAutocompleteSuggestionItem(`Apt ${i + 1}`),
+			);
+
+			service.setAutocompleteSuggestions(primary);
+			service.setSecondaryAutocompleteSuggestions(secondaries);
+			service.setSelectedIndex(0);
+			service.setShowAllItem(createMockUiAutocompleteSuggestionItem("show all"));
+			service.setSecondariesExpanded(true);
+
+			const result = service.getMergedAutocompleteSuggestions();
+
+			expect(result.length).toBe(1 + 8);
+		});
+	});
+
+	describe("getVisibleSecondaryAutocompleteSuggestions", () => {
+		it("should return first 5 when more than 5 and not expanded", () => {
+			const service = new DropdownStateService();
+			const secondaries = Array.from({ length: 10 }, (_, i) =>
+				createMockUiAutocompleteSuggestionItem(`Apt ${i + 1}`),
+			);
+
+			service.setSecondaryAutocompleteSuggestions(secondaries);
+
+			const result = service.getVisibleSecondaryAutocompleteSuggestions();
+
+			expect(result.length).toBe(INITIAL_VISIBLE_SECONDARIES);
+			expect(result[0].address.street_line).toBe("Apt 1");
+			expect(result[4].address.street_line).toBe("Apt 5");
+		});
+
+		it("should return all when expanded", () => {
+			const service = new DropdownStateService();
+			const secondaries = Array.from({ length: 10 }, (_, i) =>
+				createMockUiAutocompleteSuggestionItem(`Apt ${i + 1}`),
+			);
+
+			service.setSecondaryAutocompleteSuggestions(secondaries);
+			service.setSecondariesExpanded(true);
+
+			const result = service.getVisibleSecondaryAutocompleteSuggestions();
+
+			expect(result.length).toBe(10);
+		});
+
+		it("should return all when 5 or fewer", () => {
+			const service = new DropdownStateService();
+			const secondaries = Array.from({ length: 3 }, (_, i) =>
+				createMockUiAutocompleteSuggestionItem(`Apt ${i + 1}`),
+			);
+
+			service.setSecondaryAutocompleteSuggestions(secondaries);
+
+			const result = service.getVisibleSecondaryAutocompleteSuggestions();
+
+			expect(result.length).toBe(3);
+		});
+
+		it("should return all when exactly 5", () => {
+			const service = new DropdownStateService();
+			const secondaries = Array.from({ length: 5 }, (_, i) =>
+				createMockUiAutocompleteSuggestionItem(`Apt ${i + 1}`),
+			);
+
+			service.setSecondaryAutocompleteSuggestions(secondaries);
+
+			const result = service.getVisibleSecondaryAutocompleteSuggestions();
+
+			expect(result.length).toBe(5);
 		});
 	});
 });

@@ -13,6 +13,9 @@ export const CSS_CLASSES = {
 	autocompleteSuggestionEntries: "smartyAddress__autocompleteSuggestionEntries",
 	autocompleteSuggestion: "smartyAddress__autocompleteSuggestion",
 	secondaryAutocompleteSuggestion: "smartyAddress__secondaryAutocompleteSuggestion",
+	entriesChevron: "smartyAddress__entriesChevron",
+	entriesChevronUp: "smartyAddress__entriesChevronUp",
+	showAllSecondaries: "smartyAddress__showAllSecondaries",
 	colorDynamic: "smartyAddress__color_dynamic",
 	positionDynamic: "smartyAddress__position_dynamic",
 } as const;
