@@ -719,7 +719,7 @@ export class DropdownService extends BaseService {
 										elementType: "img",
 										className: darkLogoElementClasses,
 										attributes: {
-											src: getSmartyLogo("#0066FF"),
+											src: getSmartyLogo("#151b23", "#0066FF"),
 											alt: "",
 											"aria-hidden": "true",
 										},
