@@ -31,6 +31,32 @@ npm install @smarty-integrations-sandbox/smarty-address
 </script>
 ```
 
+### Via CDN
+
+Use the library directly in the browser without a build step:
+
+```html
+<form>
+  <input type="text" id="street" placeholder="Start typing an address..." />
+  <input type="text" id="city" />
+  <input type="text" id="state" />
+  <input type="text" id="zipcode" />
+</form>
+
+<script src="https://cdn.jsdelivr.net/npm/@smarty-integrations-sandbox/smarty-address/dist/smarty-address.iife.js"></script>
+<script>
+  SmartyAddress.create({
+    embeddedKey: "your-smarty-embedded-key",
+    streetSelector: "#street",
+    citySelector: "#city",
+    stateSelector: "#state",
+    zipcodeSelector: "#zipcode",
+  });
+</script>
+```
+
+The CDN script adds a global `SmartyAddress` object with the same API as the module import. You can also use [unpkg](https://unpkg.com/@smarty-integrations-sandbox/smarty-address/dist/smarty-address.iife.js) as an alternative CDN.
+
 Get your embedded key from the [Smarty dashboard](https://www.smarty.com/account/keys).
 
 ## Configuration
