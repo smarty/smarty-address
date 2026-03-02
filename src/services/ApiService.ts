@@ -207,14 +207,14 @@ export class ApiService extends BaseService {
 		primaryAutocompleteSuggestions: AutocompleteSuggestion[],
 		selectedAddress: AutocompleteSuggestion,
 	): AutocompleteSuggestion | undefined {
-		const matchingResult = primaryAutocompleteSuggestions.find((autocompleteSuggestion) => {
+		return primaryAutocompleteSuggestions.find((autocompleteSuggestion) => {
 			return (
 				autocompleteSuggestion.street_line.trim() === selectedAddress.street_line.trim() &&
+				autocompleteSuggestion.city === selectedAddress.city &&
+				autocompleteSuggestion.state === selectedAddress.state &&
 				autocompleteSuggestion.secondary?.includes(selectedAddress.secondary?.trim() ?? "")
 			);
 		});
-
-		return matchingResult;
 	}
 
 	getApiError(

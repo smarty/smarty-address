@@ -223,7 +223,8 @@ export class DropdownService extends BaseService {
 
 		const { street_line, secondary = "", entries = 0 } = selectedAddress.address;
 		const searchInputElement = this.getSearchInputElement();
-		stateService.setSelectedIndex(addressIndex);
+		const primaryIndex = stateService.getAutocompleteSuggestions().indexOf(selectedAddress);
+		stateService.setSelectedIndex(primaryIndex !== -1 ? primaryIndex : addressIndex);
 
 		const hasSecondaries = entries > 1;
 		if (hasSecondaries && searchInputElement) {
@@ -337,9 +338,6 @@ export class DropdownService extends BaseService {
 		) => Record<string, HTMLElement | Text>,
 		elementKey: string,
 	): UiAutocompleteSuggestionItem[] {
-		const selectedAutocompleteSuggestionIndex =
-			this.getService("dropdownStateService").getSelectedIndex();
-
 		return suggestions.map(
 			(address: AutocompleteSuggestion, addressIndex: number): UiAutocompleteSuggestionItem => {
 				const autocompleteSuggestionId = this.getAutocompleteSuggestionId(baseIndex + addressIndex);
@@ -347,7 +345,11 @@ export class DropdownService extends BaseService {
 				const autocompleteSuggestionElement = elements[elementKey] as HTMLElement;
 
 				autocompleteSuggestionElement.addEventListener("click", () => {
-					this.handleSelectDropdownItem(addressIndex + selectedAutocompleteSuggestionIndex + 1);
+					const merged = this.getService("dropdownStateService").getMergedAutocompleteSuggestions();
+					const mergedIndex = merged.findIndex(
+						(item) => item.autocompleteSuggestionElement === autocompleteSuggestionElement,
+					);
+					if (mergedIndex !== -1) this.handleSelectDropdownItem(mergedIndex);
 				});
 
 				return { address, autocompleteSuggestionElement };
