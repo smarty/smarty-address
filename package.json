@@ -1,6 +1,6 @@
 {
   "name": "@smarty-integrations-sandbox/smarty-address",
-  "version": "0.1.15",
+  "version": "0.1.17",
   "description": "Quick and easy Smarty address autocomplete and validation.",
   "keywords": [
     "smarty",
@@ -22,6 +22,9 @@
   ],
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
+  "unpkg": "dist/smarty-address.iife.js",
+  "jsdelivr": "dist/smarty-address.iife.js",
+  "browser": "dist/smarty-address.iife.js",
   "author": "Smarty Integrations Team <support@smarty.com> (https://www.smarty.com)",
   "license": "Apache-2.0",
   "type": "module",
@@ -29,7 +32,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc && cp -r assets dist/",
+    "build": "npm run build:esm && npm run build:cdn",
+    "build:esm": "tsc && cp -r assets dist/",
+    "build:cdn": "vite build",
     "dev": "vite --port 5176",
     "test": "jest"
   },
