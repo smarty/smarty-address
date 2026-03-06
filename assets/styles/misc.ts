@@ -1,6 +1,8 @@
 export const miscStyles = {
 	".smartyAddress__typography_default": {
 		"--smartyAddress__fontSizeSmall1": ".65em",
+		"--smartyAddress__chevronHeight": "0.375em",
+		"--smartyAddress__entriesGap": "0.3em",
 	},
 
 	".smartyAddress__position_default": {

@@ -19,5 +19,10 @@ export const baseStyles = {
 		"--smartyAddress__suggestionWhitespace": "nowrap",
 		"--smartyAddress__suggestionOverflow": "ellipsis",
 		"--smartyAddress__suggestionOverflowX": "hidden",
+		"--smartyAddress__entriesDisplay": "flex",
+		"--smartyAddress__entriesAlignItems": "center",
+		"--smartyAddress__chevronTransition": "transform 0.2s ease",
+		"--smartyAddress__chevronRotation": "rotate(0deg)",
+		"--smartyAddress__chevronRotationExpanded": "rotate(180deg)",
 	},
 };
