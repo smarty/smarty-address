@@ -309,7 +309,12 @@ export class DropdownService extends BaseService {
 		);
 
 		this.scrollSelectedPrimaryToTop();
-		this.flipChevronUp(stateService);
+
+		if (autocompleteSuggestionItems.length > 0) {
+			this.flipChevronUp(stateService);
+		} else {
+			this.flipChevronDown(stateService);
+		}
 	}
 
 	private displayAutocompleteSuggestions(
@@ -641,12 +646,25 @@ export class DropdownService extends BaseService {
 	private flipChevronUp(
 		stateService: ReturnType<typeof this.getService<"dropdownStateService">>,
 	): void {
+		const chevron = this.getSelectedChevron(stateService);
+		if (chevron) chevron.classList.add(CSS_CLASSES.entriesChevronUp);
+	}
+
+	private flipChevronDown(
+		stateService: ReturnType<typeof this.getService<"dropdownStateService">>,
+	): void {
+		const chevron = this.getSelectedChevron(stateService);
+		if (chevron) chevron.classList.remove(CSS_CLASSES.entriesChevronUp);
+	}
+
+	private getSelectedChevron(
+		stateService: ReturnType<typeof this.getService<"dropdownStateService">>,
+	): Element | null {
 		const merged = stateService.getMergedAutocompleteSuggestions();
 		const selectedItem = merged[stateService.getSelectedIndex()];
-		const chevron = selectedItem?.autocompleteSuggestionElement.querySelector(
+		return selectedItem?.autocompleteSuggestionElement.querySelector(
 			`.${CSS_CLASSES.entriesChevron}`,
-		);
-		if (chevron) chevron.classList.add(CSS_CLASSES.entriesChevronUp);
+		) ?? null;
 	}
 
 	private scrollSelectedPrimaryToTop(): void {

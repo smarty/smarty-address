@@ -49,11 +49,14 @@ describe("Integration: User Flow", () => {
 		jest.useFakeTimers();
 	});
 
+	const originalFetch = global.fetch;
+
 	afterEach(async () => {
 		if (instance) {
 			instance.destroy();
 			instance = null;
 		}
+		global.fetch = originalFetch;
 		document.body.innerHTML = "";
 		jest.useRealTimers();
 		jest.restoreAllMocks();
@@ -364,6 +367,11 @@ describe("Integration: User Flow", () => {
 				(el) => el.textContent?.includes("Apt 1") && el.textContent?.includes("Stoughton"),
 			);
 			expect(hasStoughtonSecondary).toBe(true);
+
+			const hasMiamiSecondaryAfterSwitch = Array.from(allOptions).some(
+				(el) => el.textContent?.includes("Apt 1") && el.textContent?.includes("Miami Beach"),
+			);
+			expect(hasMiamiSecondaryAfterSwitch).toBe(false);
 		});
 
 		it("should select correct address when clicking a primary after secondaries are expanded", async () => {

@@ -1,4 +1,4 @@
-import { ApiService, unknownError, API_PARAM_MAP } from "./ApiService";
+import { ApiService, unknownError } from "./ApiService";
 import { AutocompleteSuggestion, ApiConfig } from "../interfaces";
 
 describe("ApiService", () => {
