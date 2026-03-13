@@ -409,5 +409,48 @@ describe("Integration: User Flow", () => {
 			expect(streetValue).toBe("100 Main St");
 			expect(cityValue).toBe("Denver");
 		});
+
+		it("should collapse secondaries when clicking the same expanded parent address", async () => {
+			global.fetch = secondaryFetchMock();
+
+			instance = await SmartyAddress.create({
+				_testMode: true,
+				embeddedKey: "test-key",
+				streetSelector: "#street",
+				localitySelector: "#city",
+				administrativeAreaSelector: "#state",
+				postalCodeSelector: "#zip",
+			});
+
+			const streetInput = document.querySelector("#street") as HTMLInputElement;
+			streetInput.value = "200 Oak";
+			streetInput.dispatchEvent(new Event("input", { bubbles: true }));
+			await flushAsync();
+
+			const suggestions = document.querySelectorAll('[role="option"]');
+			expect(suggestions.length).toBe(3);
+
+			(suggestions[1] as HTMLElement).click();
+			await flushAsync();
+
+			let allOptions = document.querySelectorAll('[role="option"]');
+			const hasSecondaries = Array.from(allOptions).some(
+				(el) => el.textContent?.includes("Apt 1") && el.textContent?.includes("Miami Beach"),
+			);
+			expect(hasSecondaries).toBe(true);
+
+			const miamiParent = Array.from(allOptions).find(
+				(el) => el.textContent?.includes("+3 units") && el.textContent?.includes("Miami Beach"),
+			) as HTMLElement;
+			miamiParent.click();
+			await flushAsync();
+
+			allOptions = document.querySelectorAll('[role="option"]');
+			const hasSecondariesAfterCollapse = Array.from(allOptions).some(
+				(el) => el.textContent?.includes("Apt 1") && el.textContent?.includes("Miami Beach"),
+			);
+			expect(hasSecondariesAfterCollapse).toBe(false);
+			expect(allOptions.length).toBe(3);
+		});
 	});
 });

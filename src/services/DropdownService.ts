@@ -224,9 +224,21 @@ export class DropdownService extends BaseService {
 		const { street_line, secondary = "", entries = 0 } = selectedAddress.address;
 		const searchInputElement = this.getSearchInputElement();
 		const primaryIndex = stateService.getAutocompleteSuggestions().indexOf(selectedAddress);
-		stateService.setSelectedIndex(primaryIndex !== -1 ? primaryIndex : addressIndex);
+		const resolvedIndex = primaryIndex !== -1 ? primaryIndex : addressIndex;
 
 		const hasSecondaries = entries > 1;
+		const isAlreadyExpanded =
+			hasSecondaries &&
+			stateService.getSelectedIndex() === resolvedIndex &&
+			stateService.getSecondaryAutocompleteSuggestions().length > 0;
+
+		if (isAlreadyExpanded) {
+			this.collapseSecondaries();
+			return;
+		}
+
+		stateService.setSelectedIndex(resolvedIndex);
+
 		if (hasSecondaries && searchInputElement) {
 			const newSearchTerm = `${street_line} ${secondary}`;
 			stateService.setSelectedAddressSearchTerm(newSearchTerm);
@@ -641,6 +653,19 @@ export class DropdownService extends BaseService {
 
 		const count = stateService.getSecondaryAutocompleteSuggestions().length;
 		this.announce(`Showing all ${count} units.`);
+	}
+
+	private collapseSecondaries(): void {
+		const stateService = this.getService("dropdownStateService");
+		this.flipChevronDown(stateService);
+		stateService.setSecondaryAutocompleteSuggestions([]);
+		stateService.setSecondariesExpanded(false);
+		stateService.setShowAllItem(null);
+		stateService.setSelectedIndex(-1);
+		stateService.setSelectedAddressSearchTerm("");
+		this.updateDropdownContents(stateService.getMergedAutocompleteSuggestions());
+		this.getService("keyboardNavigationService").highlightNewAddress(0);
+		this.announce("Units collapsed.");
 	}
 
 	private flipChevronUp(

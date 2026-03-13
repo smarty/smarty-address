@@ -58,7 +58,6 @@ All services are located at `src/services/`:
 
 ### Figma
 
-- **Design file**: https://www.figma.com/design/IB5XGNtn3HWQhxkVxC9upF/Product-UX-Projects
 - The mockups use large values (e.g. 32px text, 1200px frames). Do NOT assume a 2x scale factor — always confirm before deriving CSS values proportionally from Figma dimensions.
 - After making UI changes based on Figma designs, use Playwright to visually verify the result in the browser before considering the task done.
 
