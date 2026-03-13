@@ -64,7 +64,7 @@ export const themeStyles = {
 		cursor: "var(--smartyAddress__cursorStyle)",
 		padding: "var(--smartyAddress__spacingMedium3)",
 		"padding-left": "var(--smartyAddress__spacingLarge3)",
-		color: "var(--smartyAddress__textAccentColor, #0066ff)",
+		color: "var(--smartyAddress__textAccentColor)",
 		"background-color": "var(--smartyAddress__surfaceBasePrimaryColor)",
 	},
 
@@ -102,7 +102,7 @@ export const themeStyles = {
 		display: "var(--smartyAddress__entriesDisplay)",
 		"align-items": "var(--smartyAddress__entriesAlignItems)",
 		gap: "var(--smartyAddress__entriesGap)",
-		color: "var(--smartyAddress__textAccentColor, #0066ff)",
+		color: "var(--smartyAddress__textAccentColor)",
 		"white-space": "var(--smartyAddress__suggestionWhitespace)",
 	},
 

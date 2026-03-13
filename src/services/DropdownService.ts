@@ -223,9 +223,22 @@ export class DropdownService extends BaseService {
 
 		const { street_line, secondary = "", entries = 0 } = selectedAddress.address;
 		const searchInputElement = this.getSearchInputElement();
-		stateService.setSelectedIndex(addressIndex);
+		const primaryIndex = stateService.getAutocompleteSuggestions().indexOf(selectedAddress);
+		const resolvedIndex = primaryIndex !== -1 ? primaryIndex : addressIndex;
 
 		const hasSecondaries = entries > 1;
+		const isAlreadyExpanded =
+			hasSecondaries &&
+			stateService.getSelectedIndex() === resolvedIndex &&
+			stateService.getSecondaryAutocompleteSuggestions().length > 0;
+
+		if (isAlreadyExpanded) {
+			this.collapseSecondaries();
+			return;
+		}
+
+		stateService.setSelectedIndex(resolvedIndex);
+
 		if (hasSecondaries && searchInputElement) {
 			const newSearchTerm = `${street_line} ${secondary}`;
 			stateService.setSelectedAddressSearchTerm(newSearchTerm);
@@ -308,7 +321,12 @@ export class DropdownService extends BaseService {
 		);
 
 		this.scrollSelectedPrimaryToTop();
-		this.flipChevronUp(stateService);
+
+		if (autocompleteSuggestionItems.length > 0) {
+			this.flipChevronUp(stateService);
+		} else {
+			this.flipChevronDown(stateService);
+		}
 	}
 
 	private displayAutocompleteSuggestions(
@@ -337,9 +355,6 @@ export class DropdownService extends BaseService {
 		) => Record<string, HTMLElement | Text>,
 		elementKey: string,
 	): UiAutocompleteSuggestionItem[] {
-		const selectedAutocompleteSuggestionIndex =
-			this.getService("dropdownStateService").getSelectedIndex();
-
 		return suggestions.map(
 			(address: AutocompleteSuggestion, addressIndex: number): UiAutocompleteSuggestionItem => {
 				const autocompleteSuggestionId = this.getAutocompleteSuggestionId(baseIndex + addressIndex);
@@ -347,7 +362,11 @@ export class DropdownService extends BaseService {
 				const autocompleteSuggestionElement = elements[elementKey] as HTMLElement;
 
 				autocompleteSuggestionElement.addEventListener("click", () => {
-					this.handleSelectDropdownItem(addressIndex + selectedAutocompleteSuggestionIndex + 1);
+					const merged = this.getService("dropdownStateService").getMergedAutocompleteSuggestions();
+					const mergedIndex = merged.findIndex(
+						(item) => item.autocompleteSuggestionElement === autocompleteSuggestionElement,
+					);
+					if (mergedIndex !== -1) this.handleSelectDropdownItem(mergedIndex);
 				});
 
 				return { address, autocompleteSuggestionElement };
@@ -636,15 +655,41 @@ export class DropdownService extends BaseService {
 		this.announce(`Showing all ${count} units.`);
 	}
 
+	private collapseSecondaries(): void {
+		const stateService = this.getService("dropdownStateService");
+		this.flipChevronDown(stateService);
+		stateService.setSecondaryAutocompleteSuggestions([]);
+		stateService.setSecondariesExpanded(false);
+		stateService.setShowAllItem(null);
+		stateService.setSelectedIndex(-1);
+		stateService.setSelectedAddressSearchTerm("");
+		this.updateDropdownContents(stateService.getMergedAutocompleteSuggestions());
+		this.getService("keyboardNavigationService").highlightNewAddress(0);
+		this.announce("Units collapsed.");
+	}
+
 	private flipChevronUp(
 		stateService: ReturnType<typeof this.getService<"dropdownStateService">>,
 	): void {
+		const chevron = this.getSelectedChevron(stateService);
+		if (chevron) chevron.classList.add(CSS_CLASSES.entriesChevronUp);
+	}
+
+	private flipChevronDown(
+		stateService: ReturnType<typeof this.getService<"dropdownStateService">>,
+	): void {
+		const chevron = this.getSelectedChevron(stateService);
+		if (chevron) chevron.classList.remove(CSS_CLASSES.entriesChevronUp);
+	}
+
+	private getSelectedChevron(
+		stateService: ReturnType<typeof this.getService<"dropdownStateService">>,
+	): Element | null {
 		const merged = stateService.getMergedAutocompleteSuggestions();
 		const selectedItem = merged[stateService.getSelectedIndex()];
-		const chevron = selectedItem?.autocompleteSuggestionElement.querySelector(
+		return selectedItem?.autocompleteSuggestionElement.querySelector(
 			`.${CSS_CLASSES.entriesChevron}`,
-		);
-		if (chevron) chevron.classList.add(CSS_CLASSES.entriesChevronUp);
+		) ?? null;
 	}
 
 	private scrollSelectedPrimaryToTop(): void {

@@ -1,4 +1,4 @@
-import { ApiService, unknownError, API_PARAM_MAP } from "./ApiService";
+import { ApiService, unknownError } from "./ApiService";
 import { AutocompleteSuggestion, ApiConfig } from "../interfaces";
 
 describe("ApiService", () => {
@@ -92,6 +92,76 @@ describe("ApiService", () => {
 
 			const result = service.getMatchingResult(autocompleteSuggestions, selected);
 			expect(result).toBeDefined();
+		});
+
+		it("should distinguish addresses with same street but different cities", () => {
+			const miamiBeach: AutocompleteSuggestion = {
+				street_line: "1600 Pennsylvania Ave",
+				secondary: "Apt",
+				city: "Miami Beach",
+				state: "FL",
+				zipcode: "33139",
+				country: "US",
+				entries: 20,
+			};
+			const stoughton: AutocompleteSuggestion = {
+				street_line: "1600 Pennsylvania Ave",
+				secondary: "Apt",
+				city: "Stoughton",
+				state: "MA",
+				zipcode: "02072",
+				country: "US",
+				entries: 10,
+			};
+			const autocompleteSuggestions = [miamiBeach, stoughton];
+
+			const resultMiami = service.getMatchingResult(autocompleteSuggestions, miamiBeach);
+			expect(resultMiami?.city).toBe("Miami Beach");
+
+			const resultStoughton = service.getMatchingResult(autocompleteSuggestions, stoughton);
+			expect(resultStoughton?.city).toBe("Stoughton");
+		});
+
+		it("should not match when street matches but city differs", () => {
+			const autocompleteSuggestions = [
+				{
+					...createAutocompleteSuggestion("123 Main St", "Apt"),
+					city: "Miami Beach",
+					state: "FL",
+				},
+			];
+			const selected: AutocompleteSuggestion = {
+				street_line: "123 Main St",
+				secondary: "Apt",
+				city: "Stoughton",
+				state: "MA",
+				zipcode: "02072",
+				country: "US",
+			};
+
+			const result = service.getMatchingResult(autocompleteSuggestions, selected);
+			expect(result).toBeUndefined();
+		});
+
+		it("should not match when street and city match but state differs", () => {
+			const autocompleteSuggestions = [
+				{
+					...createAutocompleteSuggestion("123 Main St", "Apt"),
+					city: "Springfield",
+					state: "IL",
+				},
+			];
+			const selected: AutocompleteSuggestion = {
+				street_line: "123 Main St",
+				secondary: "Apt",
+				city: "Springfield",
+				state: "MO",
+				zipcode: "65801",
+				country: "US",
+			};
+
+			const result = service.getMatchingResult(autocompleteSuggestions, selected);
+			expect(result).toBeUndefined();
 		});
 	});
 

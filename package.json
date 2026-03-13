@@ -1,6 +1,6 @@
 {
   "name": "@smarty-integrations-sandbox/smarty-address",
-  "version": "0.1.17",
+  "version": "0.1.18",
   "description": "Quick and easy Smarty address autocomplete and validation.",
   "keywords": [
     "smarty",
@@ -35,7 +35,6 @@
     "build": "npm run build:esm && npm run build:cdn",
     "build:esm": "tsc && cp -r assets dist/",
     "build:cdn": "vite build",
-    "dev": "vite --port 5176",
     "test": "jest"
   },
   "exports": {
