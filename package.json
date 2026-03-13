@@ -35,7 +35,6 @@
     "build": "npm run build:esm && npm run build:cdn",
     "build:esm": "tsc && cp -r assets dist/",
     "build:cdn": "vite build",
-    "dev": "vite --port 5176",
     "test": "jest"
   },
   "exports": {
