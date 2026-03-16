@@ -5,7 +5,7 @@ A lightweight TypeScript library for adding Smarty address autocomplete and vali
 ## Installation
 
 ```bash
-npm install @smarty-integrations-sandbox/smarty-address
+npm install smarty-address
 ```
 
 ## Quick Start
@@ -19,7 +19,7 @@ npm install @smarty-integrations-sandbox/smarty-address
 </form>
 
 <script type="module">
-  import SmartyAddress from "@smarty-integrations-sandbox/smarty-address";
+  import SmartyAddress from "smarty-address";
 
   const autocomplete = await SmartyAddress.create({
     embeddedKey: "your-smarty-embedded-key",
@@ -43,7 +43,7 @@ Use the library directly in the browser without a build step:
   <input type="text" id="zipcode" />
 </form>
 
-<script src="https://cdn.jsdelivr.net/npm/@smarty-integrations-sandbox/smarty-address/dist/smarty-address.iife.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/smarty-address/dist/smarty-address.iife.js"></script>
 <script>
   SmartyAddress.create({
     embeddedKey: "your-smarty-embedded-key",
@@ -55,7 +55,7 @@ Use the library directly in the browser without a build step:
 </script>
 ```
 
-The CDN script adds a global `SmartyAddress` object with the same API as the module import. You can also use [unpkg](https://unpkg.com/@smarty-integrations-sandbox/smarty-address/dist/smarty-address.iife.js) as an alternative CDN.
+The CDN script adds a global `SmartyAddress` object with the same API as the module import. You can also use [unpkg](https://unpkg.com/smarty-address/dist/smarty-address.iife.js) as an alternative CDN.
 
 Get your embedded key from the [Smarty dashboard](https://www.smarty.com/account/keys).
 
@@ -163,7 +163,7 @@ const autocomplete = await SmartyAddress.create({
 Four built-in themes are available:
 
 ```javascript
-import SmartyAddress from "@smarty-integrations-sandbox/smarty-address";
+import SmartyAddress from "smarty-address";
 
 // Default theme (adapts to input colors)
 const autocomplete = await SmartyAddress.create({
@@ -257,7 +257,7 @@ This removes all event listeners, disconnects observers, and removes injected DO
 For advanced customization, you can extend and replace any internal service:
 
 ```javascript
-import SmartyAddress from "@smarty-integrations-sandbox/smarty-address";
+import SmartyAddress from "smarty-address";
 
 class CustomApiService extends SmartyAddress.services.ApiService {
   // Override methods to customize API behavior
