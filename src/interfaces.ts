@@ -69,8 +69,6 @@ export interface SmartyAddressConfig extends Omit<DefaultSmartyAddressConfig, "t
 	preferStates?: string[];
 	preferZipCodes?: string[];
 
-	domWaitTimeoutMs?: number;
-
 	/** @internal For testing only - bypasses isTrusted check on events */
 	_testMode?: boolean;
 
@@ -92,8 +90,6 @@ export interface NormalizedSmartyAddressConfig extends DefaultSmartyAddressConfi
 	localitySelector?: string;
 	administrativeAreaSelector?: string;
 	postalCodeSelector?: string;
-
-	domWaitTimeoutMs?: number;
 
 	/** @internal For testing only - bypasses isTrusted check on events */
 	_testMode?: boolean;
