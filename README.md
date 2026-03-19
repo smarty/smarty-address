@@ -136,7 +136,7 @@ const autocomplete = await SmartyAddress.create({
     // address contains: street_line, secondary, city, state, zipcode, country
   },
 
-  onSuggestionsReceived: (suggestions) => {
+  onAutocompleteSuggestionsReceived: (suggestions) => {
     // Filter or modify suggestions before display
     return suggestions.filter((s) => s.state !== "CA");
   },
@@ -154,7 +154,7 @@ const autocomplete = await SmartyAddress.create({
 | Hook | Signature | Description |
 |------|-----------|-------------|
 | `onAddressSelected` | `(address: AddressSuggestion) => void` | Called when user selects an address |
-| `onSuggestionsReceived` | `(suggestions: AddressSuggestion[]) => AddressSuggestion[]` | Called when suggestions arrive; return modified array |
+| `onAutocompleteSuggestionsReceived` | `(suggestions: AutocompleteSuggestion[]) => AutocompleteSuggestion[]` | Called when suggestions arrive; return modified array |
 | `onDropdownOpen` | `() => void` | Called when dropdown opens |
 | `onDropdownClose` | `() => void` | Called when dropdown closes |
 

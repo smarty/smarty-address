@@ -67,7 +67,7 @@ Users can customize the library in two ways:
 
 1. **Lifecycle Hooks** (config options):
    - `onAddressSelected(address)` - Called when an address is selected
-   - `onSuggestionsReceived(suggestions)` - Called when suggestions are received, can modify/filter results
+   - `onAutocompleteSuggestionsReceived(suggestions)` - Called when suggestions are received, can modify/filter results
    - `onDropdownOpen()` - Called when dropdown opens
    - `onDropdownClose()` - Called when dropdown closes
 
