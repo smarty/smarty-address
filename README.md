@@ -153,7 +153,7 @@ const autocomplete = await SmartyAddress.create({
 
 | Hook | Signature | Description |
 |------|-----------|-------------|
-| `onAddressSelected` | `(address: AddressSuggestion) => void` | Called when user selects an address |
+| `onAddressSelected` | `(address: AutocompleteSuggestion) => void` | Called when user selects an address |
 | `onAutocompleteSuggestionsReceived` | `(suggestions: AutocompleteSuggestion[]) => AutocompleteSuggestion[]` | Called when suggestions arrive; return modified array |
 | `onDropdownOpen` | `() => void` | Called when dropdown opens |
 | `onDropdownClose` | `() => void` | Called when dropdown closes |
@@ -282,7 +282,9 @@ const autocomplete = await SmartyAddress.create({
 | Service | Purpose |
 |---------|---------|
 | `ApiService` | Handles Smarty API calls and response processing |
-| `DropdownService` | Manages dropdown UI, keyboard navigation, and events |
+| `DropdownService` | Manages dropdown UI orchestration, DOM creation, and event handling |
+| `DropdownStateService` | Manages dropdown state (open/close, selected items, suggestion tracking) |
+| `KeyboardNavigationService` | Handles keyboard navigation within the dropdown (arrow keys, enter, escape) |
 | `FormService` | Populates form fields when an address is selected |
 | `DomService` | Generic DOM utilities for element creation, manipulation, and form value handling |
 | `StyleService` | CSS generation, dynamic style calculation, and style block formatting |
@@ -316,12 +318,12 @@ All services extend `BaseService` which provides:
 | `SmartyAddress.services` | `object` | Service classes for extension |
 | `SmartyAddress.defaultConfig` | `object` | Default configuration values |
 
-### AddressSuggestion Object
+### AutocompleteSuggestion Object
 
 The address object passed to hooks contains:
 
 ```typescript
-interface AddressSuggestion {
+interface AutocompleteSuggestion {
   street_line: string;
   secondary?: string;
   city: string;
@@ -329,6 +331,6 @@ interface AddressSuggestion {
   zipcode: string;
   country: string;
   entries?: number;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 ```

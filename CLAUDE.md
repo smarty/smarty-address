@@ -29,12 +29,14 @@ Services are instantiated in the `SmartyAddress` constructor and wired together 
 All services are located at `src/services/`:
 
 1. **ApiService** (`ApiService.ts`): Handles all Smarty API calls including address suggestions, error handling, and API parameter mapping
-2. **DropdownService** (`DropdownService.ts`): Consolidated dropdown functionality including UI orchestration, state management, DOM creation, keyboard navigation, and event handling
-3. **FormService** (`FormService.ts`): Populates form fields when an address is selected
-4. **DomService** (`DomService.ts`): Generic DOM utilities for element creation, manipulation, and form value handling
-5. **StyleService** (`StyleService.ts`): CSS generation, dynamic style calculation, and style block formatting
-6. **FormatService** (`FormatService.ts`): Address formatting for display and text highlighting for search matches
-7. **ColorService** (`ColorService.ts`): Color conversion utilities (RGB/HSL), CSS color parsing, and percentage conversions
+2. **DropdownService** (`DropdownService.ts`): Dropdown UI orchestration, DOM creation, and event handling
+3. **DropdownStateService** (`DropdownStateService.ts`): Dropdown state management (open/close, selected items, suggestion tracking)
+4. **KeyboardNavigationService** (`KeyboardNavigationService.ts`): Keyboard navigation within the dropdown (arrow keys, enter, escape)
+5. **FormService** (`FormService.ts`): Populates form fields when an address is selected
+6. **DomService** (`DomService.ts`): Generic DOM utilities for element creation, manipulation, and form value handling
+7. **StyleService** (`StyleService.ts`): CSS generation, dynamic style calculation, and style block formatting
+8. **FormatService** (`FormatService.ts`): Address formatting for display and text highlighting for search matches
+9. **ColorService** (`ColorService.ts`): Color conversion utilities (RGB/HSL), CSS color parsing, and percentage conversions
 
 ### Key Patterns
 
