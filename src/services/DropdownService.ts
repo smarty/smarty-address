@@ -686,9 +686,10 @@ export class DropdownService extends BaseService {
 	): Element | null {
 		const merged = stateService.getMergedAutocompleteSuggestions();
 		const selectedItem = merged[stateService.getSelectedIndex()];
-		return selectedItem?.autocompleteSuggestionElement.querySelector(
-			`.${CSS_CLASSES.entriesChevron}`,
-		) ?? null;
+		return (
+			selectedItem?.autocompleteSuggestionElement.querySelector(`.${CSS_CLASSES.entriesChevron}`) ??
+			null
+		);
 	}
 
 	private scrollSelectedPrimaryToTop(): void {

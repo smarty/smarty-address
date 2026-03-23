@@ -88,8 +88,7 @@ export class StyleService extends BaseService {
 		);
 		const inputTextColor = domService.getElementStyles(colorElement, "color");
 
-		const { hue, saturation, lightness } =
-			colorService.getHslFromColorString(inputBackgroundColor);
+		const { hue, saturation, lightness } = colorService.getHslFromColorString(inputBackgroundColor);
 		const derivedColors = this.deriveSurfaceColors(hue, saturation, lightness);
 
 		return {
