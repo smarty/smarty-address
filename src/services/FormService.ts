@@ -144,10 +144,7 @@ export class FormService extends BaseService {
 		domService.setInputValue(elements.streetInputElement, streetValue);
 
 		if (elements.secondaryInputElement) {
-			domService.setInputValue(
-				elements.secondaryInputElement,
-				selectedAddress.secondary ?? "",
-			);
+			domService.setInputValue(elements.secondaryInputElement, selectedAddress.secondary ?? "");
 		}
 		if (elements.localityInputElement) {
 			domService.setInputValue(elements.localityInputElement, selectedAddress.city);

@@ -10,6 +10,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Run a single test file**: `npm test -- path/to/file.test.ts`
 - **Format code**: `npx prettier --write .`
 
+## CI/CD
+
+- **CI**: Runs on every push to `master` and on PRs. Checks formatting (Prettier), runs tests, and builds.
+- **Publish**: Automatically publishes to npm when a GitHub release is created. Uses OIDC trusted publishing (no npm token needed).
+- **Release process**: Bump version in `package.json` and `src/constants.ts`, merge to `master`, then create a GitHub release.
+
 ## Architecture
 
 This is a TypeScript library for Smarty address autocomplete and validation. The main entry point is the `SmartyAddress` class exported from `src/index.ts`.
