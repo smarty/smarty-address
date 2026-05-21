@@ -13,8 +13,9 @@ export class FormatService extends BaseService {
 			administrativeArea,
 			postalCode,
 		} = autocompleteSuggestion;
-		const streetText = isSecondary ? "…" : street_line;
-		const secondaryText = secondary.length ? ` ${secondary}` : secondary;
+		const useEllipsis = isSecondary && secondary.length > 0;
+		const streetText = useEllipsis ? "…" : street_line;
+		const secondaryText = secondary.length ? ` ${secondary}` : "";
 		const areaPostal = [administrativeArea, postalCode].filter(Boolean).join(" ");
 		const localityAreaPostal = [locality, areaPostal].filter(Boolean).join(", ");
 		const streetSegment = `${streetText}${secondaryText}`;
