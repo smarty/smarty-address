@@ -3,6 +3,7 @@
  */
 import SmartyAddress from "../../index";
 import { AutocompleteSuggestion } from "../../interfaces";
+import { flushAsync } from "./testUtils";
 
 describe("Integration: User Flow", () => {
 	let instance: SmartyAddress | null = null;
@@ -296,13 +297,6 @@ describe("Integration: User Flow", () => {
 				country: "US",
 			},
 		];
-
-		const flushAsync = async () => {
-			for (let i = 0; i < 5; i++) {
-				await jest.runAllTimersAsync();
-				await Promise.resolve();
-			}
-		};
 
 		const secondaryFetchMock = () =>
 			jest.fn().mockImplementation((url: string) => {

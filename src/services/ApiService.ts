@@ -37,10 +37,8 @@ export const INTERNATIONAL_API_PARAM_MAP = {
 	preferGeolocation: "geolocation",
 } as const;
 
-export const API_PARAM_MAP = US_API_PARAM_MAP;
-
-export type ApiParamKey = keyof typeof US_API_PARAM_MAP;
-export const API_PARAM_KEYS = Object.keys(US_API_PARAM_MAP) as ApiParamKey[];
+type ApiParamKey = keyof typeof US_API_PARAM_MAP;
+const US_API_PARAM_KEYS = Object.keys(US_API_PARAM_MAP) as ApiParamKey[];
 
 interface InternationalCandidateSummary {
 	address_id: string;
@@ -104,17 +102,17 @@ export class ApiService extends BaseService {
 	private autocompleteApiUrl: string = "";
 	private internationalAutocompleteApiUrl: string = "";
 	private apiParams: Record<string, unknown> = {};
-	private staticCountry: string | null = null;
-	private countrySelector: string | null = null;
+	private staticCountry: string | undefined;
+	private countrySelector: string | undefined;
 
 	init(config: NormalizedSmartyAddressConfig) {
 		this.embeddedKey = config.embeddedKey;
 		this.autocompleteApiUrl = config.autocompleteApiUrl;
 		this.internationalAutocompleteApiUrl = config.internationalAutocompleteApiUrl;
-		this.staticCountry = config.country?.trim() || null;
-		this.countrySelector = config.countrySelector ?? null;
+		this.staticCountry = config.country?.trim() || undefined;
+		this.countrySelector = config.countrySelector;
 
-		API_PARAM_KEYS.forEach((param) => {
+		US_API_PARAM_KEYS.forEach((param) => {
 			if (config[param] !== undefined) {
 				this.apiParams[param] = config[param];
 			}
@@ -232,7 +230,7 @@ export class ApiService extends BaseService {
 
 		try {
 			const country = (apiConfig.country ?? "").toUpperCase();
-			const requestData = this.buildInternationalRequestData(apiConfig, "", country);
+			const requestData = this.buildInternationalRequestData(apiConfig, country);
 			const params = new URLSearchParams(requestData);
 			const url = `${apiConfig.internationalAutocompleteApiUrl}/${encodeURIComponent(selectedAddress.address_id)}?${params}`;
 			const response = await fetchFn(url);
@@ -249,7 +247,7 @@ export class ApiService extends BaseService {
 		fetchFn: typeof fetch,
 	): Promise<AutocompleteSuggestion[]> {
 		const upperCountry = country.toUpperCase();
-		const requestData = this.buildInternationalRequestData(apiConfig, searchString, upperCountry);
+		const requestData = this.buildInternationalRequestData(apiConfig, upperCountry, searchString);
 		const params = new URLSearchParams(requestData);
 		const response = await fetchFn(`${apiConfig.internationalAutocompleteApiUrl}?${params}`);
 		return this.fetchAndNormalizeInternational(response, upperCountry);
@@ -283,12 +281,12 @@ export class ApiService extends BaseService {
 
 	private buildInternationalRequestData(
 		apiConfig: ApiConfig,
-		searchString: string,
 		country: string,
+		searchString?: string,
 	): Record<string, string> {
 		const requestData: Record<string, string> = {
 			key: apiConfig.embeddedKey,
-			country: country.toUpperCase(),
+			country,
 		};
 
 		if (searchString) {
@@ -335,7 +333,10 @@ export class ApiService extends BaseService {
 		return suggestion;
 	}
 
-	private async parseResponse<T>(response: Response, dataKey: string): Promise<T[]> {
+	private async parseResponse<T>(
+		response: Response,
+		dataKey: "suggestions" | "candidates",
+	): Promise<T[]> {
 		if (response.ok) {
 			const data = (await response.json()) as Record<string, T[] | null | undefined>;
 			return data[dataKey] ?? [];

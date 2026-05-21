@@ -4,6 +4,7 @@
 import SmartyAddress from "../../index";
 import { AutocompleteSuggestion } from "../../interfaces";
 import { INTERNATIONAL_AUTOCOMPLETE_API_URL } from "../../constants";
+import { flushAsync } from "./testUtils";
 
 interface InternationalSummaryCandidate {
 	address_id: string;
@@ -43,13 +44,6 @@ describe("Integration: International Address Flow", () => {
 				<input id="zip" type="text" />
 			</form>
 		`;
-	};
-
-	const flushAsync = async () => {
-		for (let i = 0; i < 5; i++) {
-			await jest.runAllTimersAsync();
-			await Promise.resolve();
-		}
 	};
 
 	const buildIntlFetchMock = (
@@ -164,7 +158,7 @@ describe("Integration: International Address Flow", () => {
 		expect(detailCallUrl).toContain("/v2/lookup/summary-id-1");
 
 		expect(selected).not.toBeNull();
-		expect((selected as unknown as AutocompleteSuggestion).address_id).toBe("summary-id-1");
+		expect(selected?.address_id).toBe("summary-id-1");
 
 		expect((document.querySelector("#street") as HTMLInputElement).value).toBe("123 Main St");
 		expect((document.querySelector("#city") as HTMLInputElement).value).toBe("Toronto");
