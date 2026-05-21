@@ -68,6 +68,37 @@ Get your embedded key from the [Smarty dashboard](https://www.smarty.com/account
 | `embeddedKey` | `string` | Your Smarty embedded key |
 | `streetSelector` | `string` | CSS selector for street address field (also used as the autocomplete input unless `searchInputSelector` is provided) |
 
+### International Addresses
+
+By default the plugin uses the US Autocomplete Pro API. To autocomplete addresses in other countries, set `country` (an [ISO 3166-1 alpha-3](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3) code) or point `countrySelector` at a country `<input>` or `<select>` on your form. Anything other than `US`/`USA` (or empty) routes lookups through Smarty's [International Address Autocomplete API](https://www.smarty.com/docs/cloud/international-address-autocomplete-api). When neither is provided, the plugin defaults to US.
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `country` | `string` | Static ISO3 country code. Use `"US"`/`"USA"` (or omit) for US autocomplete; any other value (e.g. `"CAN"`, `"GBR"`) uses the international API. |
+| `countrySelector` | `string` | CSS selector for a country `<input>` or `<select>` whose `.value` is an [ISO 3166-1 alpha-3](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-3) code (e.g. `"USA"`, `"CAN"`, `"GBR"`; `"US"` also accepted). The plugin reads the value before each request, so users can switch country without reloading. Falls back to `country` (then to US) when blank. |
+
+```javascript
+// Static country
+const autocomplete = await SmartyAddress.create({
+  embeddedKey: "your-key",
+  streetSelector: "#street",
+  country: "CAN",
+  citySelector: "#city",
+  stateSelector: "#province",
+  zipcodeSelector: "#postal-code",
+});
+
+// Country driven by a form field
+const autocomplete = await SmartyAddress.create({
+  embeddedKey: "your-key",
+  streetSelector: "#street",
+  countrySelector: "#country",
+  localitySelector: "#city",
+  administrativeAreaSelector: "#region",
+  postalCodeSelector: "#postal-code",
+});
+```
+
 ### Form Field Selectors
 
 These selectors define where the selected address data gets populated:
@@ -98,15 +129,15 @@ These options control the suggestions returned by the Smarty API:
 |--------|------|-------------|
 | `maxResults` | `number` | Maximum number of suggestions to return |
 | `includeOnlyCities` | `string[]` | Only return addresses in these cities |
-| `includeOnlyStates` | `string[]` | Only return addresses in these states |
-| `includeOnlyZipCodes` | `string[]` | Only return addresses in these ZIP codes |
-| `excludeStates` | `string[]` | Exclude addresses in these states |
-| `preferCities` | `string[]` | Prefer addresses in these cities |
-| `preferStates` | `string[]` | Prefer addresses in these states |
-| `preferZipCodes` | `string[]` | Prefer addresses in these ZIP codes |
-| `preferRatio` | `number` | Ratio of preferred results (0-100) |
-| `preferGeolocation` | `string` | Prefer results near a geolocation |
-| `source` | `"postal" \| "all"` | Address data source |
+| `includeOnlyStates` | `string[]` | Only return addresses in these states (US only) |
+| `includeOnlyZipCodes` | `string[]` | Only return addresses in these ZIP/postal codes |
+| `excludeStates` | `string[]` | Exclude addresses in these states (US only) |
+| `preferCities` | `string[]` | Prefer addresses in these cities (US only) |
+| `preferStates` | `string[]` | Prefer addresses in these states (US only) |
+| `preferZipCodes` | `string[]` | Prefer addresses in these ZIP codes (US only) |
+| `preferRatio` | `number` | Ratio of preferred results, 0-100 (US only) |
+| `preferGeolocation` | `string` | US: name of a geolocation source; international: pass `"on"` to bias by sender IP (where supported by the API) |
+| `source` | `"postal" \| "all"` | Address data source (US only) |
 
 #### International Naming
 

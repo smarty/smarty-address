@@ -15,13 +15,17 @@ import { KeyboardNavigationService } from "./services/KeyboardNavigationService"
 import { StyleService } from "./services/StyleService";
 import { themes } from "./themes";
 import { defineStyles, validateConfig } from "./utils/appUtils";
-import { US_AUTOCOMPLETE_PRO_API_URL } from "./constants";
+import {
+	INTERNATIONAL_AUTOCOMPLETE_API_URL,
+	US_AUTOCOMPLETE_PRO_API_URL,
+} from "./constants";
 
 export default class SmartyAddress {
 	static defaultConfig: DefaultSmartyAddressConfig = {
 		embeddedKey: "",
 		theme: themes.default,
 		autocompleteApiUrl: US_AUTOCOMPLETE_PRO_API_URL,
+		internationalAutocompleteApiUrl: INTERNATIONAL_AUTOCOMPLETE_API_URL,
 	};
 
 	static {

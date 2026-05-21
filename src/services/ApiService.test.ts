@@ -1,4 +1,8 @@
+/**
+ * @jest-environment jsdom
+ */
 import { ApiService, unknownError } from "./ApiService";
+import { DomService } from "./DomService";
 import { AutocompleteSuggestion, ApiConfig } from "../interfaces";
 
 describe("ApiService", () => {
@@ -382,6 +386,265 @@ describe("ApiService", () => {
 			const apiConfig = service.getApiConfig();
 			expect(apiConfig.maxResults).toBe(5);
 			expect(apiConfig.preferAdministrativeAreas).toEqual(["CO"]);
+		});
+	});
+
+	describe("country resolution", () => {
+		const initWith = (
+			overrides: Partial<Parameters<ApiService["init"]>[0]> = {},
+		): ApiService => {
+			const svc = new ApiService();
+			const domService = new DomService();
+			svc.setServices({ domService });
+			svc.init({
+				embeddedKey: "k",
+				autocompleteApiUrl: "https://us.example.com",
+				internationalAutocompleteApiUrl: "https://intl.example.com",
+				streetSelector: "#s",
+				theme: [],
+				...overrides,
+			});
+			return svc;
+		};
+
+		afterEach(() => {
+			document.body.innerHTML = "";
+		});
+
+		it("defaults to USA when no country or selector is configured", () => {
+			expect(initWith().getCountry()).toBe("USA");
+		});
+
+		it("uses the static country config when set", () => {
+			expect(initWith({ country: "CAN" }).getCountry()).toBe("CAN");
+		});
+
+		it("reads country from a countrySelector input", () => {
+			document.body.innerHTML = `<input id="country" value="GBR" />`;
+			expect(initWith({ countrySelector: "#country" }).getCountry()).toBe("GBR");
+		});
+
+		it("falls back to static country when selector value is blank", () => {
+			document.body.innerHTML = `<input id="country" value="" />`;
+			expect(
+				initWith({ countrySelector: "#country", country: "CAN" }).getCountry(),
+			).toBe("CAN");
+		});
+
+		it("treats US and USA as US (not international)", () => {
+			expect(initWith({ country: "US" }).isInternational()).toBe(false);
+			expect(initWith({ country: "USA" }).isInternational()).toBe(false);
+		});
+
+		it("treats other countries as international", () => {
+			expect(initWith({ country: "CAN" }).isInternational()).toBe(true);
+			expect(initWith({ country: "gbr" }).isInternational()).toBe(true);
+		});
+	});
+
+	describe("international fetchAutocompleteResults", () => {
+		const apiConfig: ApiConfig = {
+			embeddedKey: "test-key",
+			autocompleteApiUrl: "https://us.example.com/lookup",
+			internationalAutocompleteApiUrl: "https://intl.example.com/v2/lookup",
+			country: "CAN",
+		};
+
+		beforeEach(() => {
+			service.setServices({ domService: new DomService() });
+		});
+
+		it("calls the international endpoint with country and key", async () => {
+			const mockFetch = jest.fn().mockResolvedValue({
+				ok: true,
+				json: () => Promise.resolve({ candidates: [] }),
+			});
+
+			await service.fetchAutocompleteResults(apiConfig, "1 Main", null, mockFetch);
+
+			const calledUrl = mockFetch.mock.calls[0][0];
+			expect(calledUrl).toContain("https://intl.example.com/v2/lookup?");
+			expect(calledUrl).toContain("key=test-key");
+			expect(calledUrl).toContain("country=CAN");
+			expect(calledUrl).toContain("search=1+Main");
+			expect(calledUrl).not.toContain("auth-id=");
+		});
+
+		it("normalizes summary candidates into AutocompleteSuggestion", async () => {
+			const mockFetch = jest.fn().mockResolvedValue({
+				ok: true,
+				json: () =>
+					Promise.resolve({
+						candidates: [
+							{
+								address_id: "abc-123",
+								address_text: "123 Main St Winnipeg, MB, R3C",
+								entries: 12,
+							},
+						],
+					}),
+			});
+
+			const result = await service.fetchAutocompleteResults(apiConfig, "123", null, mockFetch);
+
+			expect(result).toEqual([
+				{
+					street_line: "123 Main St Winnipeg, MB, R3C",
+					city: "",
+					state: "",
+					zipcode: "",
+					country: "CAN",
+					entries: 12,
+					address_id: "abc-123",
+				},
+			]);
+		});
+
+		it("maps international filter params to the documented names", async () => {
+			const configWithParams: ApiConfig = {
+				...apiConfig,
+				maxResults: 3,
+				includeOnlyLocalities: ["Toronto", "Montreal"],
+				includeOnlyPostalCodes: ["M5V"],
+				preferGeolocation: "on",
+			};
+
+			const mockFetch = jest.fn().mockResolvedValue({
+				ok: true,
+				json: () => Promise.resolve({ candidates: [] }),
+			});
+
+			await service.fetchAutocompleteResults(configWithParams, "test", null, mockFetch);
+			const calledUrl = mockFetch.mock.calls[0][0];
+
+			expect(calledUrl).toContain("max_results=3");
+			expect(calledUrl).toContain("include_only_locality=Toronto%2CMontreal");
+			expect(calledUrl).toContain("include_only_postal_code=M5V");
+			expect(calledUrl).toContain("geolocation=on");
+		});
+
+		it("uppercases the country code", async () => {
+			const mockFetch = jest.fn().mockResolvedValue({
+				ok: true,
+				json: () => Promise.resolve({ candidates: [] }),
+			});
+
+			await service.fetchAutocompleteResults(
+				{ ...apiConfig, country: "can" },
+				"test",
+				null,
+				mockFetch,
+			);
+
+			const calledUrl = mockFetch.mock.calls[0][0];
+			expect(calledUrl).toContain("country=CAN");
+		});
+
+		it("truncates search to 32 characters", async () => {
+			const mockFetch = jest.fn().mockResolvedValue({
+				ok: true,
+				json: () => Promise.resolve({ candidates: [] }),
+			});
+
+			const longSearch = "a".repeat(50);
+			await service.fetchAutocompleteResults(apiConfig, longSearch, null, mockFetch);
+
+			const calledUrl: string = mockFetch.mock.calls[0][0];
+			const search = new URL(calledUrl).searchParams.get("search");
+			expect(search).toHaveLength(32);
+		});
+	});
+
+	describe("fetchInternationalAddressDetail", () => {
+		const apiConfig: ApiConfig = {
+			embeddedKey: "test-key",
+			autocompleteApiUrl: "https://us.example.com/lookup",
+			internationalAutocompleteApiUrl: "https://intl.example.com/v2/lookup",
+			country: "CAN",
+		};
+
+		beforeEach(() => {
+			service.setServices({ domService: new DomService() });
+		});
+
+		it("appends the address_id to the URL path", async () => {
+			const mockFetch = jest.fn().mockResolvedValue({
+				ok: true,
+				json: () => Promise.resolve({ candidates: [] }),
+			});
+
+			const selected: AutocompleteSuggestion = {
+				street_line: "preview",
+				city: "",
+				state: "",
+				zipcode: "",
+				country: "CAN",
+				address_id: "id with spaces",
+			};
+
+			await service.fetchInternationalAddressDetail(apiConfig, selected, mockFetch);
+
+			const calledUrl: string = mockFetch.mock.calls[0][0];
+			expect(calledUrl).toContain("/v2/lookup/id%20with%20spaces?");
+		});
+
+		it("normalizes detail candidates with locality/admin/postal fields", async () => {
+			const mockFetch = jest.fn().mockResolvedValue({
+				ok: true,
+				json: () =>
+					Promise.resolve({
+						candidates: [
+							{
+								street: "1-123 Main St",
+								locality: "Fredericton",
+								administrative_area: "NB",
+								administrative_area_short: "NB",
+								administrative_area_long: "New Brunswick",
+								postal_code: "E3A 1C7",
+								country_iso3: "CAN",
+							},
+						],
+					}),
+			});
+
+			const selected: AutocompleteSuggestion = {
+				street_line: "preview",
+				city: "",
+				state: "",
+				zipcode: "",
+				country: "CAN",
+				address_id: "abc",
+			};
+
+			const result = await service.fetchInternationalAddressDetail(apiConfig, selected, mockFetch);
+
+			expect(result).toEqual([
+				{
+					street_line: "1-123 Main St",
+					city: "Fredericton",
+					state: "NB",
+					zipcode: "E3A 1C7",
+					country: "CAN",
+					entries: 0,
+					metadata: { administrative_area_long: "New Brunswick" },
+				},
+			]);
+		});
+
+		it("returns the selected address unchanged when address_id is missing", async () => {
+			const mockFetch = jest.fn();
+			const selected: AutocompleteSuggestion = {
+				street_line: "1 Main",
+				city: "Toronto",
+				state: "ON",
+				zipcode: "M5V",
+				country: "CAN",
+			};
+
+			const result = await service.fetchInternationalAddressDetail(apiConfig, selected, mockFetch);
+
+			expect(mockFetch).not.toHaveBeenCalled();
+			expect(result).toEqual([selected]);
 		});
 	});
 });

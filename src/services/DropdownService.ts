@@ -220,12 +220,13 @@ export class DropdownService extends BaseService {
 			this.config.onAddressSelected(selectedAddress.address);
 		}
 
-		const { street_line, secondary = "", entries = 0 } = selectedAddress.address;
+		const { street_line, secondary = "", entries = 0, address_id } = selectedAddress.address;
 		const searchInputElement = this.getSearchInputElement();
 		const primaryIndex = stateService.getAutocompleteSuggestions().indexOf(selectedAddress);
 		const resolvedIndex = primaryIndex !== -1 ? primaryIndex : addressIndex;
 
 		const hasSecondaries = entries > 1;
+		const needsInternationalDetail = !!address_id;
 		const isAlreadyExpanded =
 			hasSecondaries &&
 			stateService.getSelectedIndex() === resolvedIndex &&
@@ -238,8 +239,8 @@ export class DropdownService extends BaseService {
 
 		stateService.setSelectedIndex(resolvedIndex);
 
-		if (hasSecondaries && searchInputElement) {
-			const newSearchTerm = `${street_line} ${secondary}`;
+		if ((hasSecondaries || needsInternationalDetail) && searchInputElement) {
+			const newSearchTerm = `${street_line} ${secondary}`.trim();
 			stateService.setSelectedAddressSearchTerm(newSearchTerm);
 			searchInputElement.value = newSearchTerm;
 			this.getService("apiService").fetchSecondaryAutocompleteSuggestions(
@@ -247,7 +248,12 @@ export class DropdownService extends BaseService {
 				selectedAddress.address,
 				{
 					onSuccess: (autocompleteSuggestions, searchString) =>
-						this.processSecondaryAutocompleteSuggestions(autocompleteSuggestions, searchString),
+						this.handleSecondaryResults(
+							autocompleteSuggestions,
+							searchString,
+							selectedAddress.address,
+							needsInternationalDetail,
+						),
 					onError: () => this.handleApiError(),
 				},
 			);
@@ -256,6 +262,25 @@ export class DropdownService extends BaseService {
 			this.getService("formService").populateFormWithAddress(selectedAddress.address);
 			this.closeDropdown();
 		}
+	}
+
+	private handleSecondaryResults(
+		autocompleteSuggestions: AutocompleteSuggestion[],
+		searchString: string,
+		fallbackAddress: AutocompleteSuggestion,
+		needsInternationalDetail: boolean,
+	): void {
+		const isSingleInternationalResult =
+			needsInternationalDetail && autocompleteSuggestions.length <= 1;
+
+		if (isSingleInternationalResult) {
+			const resolved = autocompleteSuggestions[0] ?? fallbackAddress;
+			this.getService("formService").populateFormWithAddress(resolved);
+			this.closeDropdown();
+			return;
+		}
+
+		this.processSecondaryAutocompleteSuggestions(autocompleteSuggestions, searchString);
 	}
 
 	processAutocompleteSuggestions(
