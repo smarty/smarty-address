@@ -67,5 +67,4 @@ describe("StyleService", () => {
 			expect(service.getInstanceClassName(0)).toBe("smartyAddress__instance_0");
 		});
 	});
-
 });

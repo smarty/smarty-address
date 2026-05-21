@@ -41,7 +41,10 @@ export interface DefaultSmartyAddressConfig extends ApiConfig {
 	theme: string[];
 }
 
-export interface SmartyAddressConfig extends Omit<DefaultSmartyAddressConfig, "theme" | "autocompleteApiUrl"> {
+export interface SmartyAddressConfig extends Omit<
+	DefaultSmartyAddressConfig,
+	"theme" | "autocompleteApiUrl"
+> {
 	embeddedKey: string;
 	streetSelector: string;
 	theme?: string[];
