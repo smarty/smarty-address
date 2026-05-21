@@ -164,12 +164,12 @@ const autocomplete = await SmartyAddress.create({
 
   onAddressSelected: (address) => {
     console.log("User selected:", address);
-    // address contains: street_line, secondary, city, state, zipcode, country
+    // address contains: street_line, secondary, locality, administrativeArea, postalCode, country
   },
 
   onAutocompleteSuggestionsReceived: (suggestions) => {
     // Filter or modify suggestions before display
-    return suggestions.filter((s) => s.state !== "CA");
+    return suggestions.filter((s) => s.administrativeArea !== "CA");
   },
 
   onDropdownOpen: () => {
@@ -357,9 +357,9 @@ The address object passed to hooks contains:
 interface AutocompleteSuggestion {
   street_line: string;
   secondary?: string;
-  city: string;
-  state: string;
-  zipcode: string;
+  locality: string;
+  administrativeArea: string;
+  postalCode: string;
   country: string;
   entries?: number;
   metadata?: Record<string, unknown>;

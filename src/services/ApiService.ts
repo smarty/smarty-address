@@ -40,6 +40,15 @@ export const INTERNATIONAL_API_PARAM_MAP = {
 type ApiParamKey = keyof typeof US_API_PARAM_MAP;
 const US_API_PARAM_KEYS = Object.keys(US_API_PARAM_MAP) as ApiParamKey[];
 
+interface UsAutocompleteCandidate {
+	street_line: string;
+	secondary?: string;
+	city: string;
+	state: string;
+	zipcode: string;
+	entries?: number;
+}
+
 interface InternationalCandidateSummary {
 	address_id: string;
 	address_text: string;
@@ -89,11 +98,18 @@ const formatSelectedAddress = ({
 	street_line,
 	secondary,
 	entries,
-	city,
-	state,
-	zipcode,
+	locality,
+	administrativeArea,
+	postalCode,
 }: AutocompleteSuggestion): string => {
-	const addressComponents = [street_line, secondary, `(${entries})`, city, state, zipcode];
+	const addressComponents = [
+		street_line,
+		secondary,
+		`(${entries})`,
+		locality,
+		administrativeArea,
+		postalCode,
+	];
 	return addressComponents.filter(Boolean).join(" ");
 };
 
@@ -215,7 +231,8 @@ export class ApiService extends BaseService {
 			const params = new URLSearchParams(requestData);
 			const response = await fetchFn(`${apiConfig.autocompleteApiUrl}?${params}`);
 
-			return await this.parseResponse<AutocompleteSuggestion>(response, "suggestions");
+			const candidates = await this.parseResponse<UsAutocompleteCandidate>(response, "suggestions");
+			return candidates.map((candidate) => this.normalizeUsCandidate(candidate, country));
 		} catch (error) {
 			return this.handleFetchError(error);
 		}
@@ -310,15 +327,32 @@ export class ApiService extends BaseService {
 		});
 	}
 
+	private normalizeUsCandidate(
+		candidate: UsAutocompleteCandidate,
+		country: string,
+	): AutocompleteSuggestion {
+		const suggestion: AutocompleteSuggestion = {
+			street_line: candidate.street_line,
+			locality: candidate.city,
+			administrativeArea: candidate.state,
+			postalCode: candidate.zipcode,
+			country,
+		};
+		if (candidate.secondary !== undefined) suggestion.secondary = candidate.secondary;
+		if (candidate.entries !== undefined) suggestion.entries = candidate.entries;
+		return suggestion;
+	}
+
 	private normalizeInternationalCandidate(
 		candidate: InternationalCandidate,
 		fallbackCountry: string,
 	): AutocompleteSuggestion {
 		const suggestion: AutocompleteSuggestion = {
 			street_line: candidate.street ?? candidate.address_text ?? "",
-			city: candidate.locality ?? "",
-			state: candidate.administrative_area_short ?? candidate.administrative_area ?? "",
-			zipcode: candidate.postal_code ?? "",
+			locality: candidate.locality ?? "",
+			administrativeArea:
+				candidate.administrative_area_short ?? candidate.administrative_area ?? "",
+			postalCode: candidate.postal_code ?? "",
 			country: candidate.country_iso3 ?? fallbackCountry,
 			entries: candidate.entries ?? 0,
 		};
@@ -368,8 +402,8 @@ export class ApiService extends BaseService {
 		return primaryAutocompleteSuggestions.find((autocompleteSuggestion) => {
 			return (
 				autocompleteSuggestion.street_line.trim() === selectedAddress.street_line.trim() &&
-				autocompleteSuggestion.city === selectedAddress.city &&
-				autocompleteSuggestion.state === selectedAddress.state &&
+				autocompleteSuggestion.locality === selectedAddress.locality &&
+				autocompleteSuggestion.administrativeArea === selectedAddress.administrativeArea &&
 				autocompleteSuggestion.secondary?.includes(selectedAddress.secondary?.trim() ?? "")
 			);
 		});

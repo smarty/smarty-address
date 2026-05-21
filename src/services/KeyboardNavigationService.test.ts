@@ -14,9 +14,9 @@ describe("KeyboardNavigationService", () => {
 		return {
 			address: {
 				street_line: street,
-				city: "Denver",
-				state: "CO",
-				zipcode: "80202",
+				locality: "Denver",
+				administrativeArea: "CO",
+				postalCode: "80202",
 				country: "US",
 			},
 			autocompleteSuggestionElement: element,

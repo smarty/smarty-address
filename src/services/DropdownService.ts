@@ -660,7 +660,13 @@ export class DropdownService extends BaseService {
 		showAllElement.addEventListener("click", () => this.expandAllSecondaries());
 
 		return {
-			address: { street_line: "", city: "", state: "", zipcode: "", country: "" },
+			address: {
+				street_line: "",
+				locality: "",
+				administrativeArea: "",
+				postalCode: "",
+				country: "",
+			},
 			autocompleteSuggestionElement: showAllElement,
 			isShowAllControl: true,
 		};

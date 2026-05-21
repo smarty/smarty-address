@@ -19,9 +19,9 @@ describe("ApiService", () => {
 		): AutocompleteSuggestion => ({
 			street_line: street,
 			secondary,
-			city: "Denver",
-			state: "CO",
-			zipcode: "80202",
+			locality: "Denver",
+			administrativeArea: "CO",
+			postalCode: "80202",
 			country: "US",
 		});
 
@@ -88,9 +88,9 @@ describe("ApiService", () => {
 			const selected: AutocompleteSuggestion = {
 				street_line: "123 Main St",
 				secondary: undefined,
-				city: "Denver",
-				state: "CO",
-				zipcode: "80202",
+				locality: "Denver",
+				administrativeArea: "CO",
+				postalCode: "80202",
 				country: "US",
 			};
 
@@ -98,48 +98,48 @@ describe("ApiService", () => {
 			expect(result).toBeDefined();
 		});
 
-		it("should distinguish addresses with same street but different cities", () => {
+		it("should distinguish addresses with same street but different localities", () => {
 			const miamiBeach: AutocompleteSuggestion = {
 				street_line: "1600 Pennsylvania Ave",
 				secondary: "Apt",
-				city: "Miami Beach",
-				state: "FL",
-				zipcode: "33139",
+				locality: "Miami Beach",
+				administrativeArea: "FL",
+				postalCode: "33139",
 				country: "US",
 				entries: 20,
 			};
 			const stoughton: AutocompleteSuggestion = {
 				street_line: "1600 Pennsylvania Ave",
 				secondary: "Apt",
-				city: "Stoughton",
-				state: "MA",
-				zipcode: "02072",
+				locality: "Stoughton",
+				administrativeArea: "MA",
+				postalCode: "02072",
 				country: "US",
 				entries: 10,
 			};
 			const autocompleteSuggestions = [miamiBeach, stoughton];
 
 			const resultMiami = service.getMatchingResult(autocompleteSuggestions, miamiBeach);
-			expect(resultMiami?.city).toBe("Miami Beach");
+			expect(resultMiami?.locality).toBe("Miami Beach");
 
 			const resultStoughton = service.getMatchingResult(autocompleteSuggestions, stoughton);
-			expect(resultStoughton?.city).toBe("Stoughton");
+			expect(resultStoughton?.locality).toBe("Stoughton");
 		});
 
-		it("should not match when street matches but city differs", () => {
+		it("should not match when street matches but locality differs", () => {
 			const autocompleteSuggestions = [
 				{
 					...createAutocompleteSuggestion("123 Main St", "Apt"),
-					city: "Miami Beach",
-					state: "FL",
+					locality: "Miami Beach",
+					administrativeArea: "FL",
 				},
 			];
 			const selected: AutocompleteSuggestion = {
 				street_line: "123 Main St",
 				secondary: "Apt",
-				city: "Stoughton",
-				state: "MA",
-				zipcode: "02072",
+				locality: "Stoughton",
+				administrativeArea: "MA",
+				postalCode: "02072",
 				country: "US",
 			};
 
@@ -147,20 +147,20 @@ describe("ApiService", () => {
 			expect(result).toBeUndefined();
 		});
 
-		it("should not match when street and city match but state differs", () => {
+		it("should not match when street and locality match but administrative area differs", () => {
 			const autocompleteSuggestions = [
 				{
 					...createAutocompleteSuggestion("123 Main St", "Apt"),
-					city: "Springfield",
-					state: "IL",
+					locality: "Springfield",
+					administrativeArea: "IL",
 				},
 			];
 			const selected: AutocompleteSuggestion = {
 				street_line: "123 Main St",
 				secondary: "Apt",
-				city: "Springfield",
-				state: "MO",
-				zipcode: "65801",
+				locality: "Springfield",
+				administrativeArea: "MO",
+				postalCode: "65801",
 				country: "US",
 			};
 
@@ -230,25 +230,32 @@ describe("ApiService", () => {
 			autocompleteApiUrl: "https://api.example.com/lookup",
 		};
 
-		it("should return suggestions on successful response", async () => {
-			const mockAutocompleteSuggestions: AutocompleteSuggestion[] = [
+		it("should return normalized suggestions on successful response", async () => {
+			const apiSuggestions = [
 				{
 					street_line: "123 Main St",
 					city: "Denver",
 					state: "CO",
 					zipcode: "80202",
-					country: "US",
 				},
 			];
 
 			const mockFetch = jest.fn().mockResolvedValue({
 				ok: true,
-				json: () => Promise.resolve({ suggestions: mockAutocompleteSuggestions }),
+				json: () => Promise.resolve({ suggestions: apiSuggestions }),
 			});
 
 			const result = await service.fetchAutocompleteResults(apiConfig, "123 Main", null, mockFetch);
 
-			expect(result).toEqual(mockAutocompleteSuggestions);
+			expect(result).toEqual([
+				{
+					street_line: "123 Main St",
+					locality: "Denver",
+					administrativeArea: "CO",
+					postalCode: "80202",
+					country: "",
+				},
+			]);
 			expect(mockFetch).toHaveBeenCalledTimes(1);
 		});
 
@@ -326,9 +333,9 @@ describe("ApiService", () => {
 				street_line: "123 Main St",
 				secondary: "Apt 1",
 				entries: 5,
-				city: "Denver",
-				state: "CO",
-				zipcode: "80202",
+				locality: "Denver",
+				administrativeArea: "CO",
+				postalCode: "80202",
 				country: "US",
 			};
 
@@ -536,9 +543,9 @@ describe("ApiService", () => {
 			expect(result).toEqual([
 				{
 					street_line: "123 Main St Winnipeg, MB, R3C",
-					city: "",
-					state: "",
-					zipcode: "",
+					locality: "",
+					administrativeArea: "",
+					postalCode: "",
 					country: "CAN",
 					entries: 12,
 					address_id: "abc-123",
@@ -704,7 +711,7 @@ describe("ApiService", () => {
 			});
 
 			const result = await service.fetchAutocompleteResults(apiConfig, "x", null, mockFetch);
-			expect(result[0].state).toBe("ON");
+			expect(result[0].administrativeArea).toBe("ON");
 		});
 
 		it("falls back to administrative_area when only the long form is present", async () => {
@@ -717,7 +724,7 @@ describe("ApiService", () => {
 			});
 
 			const result = await service.fetchAutocompleteResults(apiConfig, "x", null, mockFetch);
-			expect(result[0].state).toBe("Ontario");
+			expect(result[0].administrativeArea).toBe("Ontario");
 		});
 
 		it("uses the request country (uppercased) when country_iso3 is absent", async () => {
@@ -898,9 +905,9 @@ describe("ApiService", () => {
 
 			const selected: AutocompleteSuggestion = {
 				street_line: "preview",
-				city: "",
-				state: "",
-				zipcode: "",
+				locality: "",
+				administrativeArea: "",
+				postalCode: "",
 				country: "CAN",
 				address_id: "id with spaces",
 			};
@@ -932,9 +939,9 @@ describe("ApiService", () => {
 
 			const selected: AutocompleteSuggestion = {
 				street_line: "preview",
-				city: "",
-				state: "",
-				zipcode: "",
+				locality: "",
+				administrativeArea: "",
+				postalCode: "",
 				country: "CAN",
 				address_id: "abc",
 			};
@@ -944,9 +951,9 @@ describe("ApiService", () => {
 			expect(result).toEqual([
 				{
 					street_line: "1-123 Main St",
-					city: "Fredericton",
-					state: "NB",
-					zipcode: "E3A 1C7",
+					locality: "Fredericton",
+					administrativeArea: "NB",
+					postalCode: "E3A 1C7",
 					country: "CAN",
 					entries: 0,
 					metadata: { administrative_area_long: "New Brunswick" },
@@ -958,9 +965,9 @@ describe("ApiService", () => {
 			const mockFetch = jest.fn();
 			const selected: AutocompleteSuggestion = {
 				street_line: "1 Main",
-				city: "Toronto",
-				state: "ON",
-				zipcode: "M5V",
+				locality: "Toronto",
+				administrativeArea: "ON",
+				postalCode: "M5V",
 				country: "CAN",
 			};
 
@@ -996,9 +1003,9 @@ describe("ApiService", () => {
 
 			const selected: AutocompleteSuggestion = {
 				street_line: "preview",
-				city: "",
-				state: "",
-				zipcode: "",
+				locality: "",
+				administrativeArea: "",
+				postalCode: "",
 				country: "CAN",
 				address_id: "abc",
 			};
@@ -1018,9 +1025,9 @@ describe("ApiService", () => {
 
 			const selected: AutocompleteSuggestion = {
 				street_line: "preview",
-				city: "",
-				state: "",
-				zipcode: "",
+				locality: "",
+				administrativeArea: "",
+				postalCode: "",
 				country: "CAN",
 				address_id: "abc-123",
 			};
@@ -1047,9 +1054,9 @@ describe("ApiService", () => {
 
 			const selected: AutocompleteSuggestion = {
 				street_line: "preview",
-				city: "",
-				state: "",
-				zipcode: "",
+				locality: "",
+				administrativeArea: "",
+				postalCode: "",
 				country: "CAN",
 				address_id: "id/with?weird&chars#1",
 			};
@@ -1068,9 +1075,9 @@ describe("ApiService", () => {
 
 			const selected: AutocompleteSuggestion = {
 				street_line: "preview",
-				city: "",
-				state: "",
-				zipcode: "",
+				locality: "",
+				administrativeArea: "",
+				postalCode: "",
 				country: "CAN",
 				address_id: "abc",
 			};
@@ -1089,9 +1096,9 @@ describe("ApiService", () => {
 
 			const selected: AutocompleteSuggestion = {
 				street_line: "preview",
-				city: "",
-				state: "",
-				zipcode: "",
+				locality: "",
+				administrativeArea: "",
+				postalCode: "",
 				country: "CAN",
 				address_id: "abc",
 			};
@@ -1108,9 +1115,9 @@ describe("ApiService", () => {
 
 			const selected: AutocompleteSuggestion = {
 				street_line: "preview",
-				city: "",
-				state: "",
-				zipcode: "",
+				locality: "",
+				administrativeArea: "",
+				postalCode: "",
 				country: "CAN",
 				address_id: "abc",
 			};
@@ -1125,9 +1132,9 @@ describe("ApiService", () => {
 	describe("fetchSecondaryAutocompleteSuggestions routing", () => {
 		const baseSelected: AutocompleteSuggestion = {
 			street_line: "1 Main",
-			city: "",
-			state: "",
-			zipcode: "",
+			locality: "",
+			administrativeArea: "",
+			postalCode: "",
 			country: "",
 			address_id: "intl-id",
 		};
@@ -1188,9 +1195,9 @@ describe("ApiService", () => {
 				"1 Main",
 				{
 					street_line: "1 Main",
-					city: "Denver",
-					state: "CO",
-					zipcode: "80202",
+					locality: "Denver",
+					administrativeArea: "CO",
+					postalCode: "80202",
 					country: "US",
 					secondary: "Apt",
 				},

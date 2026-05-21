@@ -17,20 +17,20 @@ export class FormService extends BaseService {
 		this.postalCodeSelector = config?.postalCodeSelector ?? null;
 	}
 
-	getStateValueForInput(element: HTMLElement, stateValue: string): string {
+	getAdministrativeAreaValueForInput(element: HTMLElement, areaValue: string): string {
 		if (!(element instanceof HTMLSelectElement)) {
-			return stateValue;
+			return areaValue;
 		}
 
 		const options = Array.from(element.options);
-		const normalized = stateValue.trim().toLowerCase();
+		const normalized = areaValue.trim().toLowerCase();
 
 		return (
 			this.findOptionByValue(options, normalized) ??
 			this.findOptionByText(options, normalized) ??
-			this.findOptionByAbbreviation(options, stateValue) ??
+			this.findOptionByAbbreviation(options, areaValue) ??
 			this.findOptionByFullName(options, normalized) ??
-			stateValue
+			areaValue
 		);
 	}
 
@@ -44,11 +44,8 @@ export class FormService extends BaseService {
 		return match?.value ?? null;
 	}
 
-	private findOptionByAbbreviation(
-		options: HTMLOptionElement[],
-		stateValue: string,
-	): string | null {
-		const abbreviation = STATE_ABBREVIATIONS[stateValue]?.toLowerCase();
+	private findOptionByAbbreviation(options: HTMLOptionElement[], areaValue: string): string | null {
+		const abbreviation = STATE_ABBREVIATIONS[areaValue]?.toLowerCase();
 		if (!abbreviation) return null;
 
 		const match = options.find((opt) => opt.value.toLowerCase() === abbreviation);
@@ -100,24 +97,24 @@ export class FormService extends BaseService {
 	}
 
 	private formatSingleFieldAddress(address: AutocompleteSuggestion, isTextarea: boolean): string {
-		const cityStateZip = this.formatCityStateZip(address);
+		const localityAreaPostal = this.formatLocalityAreaPostal(address);
 
 		if (isTextarea) {
 			const lines = [address.street_line];
 			if (address.secondary?.length) lines.push(address.secondary);
-			lines.push(cityStateZip);
+			lines.push(localityAreaPostal);
 			return lines.join("\n");
 		}
 
 		const parts = [address.street_line];
 		if (address.secondary?.length) parts.push(address.secondary);
-		parts.push(cityStateZip);
+		parts.push(localityAreaPostal);
 		return parts.join(", ");
 	}
 
-	private formatCityStateZip(address: AutocompleteSuggestion): string {
-		const cityState = [address.city, address.state].filter(Boolean).join(", ");
-		return address.zipcode ? `${cityState} ${address.zipcode}` : cityState;
+	private formatLocalityAreaPostal(address: AutocompleteSuggestion): string {
+		const localityArea = [address.locality, address.administrativeArea].filter(Boolean).join(", ");
+		return address.postalCode ? `${localityArea} ${address.postalCode}` : localityArea;
 	}
 
 	populateFormWithAddress(selectedAddress: AutocompleteSuggestion) {
@@ -147,16 +144,19 @@ export class FormService extends BaseService {
 			domService.setInputValue(elements.secondaryInputElement, selectedAddress.secondary ?? "");
 		}
 		if (elements.localityInputElement) {
-			domService.setInputValue(elements.localityInputElement, selectedAddress.city);
+			domService.setInputValue(elements.localityInputElement, selectedAddress.locality);
 		}
 		if (elements.administrativeAreaInputElement) {
 			domService.setInputValue(
 				elements.administrativeAreaInputElement,
-				this.getStateValueForInput(elements.administrativeAreaInputElement, selectedAddress.state),
+				this.getAdministrativeAreaValueForInput(
+					elements.administrativeAreaInputElement,
+					selectedAddress.administrativeArea,
+				),
 			);
 		}
 		if (elements.postalCodeInputElement) {
-			domService.setInputValue(elements.postalCodeInputElement, selectedAddress.zipcode);
+			domService.setInputValue(elements.postalCodeInputElement, selectedAddress.postalCode);
 		}
 	}
 }

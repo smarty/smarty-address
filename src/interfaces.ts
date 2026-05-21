@@ -119,9 +119,9 @@ export interface NormalizedSmartyAddressConfig extends DefaultSmartyAddressConfi
 export interface AutocompleteSuggestion {
 	street_line: string;
 	secondary?: string;
-	city: string;
-	state: string;
-	zipcode: string;
+	locality: string;
+	administrativeArea: string;
+	postalCode: string;
 	country: string;
 	entries?: number;
 	metadata?: Record<string, unknown>;

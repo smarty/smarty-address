@@ -15,9 +15,9 @@ describe("FormatService", () => {
 		const baseAddress: AutocompleteSuggestion = {
 			street_line: "123 Main St",
 			secondary: "",
-			city: "Denver",
-			state: "CO",
-			zipcode: "80202",
+			locality: "Denver",
+			administrativeArea: "CO",
+			postalCode: "80202",
 			country: "US",
 		};
 

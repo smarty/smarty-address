@@ -6,14 +6,20 @@ export class FormatService extends BaseService {
 		autocompleteSuggestion: AutocompleteSuggestion,
 		isSecondary: boolean = false,
 	): string {
-		const { street_line, secondary = "", city, state, zipcode } = autocompleteSuggestion;
+		const {
+			street_line,
+			secondary = "",
+			locality,
+			administrativeArea,
+			postalCode,
+		} = autocompleteSuggestion;
 		const streetText = isSecondary ? "…" : street_line;
 		const secondaryText = secondary.length ? ` ${secondary}` : secondary;
-		const stateZip = [state, zipcode].filter(Boolean).join(" ");
-		const cityStateZip = [city, stateZip].filter(Boolean).join(", ");
+		const areaPostal = [administrativeArea, postalCode].filter(Boolean).join(" ");
+		const localityAreaPostal = [locality, areaPostal].filter(Boolean).join(", ");
 		const streetSegment = `${streetText}${secondaryText}`;
 
-		return cityStateZip ? `${streetSegment}, ${cityStateZip}` : streetSegment;
+		return localityAreaPostal ? `${streetSegment}, ${localityAreaPostal}` : streetSegment;
 	}
 
 	createHighlightedTextElements(

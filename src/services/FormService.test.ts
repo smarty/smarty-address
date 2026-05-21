@@ -15,9 +15,9 @@ describe("FormService", () => {
 		const baseAddress: AutocompleteSuggestion = {
 			street_line: "123 Main St",
 			secondary: "Apt 5",
-			city: "Denver",
-			state: "CO",
-			zipcode: "80202",
+			locality: "Denver",
+			administrativeArea: "CO",
+			postalCode: "80202",
 			country: "US",
 		};
 
@@ -101,10 +101,10 @@ describe("FormService", () => {
 		});
 	});
 
-	describe("getStateValueForInput", () => {
+	describe("getAdministrativeAreaValueForInput", () => {
 		it("should return state value as-is for non-select element", () => {
 			const input = document.createElement("input");
-			const result = service.getStateValueForInput(input, "CO");
+			const result = service.getAdministrativeAreaValueForInput(input, "CO");
 			expect(result).toBe("CO");
 		});
 
@@ -116,7 +116,7 @@ describe("FormService", () => {
 				<option value="TX">Texas</option>
 			`;
 
-			const result = service.getStateValueForInput(select, "CO");
+			const result = service.getAdministrativeAreaValueForInput(select, "CO");
 			expect(result).toBe("CO");
 		});
 
@@ -127,7 +127,7 @@ describe("FormService", () => {
 				<option value="co">Colorado</option>
 			`;
 
-			const result = service.getStateValueForInput(select, "Colorado");
+			const result = service.getAdministrativeAreaValueForInput(select, "Colorado");
 			expect(result).toBe("co");
 		});
 
@@ -138,7 +138,7 @@ describe("FormService", () => {
 				<option value="CO">CO</option>
 			`;
 
-			const result = service.getStateValueForInput(select, "Colorado");
+			const result = service.getAdministrativeAreaValueForInput(select, "Colorado");
 			expect(result).toBe("CO");
 		});
 
@@ -149,7 +149,7 @@ describe("FormService", () => {
 				<option value="Colorado">CO</option>
 			`;
 
-			const result = service.getStateValueForInput(select, "CO");
+			const result = service.getAdministrativeAreaValueForInput(select, "CO");
 			expect(result).toBe("Colorado");
 		});
 
@@ -159,7 +159,7 @@ describe("FormService", () => {
 				<option value="CA">California</option>
 			`;
 
-			const result = service.getStateValueForInput(select, "ZZ");
+			const result = service.getAdministrativeAreaValueForInput(select, "ZZ");
 			expect(result).toBe("ZZ");
 		});
 
@@ -169,7 +169,7 @@ describe("FormService", () => {
 				<option value="CO">Colorado</option>
 			`;
 
-			const result = service.getStateValueForInput(select, "co");
+			const result = service.getAdministrativeAreaValueForInput(select, "co");
 			expect(result).toBe("CO");
 		});
 	});
