@@ -44,11 +44,10 @@ export interface DefaultSmartyAddressConfig extends ApiConfig {
 	internationalAutocompleteApiUrl: string;
 }
 
-export interface SmartyAddressConfig
-	extends Omit<
-		DefaultSmartyAddressConfig,
-		"theme" | "autocompleteApiUrl" | "internationalAutocompleteApiUrl"
-	> {
+export interface SmartyAddressConfig extends Omit<
+	DefaultSmartyAddressConfig,
+	"theme" | "autocompleteApiUrl" | "internationalAutocompleteApiUrl"
+> {
 	embeddedKey: string;
 	streetSelector: string;
 	theme?: string[];

@@ -123,9 +123,10 @@ export class ApiService extends BaseService {
 
 	getCountry(): string {
 		if (this.countrySelector) {
-			const element = this.getService("domService").findDomElement(
-				this.countrySelector,
-			) as HTMLInputElement | HTMLSelectElement | null;
+			const element = this.getService("domService").findDomElement(this.countrySelector) as
+				| HTMLInputElement
+				| HTMLSelectElement
+				| null;
 			const fromSelector = element?.value?.trim();
 			if (fromSelector) return fromSelector;
 		}
@@ -307,9 +308,7 @@ export class ApiService extends BaseService {
 		Object.entries(paramMap).forEach(([configKey, apiParamName]) => {
 			const value = apiConfig[configKey as keyof ApiConfig];
 			if (value === undefined) return;
-			requestData[apiParamName] = Array.isArray(value)
-				? value.join(arraySeparator)
-				: String(value);
+			requestData[apiParamName] = Array.isArray(value) ? value.join(arraySeparator) : String(value);
 		});
 	}
 

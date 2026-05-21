@@ -1,6 +1,6 @@
 {
   "name": "smarty-address",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Quick and easy Smarty address autocomplete and validation.",
   "keywords": [
     "smarty",
