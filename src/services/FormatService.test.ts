@@ -15,9 +15,9 @@ describe("FormatService", () => {
 		const baseAddress: AutocompleteSuggestion = {
 			street_line: "123 Main St",
 			secondary: "",
-			city: "Denver",
-			state: "CO",
-			zipcode: "80202",
+			locality: "Denver",
+			administrativeArea: "CO",
+			postalCode: "80202",
 			country: "US",
 		};
 
@@ -38,9 +38,21 @@ describe("FormatService", () => {
 			expect(result).toBe("… Apt 5, Denver, CO 80202");
 		});
 
-		it("should handle empty secondary when isSecondary is true", () => {
+		it("should fall back to the street line when isSecondary is true but there is no secondary", () => {
 			const result = service.getFormattedAutocompleteSuggestion(baseAddress, true);
-			expect(result).toBe("…, Denver, CO 80202");
+			expect(result).toBe("123 Main St, Denver, CO 80202");
+		});
+
+		it("should keep the international street line intact for secondary results without a secondary field", () => {
+			const internationalAddress: AutocompleteSuggestion = {
+				street_line: "1 Chemin Jean Marie Fritz (Vc 147)",
+				locality: "La Seyne-Sur-Mer",
+				administrativeArea: "",
+				postalCode: "83500",
+				country: "FRA",
+			};
+			const result = service.getFormattedAutocompleteSuggestion(internationalAddress, true);
+			expect(result).toBe("1 Chemin Jean Marie Fritz (Vc 147), La Seyne-Sur-Mer, 83500");
 		});
 	});
 

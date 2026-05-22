@@ -3,18 +3,18 @@
  */
 import SmartyAddress from "../../index";
 import { AutocompleteSuggestion } from "../../interfaces";
+import { flushAsync } from "./testUtils";
 
 describe("Integration: User Flow", () => {
 	let instance: SmartyAddress | null = null;
 
-	const mockSuggestions: AutocompleteSuggestion[] = [
+	const mockSuggestions = [
 		{
 			street_line: "123 Main St",
 			secondary: "",
 			city: "Denver",
 			state: "CO",
 			zipcode: "80202",
-			country: "US",
 		},
 		{
 			street_line: "456 Oak Ave",
@@ -22,7 +22,6 @@ describe("Integration: User Flow", () => {
 			city: "Boulder",
 			state: "CO",
 			zipcode: "80301",
-			country: "US",
 		},
 	];
 
@@ -37,7 +36,7 @@ describe("Integration: User Flow", () => {
 		`;
 	};
 
-	const mockFetch = (suggestions: AutocompleteSuggestion[] = mockSuggestions) => {
+	const mockFetch = (suggestions: typeof mockSuggestions = mockSuggestions) => {
 		return jest.fn().mockResolvedValue({
 			ok: true,
 			json: () => Promise.resolve({ suggestions }),
@@ -147,7 +146,24 @@ describe("Integration: User Flow", () => {
 
 		await jest.runAllTimersAsync();
 
-		expect(onSuggestionsReceived).toHaveBeenCalledWith(mockSuggestions);
+		expect(onSuggestionsReceived).toHaveBeenCalledWith([
+			{
+				street_line: "123 Main St",
+				secondary: "",
+				locality: "Denver",
+				administrativeArea: "CO",
+				postalCode: "80202",
+				country: "USA",
+			},
+			{
+				street_line: "456 Oak Ave",
+				secondary: "",
+				locality: "Boulder",
+				administrativeArea: "CO",
+				postalCode: "80301",
+				country: "USA",
+			},
+		]);
 	});
 
 	it("should allow filtering suggestions via onSuggestionsReceived hook", async () => {
@@ -159,7 +175,7 @@ describe("Integration: User Flow", () => {
 			embeddedKey: "test-key",
 			streetSelector: "#street",
 			onAutocompleteSuggestionsReceived: (suggestions) =>
-				suggestions.filter((s) => s.city === "Denver"),
+				suggestions.filter((s) => s.locality === "Denver"),
 		});
 
 		const streetInput = document.querySelector("#street") as HTMLInputElement;
@@ -222,14 +238,13 @@ describe("Integration: User Flow", () => {
 	});
 
 	describe("secondary address selection", () => {
-		const primarySuggestions: AutocompleteSuggestion[] = [
+		const primarySuggestions = [
 			{
 				street_line: "100 Main St",
 				secondary: "",
 				city: "Denver",
 				state: "CO",
 				zipcode: "80202",
-				country: "US",
 			},
 			{
 				street_line: "200 Oak Ave",
@@ -237,7 +252,6 @@ describe("Integration: User Flow", () => {
 				city: "Miami Beach",
 				state: "FL",
 				zipcode: "33139",
-				country: "US",
 				entries: 3,
 			},
 			{
@@ -246,19 +260,17 @@ describe("Integration: User Flow", () => {
 				city: "Stoughton",
 				state: "MA",
 				zipcode: "02072",
-				country: "US",
 				entries: 2,
 			},
 		];
 
-		const miamiSecondaries: AutocompleteSuggestion[] = [
+		const miamiSecondaries = [
 			{
 				street_line: "200 Oak Ave",
 				secondary: "Apt 1",
 				city: "Miami Beach",
 				state: "FL",
 				zipcode: "33139",
-				country: "US",
 			},
 			{
 				street_line: "200 Oak Ave",
@@ -266,7 +278,6 @@ describe("Integration: User Flow", () => {
 				city: "Miami Beach",
 				state: "FL",
 				zipcode: "33139",
-				country: "US",
 			},
 			{
 				street_line: "200 Oak Ave",
@@ -274,18 +285,16 @@ describe("Integration: User Flow", () => {
 				city: "Miami Beach",
 				state: "FL",
 				zipcode: "33139",
-				country: "US",
 			},
 		];
 
-		const stoughtonSecondaries: AutocompleteSuggestion[] = [
+		const stoughtonSecondaries = [
 			{
 				street_line: "200 Oak Ave",
 				secondary: "Apt 1",
 				city: "Stoughton",
 				state: "MA",
 				zipcode: "02072",
-				country: "US",
 			},
 			{
 				street_line: "200 Oak Ave",
@@ -293,16 +302,8 @@ describe("Integration: User Flow", () => {
 				city: "Stoughton",
 				state: "MA",
 				zipcode: "02072",
-				country: "US",
 			},
 		];
-
-		const flushAsync = async () => {
-			for (let i = 0; i < 5; i++) {
-				await jest.runAllTimersAsync();
-				await Promise.resolve();
-			}
-		};
 
 		const secondaryFetchMock = () =>
 			jest.fn().mockImplementation((url: string) => {

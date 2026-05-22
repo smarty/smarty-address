@@ -2,31 +2,28 @@
  * @jest-environment jsdom
  */
 import SmartyAddress from "../../index";
-import { AutocompleteSuggestion } from "../../interfaces";
 
 describe("Integration: Multiple Instances", () => {
 	let instance1: SmartyAddress | null = null;
 	let instance2: SmartyAddress | null = null;
 
-	const mockSuggestions1: AutocompleteSuggestion[] = [
+	const mockSuggestions1 = [
 		{
 			street_line: "100 First St",
 			secondary: "",
 			city: "Denver",
 			state: "CO",
 			zipcode: "80202",
-			country: "US",
 		},
 	];
 
-	const mockSuggestions2: AutocompleteSuggestion[] = [
+	const mockSuggestions2 = [
 		{
 			street_line: "200 Second Ave",
 			secondary: "",
 			city: "Boulder",
 			state: "CO",
 			zipcode: "80301",
-			country: "US",
 		},
 	];
 

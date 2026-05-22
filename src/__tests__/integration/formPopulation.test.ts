@@ -2,38 +2,34 @@
  * @jest-environment jsdom
  */
 import SmartyAddress from "../../index";
-import { AutocompleteSuggestion } from "../../interfaces";
 
 describe("Integration: Form Population", () => {
 	let instance: SmartyAddress | null = null;
 
-	const mockSuggestionWithSecondary: AutocompleteSuggestion = {
+	const mockSuggestionWithSecondary = {
 		street_line: "123 Main St",
 		secondary: "Apt 5",
 		city: "Denver",
 		state: "CO",
 		zipcode: "80202",
-		country: "US",
 	};
 
-	const mockSuggestionWithEntries: AutocompleteSuggestion = {
+	const mockSuggestionWithEntries = {
 		street_line: "500 Office Park Dr",
 		secondary: "(10 entries)",
 		city: "Denver",
 		state: "CO",
 		zipcode: "80203",
-		country: "US",
 		entries: 10,
 	};
 
-	const mockSecondarySuggestions: AutocompleteSuggestion[] = [
+	const mockSecondarySuggestions = [
 		{
 			street_line: "500 Office Park Dr",
 			secondary: "Suite 100",
 			city: "Denver",
 			state: "CO",
 			zipcode: "80203",
-			country: "US",
 		},
 		{
 			street_line: "500 Office Park Dr",
@@ -41,11 +37,10 @@ describe("Integration: Form Population", () => {
 			city: "Denver",
 			state: "CO",
 			zipcode: "80203",
-			country: "US",
 		},
 	];
 
-	const mockFetch = (suggestions: AutocompleteSuggestion[]) => {
+	const mockFetch = (suggestions: Array<Record<string, unknown>>) => {
 		return jest.fn().mockResolvedValue({
 			ok: true,
 			json: () => Promise.resolve({ suggestions }),

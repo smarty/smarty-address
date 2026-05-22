@@ -34,7 +34,7 @@ Services are instantiated in the `SmartyAddress` constructor and wired together 
 
 All services are located at `src/services/`:
 
-1. **ApiService** (`ApiService.ts`): Handles all Smarty API calls including address suggestions, error handling, and API parameter mapping
+1. **ApiService** (`ApiService.ts`): Handles all Smarty API calls including address suggestions, error handling, and API parameter mapping. Branches on resolved country between the US Autocomplete Pro API and the International Address Autocomplete v2 API; international flow is two-step (summary lookup → detail lookup by `address_id`)
 2. **DropdownService** (`DropdownService.ts`): Dropdown UI orchestration, DOM creation, and event handling
 3. **DropdownStateService** (`DropdownStateService.ts`): Dropdown state management (open/close, selected items, suggestion tracking)
 4. **KeyboardNavigationService** (`KeyboardNavigationService.ts`): Keyboard navigation within the dropdown (arrow keys, enter, escape)
@@ -68,6 +68,16 @@ All services are located at `src/services/`:
 
 - The mockups use large values (e.g. 32px text, 1200px frames). Do NOT assume a 2x scale factor — always confirm before deriving CSS values proportionally from Figma dimensions.
 - After making UI changes based on Figma designs, use Playwright to visually verify the result in the browser before considering the task done.
+
+### International Addresses
+
+The plugin supports both the US Autocomplete Pro API and the International Address Autocomplete v2 API. The country drives which endpoint is used:
+
+- `country` (config) — static ISO 3166-1 alpha-2 or alpha-3 code (e.g. `"US"`, `"USA"`, `"GBR"`)
+- `countrySelector` (config) — CSS selector for a form field whose value supplies the country at lookup time
+- If neither is set, defaults to `USA`. Country values in `US_COUNTRY_CODES` (`["US", "USA"]`) route to the US Pro API; everything else routes to the international API
+- International selection is two-step: a summary candidate has an `address_id`; on selection, `ApiService.fetchInternationalAddressDetail()` is called and a single-result detail auto-populates the form
+- Several `ApiConfig` filter params (e.g. `includeOnlyAdministrativeAreas`, `excludeAdministrativeAreas`, `preferRatio`, `source`) are US-only and ignored on international lookups
 
 ### Customization Options
 

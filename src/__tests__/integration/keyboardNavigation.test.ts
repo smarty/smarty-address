@@ -7,14 +7,13 @@ import { AutocompleteSuggestion } from "../../interfaces";
 describe("Integration: Keyboard Navigation", () => {
 	let instance: SmartyAddress | null = null;
 
-	const mockSuggestions: AutocompleteSuggestion[] = [
+	const mockSuggestions = [
 		{
 			street_line: "123 Main St",
 			secondary: "",
 			city: "Denver",
 			state: "CO",
 			zipcode: "80202",
-			country: "US",
 		},
 		{
 			street_line: "456 Oak Ave",
@@ -22,7 +21,6 @@ describe("Integration: Keyboard Navigation", () => {
 			city: "Boulder",
 			state: "CO",
 			zipcode: "80301",
-			country: "US",
 		},
 		{
 			street_line: "789 Pine Rd",
@@ -30,7 +28,6 @@ describe("Integration: Keyboard Navigation", () => {
 			city: "Aurora",
 			state: "CO",
 			zipcode: "80010",
-			country: "US",
 		},
 	];
 
@@ -45,7 +42,7 @@ describe("Integration: Keyboard Navigation", () => {
 		`;
 	};
 
-	const mockFetch = (suggestions: AutocompleteSuggestion[] = mockSuggestions) => {
+	const mockFetch = (suggestions: typeof mockSuggestions = mockSuggestions) => {
 		return jest.fn().mockResolvedValue({
 			ok: true,
 			json: () => Promise.resolve({ suggestions }),

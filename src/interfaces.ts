@@ -11,6 +11,8 @@ import type { StyleService } from "./services/StyleService";
 export interface ApiConfig {
 	embeddedKey: string;
 	autocompleteApiUrl: string;
+	internationalAutocompleteApiUrl?: string;
+	country?: string;
 	maxResults?: number;
 
 	includeOnlyLocalities?: string[];
@@ -39,16 +41,21 @@ export interface ServiceClassOverrides {
 
 export interface DefaultSmartyAddressConfig extends ApiConfig {
 	theme: string[];
+	internationalAutocompleteApiUrl: string;
 }
 
 export interface SmartyAddressConfig extends Omit<
 	DefaultSmartyAddressConfig,
-	"theme" | "autocompleteApiUrl"
+	"theme" | "autocompleteApiUrl" | "internationalAutocompleteApiUrl"
 > {
 	embeddedKey: string;
 	streetSelector: string;
 	theme?: string[];
 	autocompleteApiUrl?: string;
+	internationalAutocompleteApiUrl?: string;
+
+	country?: string;
+	countrySelector?: string;
 
 	searchInputSelector?: string;
 	secondarySelector?: string;
@@ -88,6 +95,9 @@ export interface NormalizedSmartyAddressConfig extends DefaultSmartyAddressConfi
 	embeddedKey: string;
 	streetSelector: string;
 
+	country?: string;
+	countrySelector?: string;
+
 	searchInputSelector?: string;
 	secondarySelector?: string;
 	localitySelector?: string;
@@ -109,10 +119,12 @@ export interface NormalizedSmartyAddressConfig extends DefaultSmartyAddressConfi
 export interface AutocompleteSuggestion {
 	street_line: string;
 	secondary?: string;
-	city: string;
-	state: string;
-	zipcode: string;
+	locality: string;
+	administrativeArea: string;
+	postalCode: string;
 	country: string;
 	entries?: number;
 	metadata?: Record<string, unknown>;
+
+	address_id?: string;
 }

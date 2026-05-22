@@ -14,4 +14,5 @@ export default {
 		],
 	},
 	setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
+	testMatch: ["**/?(*.)+(spec|test).[jt]s?(x)"],
 };
