@@ -30,6 +30,7 @@ export class VerificationOrchestrator extends BaseService {
 
 		if (this.triggers.includes("selection")) this.wireSelection();
 		if (this.triggers.includes("blur")) this.wireBlur();
+		if (this.triggers.includes("submit")) this.wireSubmit();
 		this.wireStaleness();
 	}
 
@@ -57,6 +58,39 @@ export class VerificationOrchestrator extends BaseService {
 			element.addEventListener("blur", handler, true);
 			this.cleanups.push(() => element.removeEventListener("blur", handler, true));
 		});
+	}
+
+	// Best-effort native interception for a real <form> (ERD §6). The supported
+	// path is the await-able verifyBeforeSubmit(); this is a convenience for
+	// vanilla <form> hosts. SPA / non-form hosts must call the method directly.
+	private wireSubmit(): void {
+		const form = this.findForm();
+		if (!form) return;
+
+		const verificationService = this.getService("verificationService");
+		let resubmitting = false;
+		const handler = async (event: Event) => {
+			if (resubmitting) {
+				resubmitting = false;
+				return;
+			}
+			event.preventDefault();
+			const allow = await verificationService.verifyBeforeSubmit();
+			if (allow) {
+				resubmitting = true;
+				if (typeof form.requestSubmit === "function") form.requestSubmit();
+				else form.submit();
+			}
+		};
+		form.addEventListener("submit", handler, true);
+		this.cleanups.push(() => form.removeEventListener("submit", handler, true));
+	}
+
+	private findForm(): HTMLFormElement | null {
+		const street = this.watchedSelectors[0];
+		if (!street) return null;
+		const element = this.getService("domService").findDomElement(street);
+		return element?.closest("form") ?? null;
 	}
 
 	// Invalidate-on-edit staleness (ERD §5.6, Q9). Only user-initiated edits

@@ -23,7 +23,7 @@ export const isVerificationEnabled = (config: NormalizedSmartyAddressConfig): bo
 // as the corresponding epic lands (ERD §3.1 validation guard). Verification
 // config that requests an unbuilt capability gets a clear warning rather than a
 // silent no-op.
-const UNSUPPORTED_BEHAVIORS: string[] = ["block"]; // lifted in Epic 3
+const UNSUPPORTED_BEHAVIORS: string[] = []; // block shipped in Epic 3
 const UNSUPPORTED_UI: string[] = []; // panel shipped in Epic 2
 const UNSUPPORTED_RESULT_KEYS: string[] = []; // ambiguous shipped in Epic 2
 

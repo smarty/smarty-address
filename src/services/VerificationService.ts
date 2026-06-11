@@ -206,6 +206,30 @@ export class VerificationService extends BaseService {
 		return this.runFlow(entered, trigger);
 	}
 
+	// Await-able pre-submit gate (Epic 3 / ERD §6). The supported cross-framework
+	// blocking path: the integrator awaits this in their own submit handler and
+	// gets back `true` (ok to submit) / `false` (block). Verifies the current
+	// address, applies the configured block / fail-closed policy, then lets an
+	// onBeforeSubmit hook have the final say.
+	async verifyBeforeSubmit(): Promise<boolean> {
+		const fresh = await this.verifyCurrent("submit");
+		const result = fresh ?? this.lastResult;
+
+		let allow = this.resolveSubmitDecision(result);
+		const hook = this.effective.hooks.onBeforeSubmit;
+		if (hook) {
+			const hookAllow = await hook(result ?? null);
+			allow = allow && hookAllow !== false;
+		}
+		return allow;
+	}
+
+	private resolveSubmitDecision(result: VerificationResult | null): boolean {
+		if (!result) return true;
+		if (result.type === "error") return this.effective.failureMode !== "fail-closed";
+		return this.behaviorFor(result.type) !== "block";
+	}
+
 	private resolveEntered(
 		address: CurrentAddress | Partial<CurrentAddress> | undefined,
 		country: string,

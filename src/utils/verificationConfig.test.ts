@@ -79,24 +79,13 @@ describe("validateConfig", () => {
 		);
 	});
 
-	it("warns on the not-yet-supported block behavior (Epic 3)", () => {
+	it("accepts panel UI, ambiguous override, and block behavior (Epics 2–3)", () => {
 		validateConfig({
 			embeddedKey: "k",
 			streetSelector: "#s",
-			verification: { onResult: { undeliverable: "block" } },
+			verification: { ui: "panel", onResult: { ambiguous: "prompt", undeliverable: "block" } },
 		} as NormalizedSmartyAddressConfig);
 		const messages = warn.mock.calls.map((call) => String(call[0]));
-		expect(messages.some((m) => m.includes('behavior "block"'))).toBe(true);
-	});
-
-	it("accepts panel UI and ambiguous override (shipped in Epic 2)", () => {
-		validateConfig({
-			embeddedKey: "k",
-			streetSelector: "#s",
-			verification: { ui: "panel", onResult: { ambiguous: "prompt" } },
-		} as NormalizedSmartyAddressConfig);
-		const messages = warn.mock.calls.map((call) => String(call[0]));
-		expect(messages.some((m) => m.includes("panel"))).toBe(false);
-		expect(messages.some((m) => m.includes("ambiguous"))).toBe(false);
+		expect(messages.some((m) => m.includes("not yet supported"))).toBe(false);
 	});
 });

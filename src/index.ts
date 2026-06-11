@@ -161,6 +161,13 @@ export default class SmartyAddress {
 		return this.verificationService.verify(address);
 	}
 
+	// Await-able pre-submit gate (Epic 3, ERD §6). Call this in your submit
+	// handler: `if (!(await smartyAddress.verifyBeforeSubmit())) return;`.
+	async verifyBeforeSubmit(): Promise<boolean> {
+		if (!this.verificationActive) return true;
+		return this.verificationService.verifyBeforeSubmit();
+	}
+
 	destroy(): void {
 		this.apiService.destroy();
 		this.colorService.destroy();
