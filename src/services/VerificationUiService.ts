@@ -24,14 +24,15 @@ const TONE_CLASS: Record<ResultTone, string> = {
 export class VerificationUiService extends BaseService {
 	private streetSelector: string | null = null;
 	private announcer: HTMLElement | null = null;
-	private badge: HTMLElement | null = null;
+	private surface: HTMLElement | null = null;
+	private chooser: HTMLElement | null = null;
 
 	init(config: NormalizedSmartyAddressConfig) {
 		this.streetSelector = config.streetSelector ?? null;
 	}
 
 	destroy() {
-		this.removeBadge();
+		this.clear();
 		this.announcer?.remove();
 		this.announcer = null;
 	}
@@ -43,7 +44,7 @@ export class VerificationUiService extends BaseService {
 
 		// Type 8 (error) is always aria-only / silent regardless of `ui` (ERD §8.1).
 		if (result.type === "error") {
-			this.removeBadge();
+			this.clear();
 			if (surface !== "none") this.announce(message);
 			return;
 		}
@@ -52,16 +53,66 @@ export class VerificationUiService extends BaseService {
 
 		this.announce(message);
 		if (surface === "aria-only") {
-			this.removeBadge();
+			this.clear();
 			return;
 		}
 
-		// `badge` (and `panel` until Epic 2 lands its richer surface) render the cue.
+		if (surface === "panel") {
+			this.renderPanel(message, meta.tone);
+			return;
+		}
+
 		this.renderBadge(meta.badge, meta.tone);
 	}
 
+	// Ambiguous (Type 6) chooser — a lightweight candidate picker that works with
+	// no dropdown infrastructure (the verification-only fallback, Q4 / ERD §8.1).
+	renderChooser(
+		result: VerificationResult,
+		config: UiConfig,
+		onChoose: (chosen: CurrentAddress) => void,
+	): void {
+		this.announce(RESULT_TYPE_META.ambiguous.message);
+		if ((config.ui ?? "badge") === "none") return;
+
+		const candidates = result.candidates ?? [];
+		const anchor = this.getAnchor();
+		if (!anchor || candidates.length === 0) return;
+
+		const domService = this.getService("domService");
+		this.clear();
+		const chooser = domService.createDomElement("div", [
+			CSS_CLASSES.verifyVars,
+			CSS_CLASSES.verifyPanel,
+			CSS_CLASSES.verifyChooser,
+		]);
+		chooser.setAttribute("role", "listbox");
+
+		const heading = domService.createDomElement("div", [CSS_CLASSES.verifyPanelMessage]);
+		heading.textContent = RESULT_TYPE_META.ambiguous.message;
+		chooser.appendChild(heading);
+
+		candidates.forEach((candidate) => {
+			const option = domService.createDomElement("button", [CSS_CLASSES.verifyChooserOption]);
+			option.setAttribute("type", "button");
+			option.setAttribute("role", "option");
+			option.textContent = this.formatAddress(candidate);
+			option.addEventListener("click", () => {
+				onChoose(candidate);
+				this.clear();
+			});
+			chooser.appendChild(option);
+		});
+
+		anchor.insertAdjacentElement("afterend", chooser);
+		this.chooser = chooser;
+	}
+
 	clear(): void {
-		this.removeBadge();
+		this.surface?.remove();
+		this.surface = null;
+		this.chooser?.remove();
+		this.chooser = null;
 	}
 
 	private buildMessage(result: VerificationResult): string {
@@ -82,7 +133,7 @@ export class VerificationUiService extends BaseService {
 		if (!anchor) return;
 
 		const domService = this.getService("domService");
-		this.removeBadge();
+		this.clear();
 		const badge = domService.createDomElement("span", [
 			CSS_CLASSES.verifyVars,
 			CSS_CLASSES.verifyBadge,
@@ -91,12 +142,28 @@ export class VerificationUiService extends BaseService {
 		badge.setAttribute("role", "status");
 		badge.textContent = label;
 		anchor.insertAdjacentElement("afterend", badge);
-		this.badge = badge;
+		this.surface = badge;
 	}
 
-	private removeBadge(): void {
-		this.badge?.remove();
-		this.badge = null;
+	// Full inline panel (R2 / Epic 2): shows the diff note, secondary prompt, or
+	// caution text. Tone-styled; copy comes from the result message.
+	private renderPanel(message: string, tone: ResultTone): void {
+		const anchor = this.getAnchor();
+		if (!anchor) return;
+
+		const domService = this.getService("domService");
+		this.clear();
+		const panel = domService.createDomElement("div", [
+			CSS_CLASSES.verifyVars,
+			CSS_CLASSES.verifyPanel,
+			TONE_CLASS[tone],
+		]);
+		panel.setAttribute("role", "status");
+		const text = domService.createDomElement("div", [CSS_CLASSES.verifyPanelMessage]);
+		text.textContent = message;
+		panel.appendChild(text);
+		anchor.insertAdjacentElement("afterend", panel);
+		this.surface = panel;
 	}
 
 	protected getAnchor(): HTMLElement | null {

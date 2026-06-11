@@ -79,15 +79,24 @@ describe("validateConfig", () => {
 		);
 	});
 
-	it("warns on not-yet-supported verification capabilities", () => {
+	it("warns on the not-yet-supported block behavior (Epic 3)", () => {
 		validateConfig({
 			embeddedKey: "k",
 			streetSelector: "#s",
-			verification: { ui: "panel", onResult: { ambiguous: "prompt", undeliverable: "block" } },
+			verification: { onResult: { undeliverable: "block" } },
 		} as NormalizedSmartyAddressConfig);
 		const messages = warn.mock.calls.map((call) => String(call[0]));
-		expect(messages.some((m) => m.includes('verification.ui "panel"'))).toBe(true);
-		expect(messages.some((m) => m.includes("verification.onResult.ambiguous"))).toBe(true);
 		expect(messages.some((m) => m.includes('behavior "block"'))).toBe(true);
+	});
+
+	it("accepts panel UI and ambiguous override (shipped in Epic 2)", () => {
+		validateConfig({
+			embeddedKey: "k",
+			streetSelector: "#s",
+			verification: { ui: "panel", onResult: { ambiguous: "prompt" } },
+		} as NormalizedSmartyAddressConfig);
+		const messages = warn.mock.calls.map((call) => String(call[0]));
+		expect(messages.some((m) => m.includes("panel"))).toBe(false);
+		expect(messages.some((m) => m.includes("ambiguous"))).toBe(false);
 	});
 });

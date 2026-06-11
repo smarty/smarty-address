@@ -420,7 +420,6 @@ export class VerificationService extends BaseService {
 	private async dispatch(result: VerificationResult, _trigger: VerificationTrigger): Promise<void> {
 		const behavior = this.behaviorFor(result.type);
 		this.applyBehavior(result, behavior);
-		this.getService("verificationUiService").render(result, behavior, this.effective);
 
 		const offersCorrection = (
 			[
@@ -430,15 +429,33 @@ export class VerificationService extends BaseService {
 				"ambiguous",
 			] as VerificationResultKey[]
 		).includes(result.type);
+
+		// A customer hook returning a decision overrides the built-in UI (ERD §7).
 		if (behavior === "prompt" && offersCorrection && this.effective.hooks.onCorrectionOffered) {
 			const decision = await this.effective.hooks.onCorrectionOffered(
 				result.diff ?? { changes: {}, changedFields: [] },
 				result,
 			);
-			if (decision) this.applyDecision(decision, result);
+			if (decision) {
+				this.applyDecision(decision, result);
+				await this.effective.hooks.onVerified?.(result);
+				return;
+			}
 		}
 
+		this.renderResult(result, behavior);
 		await this.effective.hooks.onVerified?.(result);
+	}
+
+	private renderResult(result: VerificationResult, behavior: VerificationBehavior): void {
+		const ui = this.getService("verificationUiService");
+		const isChooser =
+			result.type === "ambiguous" && behavior === "prompt" && !!result.candidates?.length;
+		if (isChooser) {
+			ui.renderChooser(result, this.effective, (chosen) => this.applyToForm(chosen));
+			return;
+		}
+		ui.render(result, behavior, this.effective);
 	}
 
 	private applyBehavior(result: VerificationResult, behavior: VerificationBehavior): void {

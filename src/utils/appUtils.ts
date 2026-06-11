@@ -24,8 +24,8 @@ export const isVerificationEnabled = (config: NormalizedSmartyAddressConfig): bo
 // config that requests an unbuilt capability gets a clear warning rather than a
 // silent no-op.
 const UNSUPPORTED_BEHAVIORS: string[] = ["block"]; // lifted in Epic 3
-const UNSUPPORTED_UI: string[] = ["panel"]; // lifted in Epic 2
-const UNSUPPORTED_RESULT_KEYS: string[] = ["ambiguous"]; // lifted in Epic 2
+const UNSUPPORTED_UI: string[] = []; // panel shipped in Epic 2
+const UNSUPPORTED_RESULT_KEYS: string[] = []; // ambiguous shipped in Epic 2
 
 export const validateConfig = (config: NormalizedSmartyAddressConfig): void => {
 	const autocompleteOn = isAutocompleteEnabled(config);

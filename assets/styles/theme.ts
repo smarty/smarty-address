@@ -153,4 +153,32 @@ export const themeStyles = {
 	".smartyAddress__verifyBadge_negative": {
 		color: "var(--smartyAddress__verifyNegative)",
 	},
+
+	".smartyAddress__verifyPanel": {
+		display: "var(--smartyAddress__verifyPanelDisplay)",
+		padding: "var(--smartyAddress__verifyPanelPadding)",
+		"border-radius": "var(--smartyAddress__verifyPanelRadius)",
+		"font-size": "var(--smartyAddress__verifyPanelFontSize)",
+		"background-color": "var(--smartyAddress__verifyPanelBg)",
+		color: "var(--smartyAddress__verifyPanelText)",
+		border: "var(--smartyAddress__verifyPanelBorder)",
+		"box-shadow": "var(--smartyAddress__verifyPanelShadow)",
+	},
+
+	".smartyAddress__verifyPanelMessage": {
+		"margin-bottom": "var(--smartyAddress__verifyPanelGap)",
+	},
+
+	".smartyAddress__verifyChooserOption": {
+		display: "block",
+		width: "100%",
+		"text-align": "left",
+		cursor: "var(--smartyAddress__cursorStyle)",
+		padding: "var(--smartyAddress__verifyBadgePadding)",
+		"margin-top": "var(--smartyAddress__verifyPanelGap)",
+		"border-radius": "var(--smartyAddress__verifyBadgeRadius)",
+		"background-color": "var(--smartyAddress__verifyPanelBg)",
+		color: "var(--smartyAddress__verifyPanelText)",
+		border: "var(--smartyAddress__verifyPanelBorder)",
+	},
 };
