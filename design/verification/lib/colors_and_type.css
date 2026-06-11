@@ -1,0 +1,364 @@
+/* ============================================================
+   Smarty Design System — Tokens
+   ------------------------------------------------------------
+   Sourced from the "UI Lib testing.fig" Figma file —
+   Design System Documentation frame + live component specs.
+
+   Type families:
+     - TT Hoves Pro   → display. Weights 400/500/600/700 shipped
+                        in /fonts/ as .otf + .ttf.
+     - Inter          → body + UI (Google Fonts CDN)
+     - Hack           → code. Regular/Bold/Italic in /fonts/.
+
+   Color system is semantic-first. Ramps are 10–14 stop HSL
+   scales (Primitives) and every component consumes the Semantic
+   layer (`--color-text-action`, `--color-surface-primary`, …).
+   ============================================================ */
+
+/* ---------- FONT FACES ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* TT Hoves Pro — display face (brand supplied) */
+@font-face {
+  font-family: 'TT Hoves Pro';
+  src: url('fonts/TT-Hoves-Pro-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'TT Hoves Pro';
+  src: url('fonts/TT-Hoves-Pro-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'TT Hoves Pro';
+  src: url('fonts/TT-Hoves-Pro-DemiBold.otf') format('opentype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'TT Hoves Pro';
+  src: url('fonts/TT-Hoves-Pro-DemiBold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Hack — monospace (brand supplied) */
+@font-face {
+  font-family: 'Hack';
+  src: url('fonts/Hack-Regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+
+
+:root {
+  /* ============================================================
+     PRIMITIVES — raw palette. Don't use these directly in UI;
+     consume the semantic tokens below.
+     ============================================================ */
+
+  /* Blue — brand / action ramp */
+  --blue-50:  #E2F0FF;
+  --blue-100: #BDDCFF;
+  --blue-200: #8FC1FF;
+  --blue-300: #5AA1FF;
+  --blue-400: #0066FF;   /* brand */
+  --blue-500: #0057DB;
+  --blue-600: #0039B5;
+  --blue-700: #0134A4;
+  --blue-800: #001D7A;
+  --blue-900: #001247;
+
+  /* Gray — neutral ramp (14 stops per the doc) */
+  --gray-0:   #FFFFFF;
+  --gray-25:  #F9FAFB;
+  --gray-50:  #F5F7FA;
+  --gray-100: #E6E9ED;
+  --gray-200: #D6DBE0;
+  --gray-300: #C7CCD4;
+  --gray-400: #B7BEC7;
+  --gray-500: #939BA6;
+  --gray-600: #5C636E;   /* rgb(92,99,110) */
+  --gray-700: #49505B;   /* rgb(73,80,91) */
+  --gray-800: #383E48;
+  --gray-900: #242528;
+  --gray-950: #151B23;   /* near-black; primary text */
+  --gray-1000:#000000;
+
+  /* Semantic accents */
+  --green-100: #CFFAD6;
+  --green-300: #81EB96;
+  --green-500: #47CC69;
+  --green-700: #005925;
+
+  --cyan-500:  #3DC9D1;
+
+  --orange-100: #FFEBDE;
+  --orange-500: #F5804E;
+  --orange-700: #6B1000;
+
+  --pink-100: #FFE8EF;
+  --pink-200: #FFCBDB;
+  --pink-500: #F55591;
+  --pink-700: #6B0039;
+
+  --yellow-300: #FCF58C;
+
+  --purple-500: #8A38F5;   /* dashed annotation color in design doc */
+
+  /* ============================================================
+     SEMANTIC — consume these in every component
+     ============================================================ */
+
+  /* Text */
+  --color-text-primary:      var(--gray-950);
+  --color-text-secondary:    var(--gray-800);
+  --color-text-tertiary:     var(--gray-500);
+  --color-text-body:         var(--gray-700);
+  --color-text-muted:        var(--gray-600);
+  --color-text-action:       var(--blue-400);
+  --color-text-action-hover: var(--blue-600);
+  --color-text-action-pressed: var(--blue-800);
+  --color-text-disabled:     var(--gray-400);
+  --color-text-on-action:    var(--gray-0);
+  --color-text-on-lit-blu:   var(--blue-600);
+  --color-text-on-lit-blu-hover: var(--blue-800);
+  --color-text-positive:     var(--green-700);
+  --color-text-warning:      var(--orange-700);
+  --color-text-negative:     var(--pink-700);
+
+  /* Surface */
+  --color-surface-primary:          var(--gray-0);
+  --color-surface-secondary:        var(--gray-50);
+  --color-surface-tertiary:         var(--gray-100);
+  --color-surface-secondary-tinted: var(--blue-50);
+  --color-surface-tertiary-tinted:  var(--blue-100);
+  --color-surface-action:           var(--blue-400);
+  --color-surface-action-hover:     var(--blue-600);
+  --color-surface-action-pressed:   var(--blue-800);
+  --color-surface-on-lit-blu:       var(--blue-600);
+  --color-surface-positive:         var(--green-100);
+  --color-surface-warning:          var(--orange-100);
+  --color-surface-negative:         var(--pink-100);
+  --color-surface-negative-hover:   var(--pink-200);
+  --color-surface-disabled:         var(--gray-100);
+  --color-surface-overlay:          rgba(0, 29, 122, 0.5);
+
+  /* Icons */
+  --color-icon-primary:      var(--gray-950);
+  --color-icon-secondary:    var(--gray-800);
+  --color-icon-tertiary:     var(--gray-500);
+  --color-icon-action:       var(--blue-400);
+  --color-icon-action-hover: var(--blue-600);
+  --color-icon-disabled:     var(--gray-400);
+  --color-icon-warning:      var(--orange-500);
+  --color-icon-positive:     var(--green-500);
+  --color-icon-negative:     var(--pink-500);
+  --color-icon-on-action:    var(--gray-0);
+  --color-icon-pressed:      var(--blue-800);
+
+  /* Stroke / border */
+  --color-stroke-default:      var(--gray-950);
+  --color-stroke-secondary:    var(--gray-200);
+  --color-stroke-tertiary:     var(--gray-100);
+  --color-stroke-disabled:     var(--gray-400);
+  --color-stroke-focused:      var(--blue-300);
+  --color-stroke-action:       var(--blue-400);
+  --color-stroke-action-hover: var(--blue-600);
+  --color-stroke-positive:     var(--green-700);
+  --color-stroke-warning:      var(--orange-700);
+  --color-stroke-negative:     var(--pink-700);
+
+  /* ============================================================
+     TYPOGRAPHY
+     Display: TT Hoves Pro (→ Space Grotesk fallback)
+     Body/UI: Inter
+     Code:    Hack / Courier (→ JetBrains Mono fallback)
+     ============================================================ */
+  --font-display: 'TT Hoves Pro', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-mono:    'Hack', ui-monospace, 'SF Mono', monospace;
+
+  /* Size + leading (from Figma specimens) */
+  --type-h-extra-size: 96px;  --type-h-extra-lh: 106px; --type-h-extra-ls: -3px; --type-h-extra-weight: 700;
+  --type-h1-size: 64px;       --type-h1-lh: 64px;       --type-h1-ls: -2px;     --type-h1-weight: 500;
+  --type-h2-size: 52px;       --type-h2-lh: 57px;       --type-h2-ls: -2px;     --type-h2-weight: 500;
+  --type-h3-size: 44px;       --type-h3-lh: 48px;       --type-h3-ls: -2px;     --type-h3-weight: 500;
+  --type-h4-size: 36px;       --type-h4-lh: 43px;       --type-h4-ls: -2px;     --type-h4-weight: 500;
+  --type-h5-size: 30px;       --type-h5-lh: 33px;       --type-h5-ls: -1px;     --type-h5-weight: 500;
+  --type-h6-size: 28px;       --type-h6-lh: 31px;       --type-h6-ls: -1px;     --type-h6-weight: 500;
+  --type-paragraph-size: 24px;--type-paragraph-lh: 36px;--type-paragraph-ls: -1px; --type-paragraph-weight: 500;
+  --type-body-lg-size: 20px;  --type-body-lg-lh: 30px;  --type-body-lg-ls: -0.02px; --type-body-lg-weight: 400;
+  --type-body-sm-size: 16px;  --type-body-sm-lh: 24px;  --type-body-sm-ls: -0.02px; --type-body-sm-weight: 400;
+  --type-caption-lg-size: 16px; --type-caption-lg-lh: 24px; --type-caption-lg-weight: 500;
+  --type-caption-md-size: 12px; --type-caption-md-lh: 18px; --type-caption-md-weight: 400;
+  --type-caption-up-size: 13px; --type-caption-up-lh: 16px; --type-caption-up-weight: 400; --type-caption-up-tracking: 4px;
+  --type-button-lg-size: 20px; --type-button-lg-lh: 24px; --type-button-lg-weight: 500;
+  --type-button-sm-size: 17px; --type-button-sm-lh: 24px; --type-button-sm-weight: 500;
+  --type-code-size: 14px;     --type-code-lh: 17px;
+
+  /* ============================================================
+     SPACING — 4-pt grid, every stop from 0 → 128.
+     Named by multiples of 4px. Button padding, modal gutters,
+     card inset — all derived from these values.
+     Observed in Figma: 2, 4, 6, 8, 10, 12, 16, 20, 24, 28,
+                        32, 36, 40, 48, 56, 64, 80, 96, 128.
+     ============================================================ */
+  --space-0:   0;
+  --space-px:  1px;
+  --space-0-5: 2px;   /* icon nudges, checkbox tick inset */
+  --space-1:   4px;
+  --space-1-5: 6px;   /* chevron inset, pill badge vertical */
+  --space-2:   8px;
+  --space-2-5: 10px;  /* checkbox/radio hit padding */
+  --space-3:   12px;  /* button-sm vertical, tight stack */
+  --space-4:   16px;  /* base stack */
+  --space-5:   20px;  /* button-default vertical, icon frame */
+  --space-6:   24px;  /* card inset, modal body */
+  --space-7:   28px;  /* order summary inset */
+  --space-8:   32px;  /* button-default horizontal, section */
+  --space-9:   36px;  /* modal gutter */
+  --space-10:  40px;
+  --space-11:  44px;
+  --space-12:  48px;  /* large section gap */
+  --space-14:  56px;
+  --space-16:  64px;  /* page rhythm */
+  --space-18:  72px;
+  --space-20:  80px;
+  --space-24:  96px;
+  --space-32:  128px; /* hero padding */
+
+  /* ------------------------------------------------------------
+     COMPONENT PADDING TOKENS — shorthand pairs lifted directly
+     from Figma component specs. Use these first, fall back to
+     raw --space-* only when composing new layouts.
+     ------------------------------------------------------------ */
+  --pad-btn-sm:       var(--space-3);                     /* 12px square — icon-only sm */
+  --pad-btn-sm-x:     var(--space-5);                     /* 20px — sm w/ text */
+  --pad-btn-default:  var(--space-5);                     /* 20px square — icon-only default */
+  --pad-btn-default-x:var(--space-8);                     /* 32px — default w/ text */
+  --pad-btn-dropdown: var(--space-2) var(--space-2) var(--space-2) var(--space-8);  /* 8 8 8 32 */
+  --pad-control:      var(--space-2-5);                   /* 10px — checkbox/radio hit */
+  --pad-tab:          var(--space-2-5) var(--space-5);    /* 10 20 */
+  --pad-card:         var(--space-6);                     /* 24px */
+  --pad-card-lg:      var(--space-7) var(--space-8);      /* 28 32 */
+  --pad-modal:        var(--space-6) var(--space-9);      /* 24 36 */
+  --pad-modal-lg:     var(--space-9);                     /* 36px */
+  --pad-badge:        var(--space-0-5) var(--space-2);    /* 2 8 — discount/webinar pills */
+  --pad-chip:         var(--space-1-5) var(--space-3);    /* 6 12 — small active chip */
+  --pad-icon-frame:   var(--space-5);                     /* 20px — icon container */
+
+  /* ============================================================
+     RADIUS — components cluster at 4 / 5 / 12 / 24 / 360 (pill)
+     ============================================================ */
+  --radius-xs: 4px;
+  --radius-sm: 5px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-pill: 360px;  /* explicit value used throughout Figma */
+  --radius-round: 999px;
+
+  /* ============================================================
+     STROKE WIDTHS — 1 for tertiary borders, 2 for focus & CTAs
+     ============================================================ */
+  --stroke-1: 1px;
+  --stroke-2: 2px;
+
+  /* ============================================================
+     SHADOWS — pulled directly from Figma elevation tokens.
+     The rgba(0,32,74,0.04) is the signature "deep blue haze".
+     ============================================================ */
+  --shadow-sm: 0px 2px 6px 0px rgba(0, 32, 74, 0.04);
+  --shadow-md: 0px 8px 20px 0px rgba(0, 32, 74, 0.04);
+  --shadow-lg: 0px 20px 40px 0px rgba(0, 32, 74, 0.04),
+               0px 8px 20px 0px rgba(0, 32, 74, 0.04);
+  --shadow-focus: 0 0 0 2px var(--color-stroke-focused);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.2, 0, 0, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur-med: 200ms;
+  --dur-slow: 320ms;
+}
+
+/* ============================================================
+   SEMANTIC CLASSES — ready-to-use text styles
+   ============================================================ */
+
+.type-display  { font-family: var(--font-display); font-weight: var(--type-h-extra-weight);
+                 font-size: var(--type-h-extra-size); line-height: var(--type-h-extra-lh);
+                 letter-spacing: var(--type-h-extra-ls); color: var(--color-text-primary); }
+
+.type-h1, h1   { font-family: var(--font-display); font-weight: var(--type-h1-weight);
+                 font-size: var(--type-h1-size); line-height: var(--type-h1-lh);
+                 letter-spacing: var(--type-h1-ls); color: var(--color-text-primary); }
+
+.type-h2, h2   { font-family: var(--font-display); font-weight: var(--type-h2-weight);
+                 font-size: var(--type-h2-size); line-height: var(--type-h2-lh);
+                 letter-spacing: var(--type-h2-ls); color: var(--color-text-primary); }
+
+.type-h3, h3   { font-family: var(--font-display); font-weight: var(--type-h3-weight);
+                 font-size: var(--type-h3-size); line-height: var(--type-h3-lh);
+                 letter-spacing: var(--type-h3-ls); color: var(--color-text-primary); }
+
+.type-h4, h4   { font-family: var(--font-display); font-weight: var(--type-h4-weight);
+                 font-size: var(--type-h4-size); line-height: var(--type-h4-lh);
+                 letter-spacing: var(--type-h4-ls); color: var(--color-text-primary); }
+
+.type-h5, h5   { font-family: var(--font-display); font-weight: var(--type-h5-weight);
+                 font-size: var(--type-h5-size); line-height: var(--type-h5-lh);
+                 letter-spacing: var(--type-h5-ls); color: var(--color-text-primary); }
+
+.type-h6, h6   { font-family: var(--font-display); font-weight: var(--type-h6-weight);
+                 font-size: var(--type-h6-size); line-height: var(--type-h6-lh);
+                 letter-spacing: var(--type-h6-ls); color: var(--color-text-primary); }
+
+.type-paragraph { font-family: var(--font-display); font-weight: var(--type-paragraph-weight);
+                  font-size: var(--type-paragraph-size); line-height: var(--type-paragraph-lh);
+                  letter-spacing: var(--type-paragraph-ls); color: var(--color-text-primary); }
+
+p, .type-body-lg { font-family: var(--font-body); font-weight: var(--type-body-lg-weight);
+                   font-size: var(--type-body-lg-size); line-height: var(--type-body-lg-lh);
+                   letter-spacing: var(--type-body-lg-ls); color: var(--color-text-body); }
+
+.type-body-sm    { font-family: var(--font-body); font-weight: var(--type-body-sm-weight);
+                   font-size: var(--type-body-sm-size); line-height: var(--type-body-sm-lh);
+                   letter-spacing: var(--type-body-sm-ls); color: var(--color-text-body); }
+
+.type-caption-lg { font-family: var(--font-body); font-weight: var(--type-caption-lg-weight);
+                   font-size: var(--type-caption-lg-size); line-height: var(--type-caption-lg-lh);
+                   color: var(--color-text-body); }
+
+.type-caption-md { font-family: var(--font-body); font-weight: var(--type-caption-md-weight);
+                   font-size: var(--type-caption-md-size); line-height: var(--type-caption-md-lh);
+                   color: var(--color-text-tertiary); }
+
+.type-caption-up { font-family: var(--font-body); font-weight: 700;
+                   font-size: var(--type-caption-up-size); line-height: var(--type-caption-up-lh);
+                   letter-spacing: var(--type-caption-up-tracking);
+                   text-transform: uppercase; color: var(--color-text-tertiary); }
+
+.type-button-lg  { font-family: var(--font-body); font-weight: var(--type-button-lg-weight);
+                   font-size: var(--type-button-lg-size); line-height: var(--type-button-lg-lh);
+                   letter-spacing: -0.02em; }
+
+.type-button-sm  { font-family: var(--font-body); font-weight: var(--type-button-sm-weight);
+                   font-size: var(--type-button-sm-size); line-height: var(--type-button-sm-lh);
+                   letter-spacing: -0.02em; }
+
+code, pre, .type-code { font-family: var(--font-mono);
+                        font-size: var(--type-code-size); line-height: var(--type-code-lh);
+                        color: var(--color-text-primary); }
+
+a, .type-link { color: var(--color-text-action); text-decoration: none;
+                transition: color var(--dur-fast) var(--ease-out); }
+a:hover, .type-link:hover { color: var(--color-text-action-hover); }
+a:active, .type-link:active { color: var(--color-text-action-pressed); }

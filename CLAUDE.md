@@ -20,6 +20,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is a TypeScript library for Smarty address autocomplete and validation. The main entry point is the `SmartyAddress` class exported from `src/index.ts`.
 
+### Address Verification (in design)
+
+Verification (Smarty US/International Street API) is specced but not yet built. Source of truth:
+
+- `PRD-address-verification.md` — requirements; §7 is the locked result taxonomy.
+- `design/verification/` — interactive HTML/JS prototypes of the result UI. Open `Generic Result Surfacing.html` in a browser; read `chats/` for intent. `app/result-types.jsx` encodes the §7 taxonomy as data.
+
+These are prototypes to reimplement, not shippable code. Defer concrete config keys / service names until the engineering spike (PRD §12).
+
 ### Class-Based Service Architecture
 
 The codebase uses ES6 classes for all services. Each service extends `BaseService` from `src/services/BaseService.ts`, which provides:
