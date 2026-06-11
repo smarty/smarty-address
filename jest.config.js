@@ -15,4 +15,6 @@ export default {
 	},
 	setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
 	testMatch: ["**/?(*.)+(spec|test).[jt]s?(x)"],
+	// Playwright acceptance specs run under @playwright/test, not jest.
+	testPathIgnorePatterns: ["/node_modules/", "/acceptance/"],
 };

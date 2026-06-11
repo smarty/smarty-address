@@ -8,6 +8,11 @@ dist/
 .eslintcache
 .stylelintcache
 
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
 # Output of 'npm pack'
 *.tgz
 
