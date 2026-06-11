@@ -14,7 +14,7 @@ export interface FetchAutocompleteSuggestionsCallbacks {
 	onError: (errorMessage: string) => void;
 }
 
-const USER_AGENT = `name:smarty-address-plugin,version:${APP_VERSION}`;
+export const USER_AGENT = `name:smarty-address-plugin,version:${APP_VERSION}`;
 
 export const US_API_PARAM_MAP = {
 	maxResults: "max_results",

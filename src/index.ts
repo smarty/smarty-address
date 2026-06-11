@@ -2,6 +2,8 @@ import {
 	DefaultSmartyAddressConfig,
 	SmartyAddressConfig,
 	NormalizedSmartyAddressConfig,
+	CurrentAddress,
+	VerificationResult,
 } from "./interfaces";
 import { normalizeConfig } from "./utils/configNormalizer";
 import { ApiService } from "./services/ApiService";
@@ -13,8 +15,16 @@ import { FormatService } from "./services/FormatService";
 import { DomService } from "./services/DomService";
 import { KeyboardNavigationService } from "./services/KeyboardNavigationService";
 import { StyleService } from "./services/StyleService";
+import { VerificationService } from "./services/VerificationService";
+import { VerificationUiService } from "./services/VerificationUiService";
+import { VerificationOrchestrator } from "./services/VerificationOrchestrator";
 import { themes } from "./themes";
-import { defineStyles, validateConfig } from "./utils/appUtils";
+import {
+	defineStyles,
+	isAutocompleteEnabled,
+	isVerificationEnabled,
+	validateConfig,
+} from "./utils/appUtils";
 import { INTERNATIONAL_AUTOCOMPLETE_API_URL, US_AUTOCOMPLETE_PRO_API_URL } from "./constants";
 
 export default class SmartyAddress {
@@ -43,6 +53,8 @@ export default class SmartyAddress {
 		DomService,
 		KeyboardNavigationService,
 		StyleService,
+		VerificationService,
+		VerificationUiService,
 	};
 
 	private static instances: SmartyAddress[] = [];
@@ -57,6 +69,11 @@ export default class SmartyAddress {
 	private domService: DomService;
 	private keyboardNavigationService: KeyboardNavigationService;
 	private styleService: StyleService;
+	private verificationService: VerificationService;
+	private verificationUiService: VerificationUiService;
+	private verificationOrchestrator: VerificationOrchestrator;
+
+	private verificationActive = false;
 
 	static async create(config: SmartyAddressConfig): Promise<SmartyAddress> {
 		const instance = new SmartyAddress(config);
@@ -79,6 +96,9 @@ export default class SmartyAddress {
 		this.keyboardNavigationService = new svc.KeyboardNavigationService();
 		this.dropdownService = new svc.DropdownService(this.instanceId);
 		this.formService = new svc.FormService();
+		this.verificationService = new svc.VerificationService();
+		this.verificationUiService = new svc.VerificationUiService();
+		this.verificationOrchestrator = new VerificationOrchestrator();
 
 		const services = {
 			apiService: this.apiService,
@@ -90,6 +110,9 @@ export default class SmartyAddress {
 			domService: this.domService,
 			keyboardNavigationService: this.keyboardNavigationService,
 			styleService: this.styleService,
+			verificationService: this.verificationService,
+			verificationUiService: this.verificationUiService,
+			verificationOrchestrator: this.verificationOrchestrator,
 		};
 
 		Object.values(services).forEach((service) => service.setServices(services));
@@ -104,10 +127,39 @@ export default class SmartyAddress {
 
 		validateConfig(mergedConfig);
 
-		this.apiService.init(mergedConfig);
-		this.dropdownService.init(mergedConfig);
+		const autocompleteOn = isAutocompleteEnabled(mergedConfig);
+		const verificationOn = isVerificationEnabled(mergedConfig);
+
+		// Neither mode on → the plugin no-ops (PRD §4). validateConfig already warned.
+		if (!autocompleteOn && !verificationOn) return;
+
+		// FormService is shared: autocomplete populates through it and verification
+		// reads/round-trips corrections through it.
 		this.formService.init(mergedConfig);
+
+		if (autocompleteOn) {
+			this.apiService.init(mergedConfig);
+			this.dropdownService.init(mergedConfig);
+		}
+
+		if (verificationOn) {
+			this.verificationActive = true;
+			this.verificationUiService.init(mergedConfig);
+			this.verificationService.init(mergedConfig);
+			this.verificationOrchestrator.init(mergedConfig);
+		}
 	};
+
+	// Manual / standalone verification entry point (PRD §8, ERD §5.1).
+	async verify(
+		address?: CurrentAddress | Partial<CurrentAddress>,
+	): Promise<VerificationResult | null> {
+		if (!this.verificationActive) {
+			console.warn("SmartyAddress: verify() called but verification is not enabled.");
+			return null;
+		}
+		return this.verificationService.verify(address);
+	}
 
 	destroy(): void {
 		this.apiService.destroy();
@@ -119,6 +171,9 @@ export default class SmartyAddress {
 		this.domService.destroy();
 		this.keyboardNavigationService.destroy();
 		this.styleService.destroy();
+		this.verificationOrchestrator.destroy();
+		this.verificationService.destroy();
+		this.verificationUiService.destroy();
 
 		const index = SmartyAddress.instances.indexOf(this);
 		if (index > -1) {

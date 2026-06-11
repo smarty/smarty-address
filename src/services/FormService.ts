@@ -1,6 +1,11 @@
 import { BaseService } from "./BaseService";
-import { AutocompleteSuggestion, NormalizedSmartyAddressConfig } from "../interfaces";
+import {
+	AutocompleteSuggestion,
+	CurrentAddress,
+	NormalizedSmartyAddressConfig,
+} from "../interfaces";
 import { STATE_ABBREVIATIONS } from "../constants/stateAbbreviations";
+import { toSuggestion } from "../utils/currentAddress";
 
 export class FormService extends BaseService {
 	private streetSelector: string | null = null;
@@ -8,6 +13,7 @@ export class FormService extends BaseService {
 	private localitySelector: string | null = null;
 	private administrativeAreaSelector: string | null = null;
 	private postalCodeSelector: string | null = null;
+	private onPopulated: ((address: AutocompleteSuggestion) => void) | null = null;
 
 	init(config: NormalizedSmartyAddressConfig) {
 		this.streetSelector = config?.streetSelector ?? null;
@@ -15,6 +21,13 @@ export class FormService extends BaseService {
 		this.localitySelector = config?.localitySelector ?? null;
 		this.administrativeAreaSelector = config?.administrativeAreaSelector ?? null;
 		this.postalCodeSelector = config?.postalCodeSelector ?? null;
+	}
+
+	// The verification orchestrator subscribes here to fire the "selection"
+	// trigger after an address actually lands in the form (covers US multi-entry
+	// and the international detail flow, which both finish at populateFormWithAddress).
+	setOnPopulated(callback: ((address: AutocompleteSuggestion) => void) | null) {
+		this.onPopulated = callback;
 	}
 
 	getAdministrativeAreaValueForInput(element: HTMLElement, areaValue: string): string {
@@ -118,6 +131,11 @@ export class FormService extends BaseService {
 	}
 
 	populateFormWithAddress(selectedAddress: AutocompleteSuggestion) {
+		this.applyAddressToForm(selectedAddress);
+		this.onPopulated?.(selectedAddress);
+	}
+
+	private applyAddressToForm(selectedAddress: AutocompleteSuggestion) {
 		const domService = this.getService("domService");
 		const elements = {
 			streetInputElement: domService.findDomElement(this.streetSelector),
@@ -158,5 +176,41 @@ export class FormService extends BaseService {
 		if (elements.postalCodeInputElement) {
 			domService.setInputValue(elements.postalCodeInputElement, selectedAddress.postalCode);
 		}
+	}
+
+	// Corrections round-trip back through here (ERD §4.1, Q6). Maps the
+	// CurrentAddress onto the same population path autocomplete already uses.
+	// Does NOT fire onPopulated — a verification correction must not re-trigger
+	// the selection flow that produced it.
+	populateFormWithCurrentAddress(address: CurrentAddress) {
+		this.applyAddressToForm(toSuggestion(address));
+	}
+
+	// fromFormFields adapter (ERD §4.1, Q8). Reads the configured selectors into
+	// a CurrentAddress for the verification-only / free-form path, where no
+	// autocomplete suggestion exists.
+	readCurrentAddress(
+		country: string,
+		origin: CurrentAddress["origin"] = "free-form",
+	): CurrentAddress {
+		const domService = this.getService("domService");
+		const readValue = (selector: string | null): string => {
+			if (!selector) return "";
+			const element = domService.findDomElement(selector) as
+				| HTMLInputElement
+				| HTMLSelectElement
+				| null;
+			return element?.value?.trim() ?? "";
+		};
+
+		return {
+			street: readValue(this.streetSelector),
+			secondary: readValue(this.secondarySelector),
+			locality: readValue(this.localitySelector),
+			administrativeArea: readValue(this.administrativeAreaSelector),
+			postalCode: readValue(this.postalCodeSelector),
+			country,
+			origin,
+		};
 	}
 }

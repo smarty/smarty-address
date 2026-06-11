@@ -8,6 +8,9 @@ import type { FormatService } from "./FormatService";
 import type { DomService } from "./DomService";
 import type { KeyboardNavigationService } from "./KeyboardNavigationService";
 import type { StyleService } from "./StyleService";
+import type { VerificationService } from "./VerificationService";
+import type { VerificationUiService } from "./VerificationUiService";
+import type { VerificationOrchestrator } from "./VerificationOrchestrator";
 
 export interface ServiceDependencies {
 	apiService?: ApiService;
@@ -19,6 +22,9 @@ export interface ServiceDependencies {
 	domService?: DomService;
 	keyboardNavigationService?: KeyboardNavigationService;
 	styleService?: StyleService;
+	verificationService?: VerificationService;
+	verificationUiService?: VerificationUiService;
+	verificationOrchestrator?: VerificationOrchestrator;
 }
 
 export abstract class BaseService {

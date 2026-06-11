@@ -13,7 +13,31 @@ export class ConfigValidationError extends Error {
 	}
 }
 
+export const isAutocompleteEnabled = (config: NormalizedSmartyAddressConfig): boolean =>
+	config.autocomplete?.enabled ?? true;
+
+export const isVerificationEnabled = (config: NormalizedSmartyAddressConfig): boolean =>
+	config.verification?.enabled ?? true;
+
+// Behaviors / surfaces not yet shipped in the current release. Each list shrinks
+// as the corresponding epic lands (ERD §3.1 validation guard). Verification
+// config that requests an unbuilt capability gets a clear warning rather than a
+// silent no-op.
+const UNSUPPORTED_BEHAVIORS: string[] = ["block"]; // lifted in Epic 3
+const UNSUPPORTED_UI: string[] = ["panel"]; // lifted in Epic 2
+const UNSUPPORTED_RESULT_KEYS: string[] = ["ambiguous"]; // lifted in Epic 2
+
 export const validateConfig = (config: NormalizedSmartyAddressConfig): void => {
+	const autocompleteOn = isAutocompleteEnabled(config);
+	const verificationOn = isVerificationEnabled(config);
+
+	if (!autocompleteOn && !verificationOn) {
+		console.warn(
+			"SmartyAddress: neither autocomplete nor verification is enabled; the plugin will not initialize.",
+		);
+		return;
+	}
+
 	const errors: string[] = [];
 
 	const isEmbeddedKeyMissing =
@@ -36,6 +60,33 @@ export const validateConfig = (config: NormalizedSmartyAddressConfig): void => {
 
 	if (errors.length > 0) {
 		throw new ConfigValidationError(`SmartyAddress configuration error:\n- ${errors.join("\n- ")}`);
+	}
+
+	if (verificationOn) warnUnsupportedVerification(config.verification);
+};
+
+const warnUnsupportedVerification = (
+	verification: NormalizedSmartyAddressConfig["verification"],
+): void => {
+	if (!verification) return;
+
+	const warn = (message: string) =>
+		console.warn(
+			`SmartyAddress: ${message} is not yet supported in this version and will be ignored.`,
+		);
+
+	if (verification.ui && UNSUPPORTED_UI.includes(verification.ui)) {
+		warn(`verification.ui "${verification.ui}"`);
+	}
+
+	const onResult = verification.onResult ?? {};
+	for (const [resultKey, behavior] of Object.entries(onResult)) {
+		if (UNSUPPORTED_RESULT_KEYS.includes(resultKey)) {
+			warn(`verification.onResult.${resultKey}`);
+		}
+		if (behavior && UNSUPPORTED_BEHAVIORS.includes(behavior)) {
+			warn(`verification behavior "${behavior}"`);
+		}
 	}
 };
 

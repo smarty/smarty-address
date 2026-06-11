@@ -18,6 +18,19 @@ export const CSS_CLASSES = {
 	showAllSecondaries: "smartyAddress__showAllSecondaries",
 	colorDynamic: "smartyAddress__color_dynamic",
 	positionDynamic: "smartyAddress__position_dynamic",
+
+	verifyVars: "smartyAddress__verify_default",
+	verifyAnnouncer: "smartyAddress__verifyAnnouncer",
+	verifyBadge: "smartyAddress__verifyBadge",
+	verifyBadgePositive: "smartyAddress__verifyBadge_positive",
+	verifyBadgeWarning: "smartyAddress__verifyBadge_warning",
+	verifyBadgeNegative: "smartyAddress__verifyBadge_negative",
+	verifyPanel: "smartyAddress__verifyPanel",
+	verifyPanelMessage: "smartyAddress__verifyPanelMessage",
+	verifyPanelActions: "smartyAddress__verifyPanelActions",
+	verifyPanelButton: "smartyAddress__verifyPanelButton",
+	verifyChooser: "smartyAddress__verifyChooser",
+	verifyChooserOption: "smartyAddress__verifyChooserOption",
 } as const;
 
 export const CSS_PREFIXES = {

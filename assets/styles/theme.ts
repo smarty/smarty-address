@@ -129,4 +129,28 @@ export const themeStyles = {
 	".smartyAddress__smartyLogoLight": {
 		display: "var(--smartyAddress__logoLightDisplay)",
 	},
+
+	".smartyAddress__verifyBadge": {
+		display: "var(--smartyAddress__verifyBadgeDisplay)",
+		"align-items": "var(--smartyAddress__verifyBadgeAlignItems)",
+		gap: "var(--smartyAddress__verifyBadgeGap)",
+		"font-size": "var(--smartyAddress__verifyBadgeFontSize)",
+		"font-weight": "var(--smartyAddress__verifyBadgeFontWeight)",
+		padding: "var(--smartyAddress__verifyBadgePadding)",
+		"border-radius": "var(--smartyAddress__verifyBadgeRadius)",
+		"background-color": "var(--smartyAddress__verifyBadgeBg)",
+		color: "var(--smartyAddress__verifyBadgeText)",
+	},
+
+	".smartyAddress__verifyBadge_positive": {
+		color: "var(--smartyAddress__verifyPositive)",
+	},
+
+	".smartyAddress__verifyBadge_warning": {
+		color: "var(--smartyAddress__verifyWarning)",
+	},
+
+	".smartyAddress__verifyBadge_negative": {
+		color: "var(--smartyAddress__verifyNegative)",
+	},
 };
