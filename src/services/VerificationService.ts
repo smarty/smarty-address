@@ -3,6 +3,8 @@ import { fetchStreetJson, StreetApiError } from "./http/streetTransport";
 import { computeDiff, fingerprint, fromSuggestion } from "../utils/currentAddress";
 import {
 	defaultVerificationConfig,
+	INTERNATIONAL_MIN_VERIFIED_PRECISION,
+	INTERNATIONAL_PRECISION_RANK,
 	INTERNATIONAL_STREET_API_URL,
 	US_CORRECTION_FOOTNOTE_CLASSES,
 	US_COUNTRY_CODES,
@@ -49,6 +51,56 @@ interface UsStreetCandidate {
 	components?: UsStreetComponents;
 	analysis?: UsStreetAnalysis;
 }
+
+interface InternationalChanges {
+	sub_building?: string;
+	[component: string]: string | undefined;
+}
+
+interface InternationalAnalysis {
+	verification_status?: string;
+	address_precision?: string;
+	max_address_precision?: string;
+	changes?: InternationalChanges;
+}
+
+interface InternationalComponents {
+	thoroughfare?: string;
+	premise?: string;
+	sub_building?: string;
+	locality?: string;
+	administrative_area?: string;
+	postal_code?: string;
+	country_iso3?: string;
+}
+
+interface InternationalStreetCandidate {
+	address1?: string;
+	address2?: string;
+	components?: InternationalComponents;
+	analysis?: InternationalAnalysis;
+}
+
+const INTL_CORRECTION_CHANGES = ["Verified-SmallChange", "Added"];
+
+const precisionRank = (precision: string | undefined): number => {
+	const index = INTERNATIONAL_PRECISION_RANK.indexOf(precision ?? "None");
+	return index === -1 ? 0 : index;
+};
+
+// Q10 / ERD §5.4 — "verified" means reaching the country's max precision, not a
+// hard DeliveryPoint. Compare to the per-response max_address_precision; fall
+// back to a fixed minimum when the response omits it.
+const reachedCountryMaxPrecision = (analysis: InternationalAnalysis): boolean => {
+	if (analysis.max_address_precision) {
+		return (
+			precisionRank(analysis.address_precision) >= precisionRank(analysis.max_address_precision)
+		);
+	}
+	return (
+		precisionRank(analysis.address_precision) >= precisionRank(INTERNATIONAL_MIN_VERIFIED_PRECISION)
+	);
+};
 
 interface EffectiveVerificationConfig {
 	enabled: boolean;
@@ -296,9 +348,8 @@ export class VerificationService extends BaseService {
 		if (result.corrected) this.verifiedFingerprints.add(fingerprint(result.corrected));
 	}
 
-	// Overridden / gated in Epic 4.
 	protected internationalEnabled(): boolean {
-		return false;
+		return true;
 	}
 
 	private isEmptyAddress(address: CurrentAddress): boolean {
@@ -322,11 +373,26 @@ export class VerificationService extends BaseService {
 		return fetchStreetJson<UsStreetCandidate[]>(this.usStreetApiUrl, params, this.fetchFn);
 	}
 
-	// Implemented in Epic 4.
-	protected async fetchInternational(_entered: CurrentAddress): Promise<unknown> {
-		throw new StreetApiError(
-			"unknown",
-			`International verification (${this.internationalStreetApiUrl}) is not implemented in this release.`,
+	// International ordering (ERD §5.3): in "both" mode the autocomplete detail
+	// fetch has already populated full components into the CurrentAddress before
+	// this runs, so verify always has complete components to send.
+	protected async fetchInternational(
+		entered: CurrentAddress,
+	): Promise<InternationalStreetCandidate[]> {
+		const params: Record<string, string> = {
+			key: this.embeddedKey,
+			country: entered.country,
+		};
+		if (entered.street) params.address1 = entered.street;
+		if (entered.secondary) params.address2 = entered.secondary;
+		if (entered.locality) params.locality = entered.locality;
+		if (entered.administrativeArea) params.administrative_area = entered.administrativeArea;
+		if (entered.postalCode) params.postal_code = entered.postalCode;
+
+		return fetchStreetJson<InternationalStreetCandidate[]>(
+			this.internationalStreetApiUrl,
+			params,
+			this.fetchFn,
 		);
 	}
 
@@ -387,9 +453,81 @@ export class VerificationService extends BaseService {
 		return this.makeResult("undeliverable", entered, null, null, "us", first);
 	}
 
-	// Implemented in Epic 4.
-	protected classifyInternational(_raw: unknown, entered: CurrentAddress): VerificationResult {
-		return this.makeResult("error", entered, null, null, "international");
+	// International branch (ERD §5.4). Same VerificationResultKey outputs as US;
+	// only the input signals differ. Type 5 (flagged) is USPS-specific and never
+	// fires here.
+	protected classifyInternational(raw: unknown, entered: CurrentAddress): VerificationResult {
+		const candidates = (raw as InternationalStreetCandidate[]) ?? [];
+		const first = candidates[0];
+		if (!first) return this.makeResult("undeliverable", entered, null, null, "international");
+
+		const analysis = first.analysis ?? {};
+		const status = analysis.verification_status ?? "";
+		const corrected = this.intlCandidateToAddress(first, entered);
+		const diff = computeDiff(entered, corrected);
+
+		if (status === "None" || analysis.address_precision === "None") {
+			return this.makeResult("undeliverable", entered, null, null, "international", first);
+		}
+
+		if (status === "Ambiguous" || candidates.length > 1) {
+			const candidateAddresses = candidates.map((candidate) =>
+				this.intlCandidateToAddress(candidate, entered),
+			);
+			const result = this.makeResult("ambiguous", entered, null, null, "international", candidates);
+			result.candidates = candidateAddresses;
+			return result;
+		}
+
+		const changes = analysis.changes ?? {};
+		if (changes.sub_building === "Unrecognized") {
+			return this.makeResult(
+				"secondaryNotMatched",
+				entered,
+				corrected,
+				diff,
+				"international",
+				first,
+			);
+		}
+
+		const subBuildingAbsent = !corrected.secondary && !changes.sub_building;
+		if (status === "Partial" && analysis.address_precision === "Premise" && subBuildingAbsent) {
+			return this.makeResult("missingSecondary", entered, corrected, diff, "international", first);
+		}
+
+		if (status === "Verified") {
+			const hasCorrection = Object.values(changes).some((change) =>
+				INTL_CORRECTION_CHANGES.includes(change ?? ""),
+			);
+			if (hasCorrection || diff) {
+				return this.makeResult("corrected", entered, corrected, diff, "international", first);
+			}
+			if (reachedCountryMaxPrecision(analysis)) {
+				return this.makeResult("verified", entered, corrected, null, "international", first);
+			}
+			// Verified status but below the country's max precision — treat as
+			// missing detail rather than verified (Q10 boundary).
+			return this.makeResult("missingSecondary", entered, corrected, diff, "international", first);
+		}
+
+		return this.makeResult("undeliverable", entered, null, null, "international", first);
+	}
+
+	private intlCandidateToAddress(
+		candidate: InternationalStreetCandidate,
+		entered: CurrentAddress,
+	): CurrentAddress {
+		const components = candidate.components ?? {};
+		return {
+			street: candidate.address1 ?? components.thoroughfare ?? entered.street,
+			secondary: components.sub_building ?? "",
+			locality: components.locality ?? entered.locality,
+			administrativeArea: components.administrative_area ?? entered.administrativeArea,
+			postalCode: components.postal_code ?? entered.postalCode,
+			country: components.country_iso3 ?? entered.country,
+			origin: "verification",
+		};
 	}
 
 	private usCandidateToAddress(

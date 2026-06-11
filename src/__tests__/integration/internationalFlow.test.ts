@@ -91,6 +91,7 @@ describe("Integration: International Address Flow", () => {
 		instance = await SmartyAddress.create({
 			_testMode: true,
 			embeddedKey: "test-key",
+			verification: { enabled: false },
 			country: "CAN",
 			streetSelector: "#street",
 		});
@@ -131,6 +132,7 @@ describe("Integration: International Address Flow", () => {
 		instance = await SmartyAddress.create({
 			_testMode: true,
 			embeddedKey: "test-key",
+			verification: { enabled: false },
 			country: "CAN",
 			streetSelector: "#street",
 			localitySelector: "#city",
@@ -196,6 +198,7 @@ describe("Integration: International Address Flow", () => {
 		instance = await SmartyAddress.create({
 			_testMode: true,
 			embeddedKey: "test-key",
+			verification: { enabled: false },
 			country: "CAN",
 			streetSelector: "#street",
 			localitySelector: "#city",
@@ -241,6 +244,7 @@ describe("Integration: International Address Flow", () => {
 		instance = await SmartyAddress.create({
 			_testMode: true,
 			embeddedKey: "test-key",
+			verification: { enabled: false },
 			country: "GBR",
 			streetSelector: "#street",
 		});
@@ -269,6 +273,7 @@ describe("Integration: International Address Flow", () => {
 		instance = await SmartyAddress.create({
 			_testMode: true,
 			embeddedKey: "test-key",
+			verification: { enabled: false },
 			country: "MEX",
 			streetSelector: "#street",
 		});
@@ -328,6 +333,7 @@ describe("Integration: International Address Flow", () => {
 		instance = await SmartyAddress.create({
 			_testMode: true,
 			embeddedKey: "test-key",
+			verification: { enabled: false },
 			countrySelector: "#country",
 			streetSelector: "#street",
 			localitySelector: "#city",
@@ -365,6 +371,7 @@ describe("Integration: International Address Flow", () => {
 		instance = await SmartyAddress.create({
 			_testMode: true,
 			embeddedKey: "test-key",
+			verification: { enabled: false },
 			country: "CAN",
 			streetSelector: "#street",
 			localitySelector: "#city",
@@ -397,6 +404,7 @@ describe("Integration: International Address Flow", () => {
 		instance = await SmartyAddress.create({
 			_testMode: true,
 			embeddedKey: "test-key",
+			verification: { enabled: false },
 			country: "FRA",
 			streetSelector: "#street",
 			localitySelector: "#city",
