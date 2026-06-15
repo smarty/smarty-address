@@ -185,6 +185,56 @@ describe("VerificationService dispatch + behavior", () => {
 		await verificationService.verifyCurrent("manual");
 		expect(document.querySelector(".smartyAddress__verifyBadge")).toBeNull();
 	});
+
+	it("prompt: a reject decision leaves the entered address untouched (nothing applied before the hook)", async () => {
+		const onCorrectionOffered = jest.fn().mockResolvedValue({ action: "reject" });
+		const { verificationService } = setup({
+			onResult: { corrected: "prompt" },
+			onCorrectionOffered,
+		});
+		verificationService.setFetch(okFetch([correctedCandidate]));
+
+		await verificationService.verifyCurrent("manual");
+
+		expect(onCorrectionOffered).toHaveBeenCalled();
+		expect((document.querySelector("#zip") as HTMLInputElement).value).toBe("84604");
+	});
+
+	it("prompt: an accept decision applies the correction", async () => {
+		const onCorrectionOffered = jest.fn().mockResolvedValue({ action: "accept" });
+		const { verificationService } = setup({
+			onResult: { corrected: "prompt" },
+			onCorrectionOffered,
+		});
+		verificationService.setFetch(okFetch([correctedCandidate]));
+
+		await verificationService.verifyCurrent("manual");
+
+		expect((document.querySelector("#zip") as HTMLInputElement).value).toBe("84604-4405");
+	});
+
+	it("type 4 prompt keeps the entered unit instead of overwriting it (PRD §7 row 4)", async () => {
+		const { verificationService } = setup();
+		(document.querySelector("#secondary") as HTMLInputElement).value = "Apt 9";
+		verificationService.setFetch(okFetch([badSecondaryCandidate]));
+
+		const result = await verificationService.verifyCurrent("manual");
+
+		expect(result?.type).toBe("secondaryNotMatched");
+		expect((document.querySelector("#secondary") as HTMLInputElement).value).toBe("Apt 9");
+	});
+
+	it("nonBlocking reflects a block override on type 7", async () => {
+		const { verificationService } = setup({ onResult: { undeliverable: "block" } });
+		verificationService.setFetch(okFetch([undeliverableCandidate]));
+		const result = await verificationService.verifyCurrent("manual");
+		expect(result?.nonBlocking).toBe(false);
+	});
+
+	it("drops a disallowed onResult override instead of dispatching it", () => {
+		const { verificationService } = setup({ onResult: { verified: "block" } } as never);
+		expect(verificationService.getEffectiveConfig().onResult.verified).toBe("silent");
+	});
 });
 
 describe("VerificationService dedupe + staleness", () => {
@@ -193,10 +243,10 @@ describe("VerificationService dedupe + staleness", () => {
 		const { verificationService } = setup();
 		verificationService.setFetch(fetchFn as unknown as typeof fetch);
 
-		await verificationService.verifyCurrent("selection");
+		const first = await verificationService.verifyCurrent("selection");
 		const second = await verificationService.verifyCurrent("blur");
 
-		expect(second).toBeNull();
+		expect(second).toBe(first);
 		expect(fetchFn).toHaveBeenCalledTimes(1);
 	});
 
@@ -212,15 +262,28 @@ describe("VerificationService dedupe + staleness", () => {
 		expect(fetchFn).toHaveBeenCalledTimes(2);
 	});
 
+	it("sets verifiedAt on a successful verify and clears it on staleness", async () => {
+		const { verificationService } = setup();
+		verificationService.setFetch(okFetch([verifiedCandidate]));
+
+		const result = await verificationService.verifyCurrent("manual");
+		expect(typeof result?.entered.verifiedAt).toBe("number");
+		expect(typeof result?.corrected?.verifiedAt).toBe("number");
+
+		verificationService.markStale();
+		expect(result?.entered.verifiedAt).toBeUndefined();
+		expect(result?.corrected?.verifiedAt).toBeUndefined();
+	});
+
 	it("tracks the corrected fingerprint so a follow-up blur on corrected values is deduped", async () => {
 		const fetchFn = jest.fn(okFetch([correctedCandidate]));
 		const { verificationService } = setup();
 		verificationService.setFetch(fetchFn as unknown as typeof fetch);
 
-		await verificationService.verifyCurrent("selection"); // applies 84604-4405 to the form
+		const first = await verificationService.verifyCurrent("selection"); // applies 84604-4405 to the form
 		const second = await verificationService.verifyCurrent("blur"); // reads corrected values
 
-		expect(second).toBeNull();
+		expect(second).toBe(first);
 		expect(fetchFn).toHaveBeenCalledTimes(1);
 	});
 });

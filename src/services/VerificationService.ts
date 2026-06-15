@@ -2,6 +2,7 @@ import { BaseService } from "./BaseService";
 import { fetchStreetJson, StreetApiError } from "./http/streetTransport";
 import { computeDiff, fingerprint, fromSuggestion } from "../utils/currentAddress";
 import {
+	ALLOWED_RESULT_BEHAVIORS,
 	defaultVerificationConfig,
 	INTERNATIONAL_MIN_VERIFIED_PRECISION,
 	INTERNATIONAL_PRECISION_RANK,
@@ -97,6 +98,10 @@ const reachedCountryMaxPrecision = (analysis: InternationalAnalysis): boolean =>
 			precisionRank(analysis.address_precision) >= precisionRank(analysis.max_address_precision)
 		);
 	}
+	console.warn(
+		"SmartyAddress: international response omitted max_address_precision; " +
+			`treating address_precision >= ${INTERNATIONAL_MIN_VERIFIED_PRECISION} as verified for this country.`,
+	);
 	return (
 		precisionRank(analysis.address_precision) >= precisionRank(INTERNATIONAL_MIN_VERIFIED_PRECISION)
 	);
@@ -161,7 +166,7 @@ export class VerificationService extends BaseService {
 
 	private effective: EffectiveVerificationConfig = this.buildEffectiveConfig({});
 
-	private inFlightFingerprint: string | null = null;
+	private inFlight: { fp: string; promise: Promise<VerificationResult> } | null = null;
 	private verifiedFingerprints = new Set<string>();
 	private stale = false;
 	private lastResult: VerificationResult | null = null;
@@ -179,7 +184,7 @@ export class VerificationService extends BaseService {
 	}
 
 	destroy() {
-		this.inFlightFingerprint = null;
+		this.inFlight = null;
 		this.verifiedFingerprints.clear();
 		this.lastResult = null;
 		this.stale = false;
@@ -199,10 +204,19 @@ export class VerificationService extends BaseService {
 	}
 
 	private buildEffectiveConfig(verification: VerificationConfig): EffectiveVerificationConfig {
+		// Disallowed per-type overrides are dropped (validateConfig already warned)
+		// so dispatch never acts on a behavior the type doesn't support (ERD §3.1).
+		const allowedOverrides = Object.fromEntries(
+			Object.entries(verification.onResult ?? {}).filter(([type, behavior]) =>
+				ALLOWED_RESULT_BEHAVIORS[type as VerificationResultKey]?.includes(
+					behavior as VerificationBehavior,
+				),
+			),
+		);
 		return {
 			enabled: verification.enabled ?? defaultVerificationConfig.enabled,
 			trigger: verification.trigger ?? defaultVerificationConfig.trigger,
-			onResult: { ...defaultVerificationConfig.onResult, ...verification.onResult },
+			onResult: { ...defaultVerificationConfig.onResult, ...allowedOverrides },
 			ui: verification.ui ?? defaultVerificationConfig.ui,
 			failureMode: verification.failureMode ?? defaultVerificationConfig.failureMode,
 			fieldLevelHighlighting:
@@ -264,8 +278,12 @@ export class VerificationService extends BaseService {
 	// address, applies the configured block / fail-closed policy, then lets an
 	// onBeforeSubmit hook have the final say.
 	async verifyBeforeSubmit(): Promise<boolean> {
-		const fresh = await this.verifyCurrent("submit");
-		const result = fresh ?? this.lastResult;
+		const country = this.resolveCountry();
+		const entered = this.getService("formService").readCurrentAddress(country);
+		const fresh = await this.runFlow(entered, "submit");
+		// An empty form has nothing to gate on — never fall back to a previous
+		// address's result there.
+		const result = fresh ?? (this.isEmptyAddress(entered) ? null : this.lastResult);
 
 		let allow = this.resolveSubmitDecision(result);
 		const hook = this.effective.hooks.onBeforeSubmit;
@@ -320,25 +338,40 @@ export class VerificationService extends BaseService {
 		}
 
 		const fp = fingerprint(entered);
-		if (fp === this.inFlightFingerprint) return null;
-		if (!this.stale && this.verifiedFingerprints.has(fp)) return null;
+		// A concurrent trigger on the same address shares the in-flight call
+		// instead of getting null — a submit racing a blur verify must wait for
+		// the real result, or `block` silently fails open (ERD §6).
+		if (this.inFlight?.fp === fp) return this.inFlight.promise;
+		if (!this.stale && this.verifiedFingerprints.has(fp)) return this.lastResult;
 
-		this.inFlightFingerprint = fp;
+		const core = this.verifyCore(entered, international);
+		this.inFlight = { fp, promise: core };
 		let result: VerificationResult;
+		try {
+			result = await core;
+		} finally {
+			if (this.inFlight?.promise === core) this.inFlight = null;
+		}
+		if (result.type !== "error") await this.dispatch(result, trigger);
+		return result;
+	}
+
+	// Fetch + classify + record: the portion shared with concurrent same-address
+	// triggers. Dispatch (UI + hooks) runs once, in the initiating caller.
+	private async verifyCore(
+		entered: CurrentAddress,
+		international: boolean,
+	): Promise<VerificationResult> {
 		try {
 			const raw = international
 				? await this.fetchInternational(entered)
 				: await this.fetchUs(entered);
-			result = this.classify(raw, entered);
+			const result = this.classify(raw, entered);
+			this.recordVerified(entered, result);
+			return result;
 		} catch (error) {
-			this.inFlightFingerprint = null;
 			return this.handleError(error, entered, international);
 		}
-		this.inFlightFingerprint = null;
-
-		this.recordVerified(entered, result);
-		await this.dispatch(result, trigger);
-		return result;
 	}
 
 	private recordVerified(entered: CurrentAddress, result: VerificationResult): void {
@@ -346,6 +379,10 @@ export class VerificationService extends BaseService {
 		this.stale = false;
 		this.verifiedFingerprints = new Set([fingerprint(entered)]);
 		if (result.corrected) this.verifiedFingerprints.add(fingerprint(result.corrected));
+
+		const verifiedAt = Date.now();
+		result.entered.verifiedAt = verifiedAt;
+		if (result.corrected) result.corrected.verifiedAt = verifiedAt;
 	}
 
 	protected internationalEnabled(): boolean {
@@ -470,7 +507,9 @@ export class VerificationService extends BaseService {
 			return this.makeResult("undeliverable", entered, null, null, "international", first);
 		}
 
-		if (status === "Ambiguous" || candidates.length > 1) {
+		// Unlike the US branch, multiple candidates alone do not signal ambiguity
+		// internationally — only verification_status does (PRD §7 row 6).
+		if (status === "Ambiguous") {
 			const candidateAddresses = candidates.map((candidate) =>
 				this.intlCandidateToAddress(candidate, entered),
 			);
@@ -500,7 +539,7 @@ export class VerificationService extends BaseService {
 			const hasCorrection = Object.values(changes).some((change) =>
 				INTL_CORRECTION_CHANGES.includes(change ?? ""),
 			);
-			if (hasCorrection || diff) {
+			if (hasCorrection) {
 				return this.makeResult("corrected", entered, corrected, diff, "international", first);
 			}
 			if (reachedCountryMaxPrecision(analysis)) {
@@ -567,10 +606,19 @@ export class VerificationService extends BaseService {
 			entered,
 			corrected,
 			diff,
-			nonBlocking: NON_BLOCKING_TYPES.includes(type),
+			nonBlocking: this.isNonBlocking(type),
 			raw,
 			source,
 		};
+	}
+
+	// Types 5/7/8 never gate submit by default (ERD §4) — unless the configured
+	// behavior says otherwise (block override on type 7, fail-closed on type 8).
+	// The field must agree with what resolveSubmitDecision will actually do.
+	private isNonBlocking(type: VerificationResultKey): boolean {
+		if (type === "error") return this.effective.failureMode !== "fail-closed";
+		if (!NON_BLOCKING_TYPES.includes(type)) return false;
+		return this.behaviorFor(type) !== "block";
 	}
 
 	// --- Dispatch ----------------------------------------------------------
@@ -581,7 +629,6 @@ export class VerificationService extends BaseService {
 
 	private async dispatch(result: VerificationResult, _trigger: VerificationTrigger): Promise<void> {
 		const behavior = this.behaviorFor(result.type);
-		this.applyBehavior(result, behavior);
 
 		const offersCorrection = (
 			[
@@ -592,7 +639,10 @@ export class VerificationService extends BaseService {
 			] as VerificationResultKey[]
 		).includes(result.type);
 
-		// A customer hook returning a decision overrides the built-in UI (ERD §7).
+		// A customer hook returning a decision overrides the built-in apply AND
+		// the built-in UI (ERD §7). It must run before anything touches the form,
+		// so a "reject" decision leaves the entered address exactly as the user
+		// typed it (ERD §5.5 — prompt awaits the decision).
 		if (behavior === "prompt" && offersCorrection && this.effective.hooks.onCorrectionOffered) {
 			const decision = await this.effective.hooks.onCorrectionOffered(
 				result.diff ?? { changes: {}, changedFields: [] },
@@ -605,11 +655,15 @@ export class VerificationService extends BaseService {
 			}
 		}
 
+		this.applyBehavior(result, behavior);
 		this.renderResult(result, behavior);
 		await this.effective.hooks.onVerified?.(result);
 	}
 
 	private renderResult(result: VerificationResult, behavior: VerificationBehavior): void {
+		// "no-op beyond recording the result" (ERD §5.5) — no surface, no announce.
+		if (behavior === "ignore") return;
+
 		const ui = this.getService("verificationUiService");
 		const isChooser =
 			result.type === "ambiguous" && behavior === "prompt" && !!result.candidates?.length;
@@ -617,13 +671,28 @@ export class VerificationService extends BaseService {
 			ui.renderChooser(result, this.effective, (chosen) => this.applyToForm(chosen));
 			return;
 		}
+
+		const autoPicked = result.candidates?.[0];
+		if (result.type === "ambiguous" && behavior === "first-candidate" && autoPicked) {
+			// The auto-pick swapped the address; present it as a correction rather
+			// than asking the user to choose (PRD §7 — never a silent swap).
+			ui.render({ ...result, type: "corrected", corrected: autoPicked }, behavior, this.effective);
+			return;
+		}
+
 		ui.render(result, behavior, this.effective);
 	}
 
 	private applyBehavior(result: VerificationResult, behavior: VerificationBehavior): void {
 		if (behavior === "ignore" || behavior === "block") return;
 
-		if (behavior === "apply-primary" && result.corrected) {
+		// An unconfirmed unit must never be dropped (PRD §7 row 4): both the
+		// explicit apply-primary override and the default prompt on type 4 apply
+		// the corrected primary while keeping the user's entered secondary.
+		const keepsEnteredUnit =
+			behavior === "apply-primary" ||
+			(behavior === "prompt" && result.type === "secondaryNotMatched");
+		if (keepsEnteredUnit && result.corrected) {
 			this.applyToForm({ ...result.corrected, secondary: result.entered.secondary });
 			return;
 		}
@@ -658,6 +727,11 @@ export class VerificationService extends BaseService {
 		} finally {
 			this.applyingCorrection = false;
 		}
+		// What we just wrote into the form is verified by construction — record
+		// it so the blur that follows a chooser pick / first-candidate apply /
+		// hook decision doesn't fire a redundant billable call (ERD §5.6).
+		this.verifiedFingerprints.add(fingerprint(address));
+		this.stale = false;
 	}
 
 	private async handleError(
@@ -681,7 +755,6 @@ export class VerificationService extends BaseService {
 			international ? "international" : "us",
 			error,
 		);
-		result.nonBlocking = failureMode === "fail-open";
 		this.lastResult = result;
 
 		this.getService("verificationUiService").render(result, "ignore", this.effective);
@@ -703,6 +776,10 @@ export class VerificationService extends BaseService {
 		if (this.verifiedFingerprints.size === 0) return;
 		this.stale = true;
 		this.verifiedFingerprints.clear();
+		if (this.lastResult) {
+			delete this.lastResult.entered.verifiedAt;
+			if (this.lastResult.corrected) delete this.lastResult.corrected.verifiedAt;
+		}
 		this.getService("verificationUiService").clear();
 	}
 }

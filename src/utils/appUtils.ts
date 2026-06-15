@@ -4,7 +4,12 @@ import { colorStyles } from "../../assets/styles/colors";
 import { miscStyles } from "../../assets/styles/misc";
 import { spacingStyles } from "../../assets/styles/spacing";
 import { StyleService } from "../services/StyleService";
-import { NormalizedSmartyAddressConfig } from "../interfaces";
+import {
+	NormalizedSmartyAddressConfig,
+	VerificationBehavior,
+	VerificationResultKey,
+} from "../interfaces";
+import { ALLOWED_RESULT_BEHAVIORS } from "../constants";
 
 export class ConfigValidationError extends Error {
 	constructor(message: string) {
@@ -87,7 +92,23 @@ const warnUnsupportedVerification = (
 		if (behavior && UNSUPPORTED_BEHAVIORS.includes(behavior)) {
 			warn(`verification behavior "${behavior}"`);
 		}
+		warnDisallowedOverride(resultKey, behavior);
 	}
+};
+
+// ERD §3.1's allowed-overrides column is the canonical contract; an override
+// outside it is dropped by the dispatcher, so say so instead of silently
+// accepting config that does nothing (or worse — `verified: "block"`).
+const warnDisallowedOverride = (resultKey: string, behavior: string | undefined): void => {
+	const allowed = ALLOWED_RESULT_BEHAVIORS[resultKey as VerificationResultKey];
+	if (!behavior || !allowed || allowed.includes(behavior as VerificationBehavior)) return;
+	const reason =
+		resultKey === "error"
+			? "type 8 is governed by verification.failureMode"
+			: `allowed values: ${allowed.join(", ")}`;
+	console.warn(
+		`SmartyAddress: verification.onResult.${resultKey}: "${behavior}" is not an allowed override (${reason}) and will be ignored.`,
+	);
 };
 
 export const defineStyles = () => {

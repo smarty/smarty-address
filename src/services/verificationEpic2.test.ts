@@ -114,6 +114,49 @@ describe("Epic 2 — ambiguous chooser (Type 6)", () => {
 		expect(document.querySelector(`.${CSS_CLASSES.verifyChooserOption}`)).toBeNull();
 	});
 
+	it("first-candidate presents the auto-pick as a correction, not as 'choose one'", async () => {
+		const { verificationService } = setup({ onResult: { ambiguous: "first-candidate" } });
+		verificationService.setFetch(okFetch(ambiguousCandidates));
+		await verificationService.verifyCurrent("manual");
+
+		const badge = document.querySelector(`.${CSS_CLASSES.verifyBadge}`);
+		expect(badge?.textContent).toBe("Adjusted");
+	});
+
+	it("ignore override records the result and renders nothing", async () => {
+		const { verificationService } = setup({ onResult: { ambiguous: "ignore" } });
+		verificationService.setFetch(okFetch(ambiguousCandidates));
+		const result = await verificationService.verifyCurrent("manual");
+
+		expect(result?.type).toBe("ambiguous");
+		expect(document.querySelector(`.${CSS_CLASSES.verifyChooser}`)).toBeNull();
+		expect(document.querySelector(`.${CSS_CLASSES.verifyBadge}`)).toBeNull();
+		expect(document.querySelector(`.${CSS_CLASSES.verifyPanel}`)).toBeNull();
+	});
+
+	it("a chooser pick is fingerprint-recorded so the follow-up blur is deduped", async () => {
+		const fetchFn = jest.fn(okFetch(ambiguousCandidates));
+		const { verificationService } = setup();
+		verificationService.setFetch(fetchFn as unknown as typeof fetch);
+		await verificationService.verifyCurrent("manual");
+
+		document.querySelectorAll<HTMLButtonElement>(`.${CSS_CLASSES.verifyChooserOption}`)[1].click();
+		await verificationService.verifyCurrent("blur");
+
+		expect(fetchFn).toHaveBeenCalledTimes(1);
+	});
+
+	it("aria-only renders no visible chooser, only the announcement", async () => {
+		const { verificationService } = setup({ ui: "aria-only" });
+		verificationService.setFetch(okFetch(ambiguousCandidates));
+		await verificationService.verifyCurrent("manual");
+
+		expect(document.querySelector(`.${CSS_CLASSES.verifyChooser}`)).toBeNull();
+		expect(document.querySelector(`.${CSS_CLASSES.verifyAnnouncer}`)?.textContent).toContain(
+			"More than one address",
+		);
+	});
+
 	it("a customer onCorrectionOffered decision overrides the built-in chooser", async () => {
 		const chosen = {
 			street: "120 N Center St",

@@ -1,4 +1,5 @@
 import { BaseService } from "./BaseService";
+import { REVALIDATE_DEBOUNCE_MS } from "../constants";
 import type {
 	AutocompleteSuggestion,
 	NormalizedSmartyAddressConfig,
@@ -14,6 +15,7 @@ export class VerificationOrchestrator extends BaseService {
 	private testMode = false;
 	private watchedSelectors: string[] = [];
 	private cleanups: Array<() => void> = [];
+	private revalidateTimer: ReturnType<typeof setTimeout> | null = null;
 
 	init(config: NormalizedSmartyAddressConfig) {
 		const verificationService = this.getService("verificationService");
@@ -30,14 +32,27 @@ export class VerificationOrchestrator extends BaseService {
 
 		if (this.triggers.includes("selection")) this.wireSelection();
 		if (this.triggers.includes("blur")) this.wireBlur();
-		if (this.triggers.includes("submit")) this.wireSubmit();
+		// Native interception attaches when the submit trigger is configured OR
+		// when any configured behavior can block (ERD §6: "when a real <form> is
+		// present and block is configured") — a block override must not silently
+		// fail to block just because the default triggers were kept.
+		if (this.triggers.includes("submit") || this.blockingConfigured()) this.wireSubmit();
 		this.wireStaleness();
 	}
 
 	destroy() {
 		this.cleanups.forEach((cleanup) => cleanup());
 		this.cleanups = [];
+		if (this.revalidateTimer) clearTimeout(this.revalidateTimer);
+		this.revalidateTimer = null;
 		this.getService("formService").setOnPopulated(null);
+	}
+
+	private blockingConfigured(): boolean {
+		const effective = this.getService("verificationService").getEffectiveConfig();
+		return (
+			Object.values(effective.onResult).includes("block") || effective.failureMode === "fail-closed"
+		);
 	}
 
 	private wireSelection(): void {
@@ -70,17 +85,27 @@ export class VerificationOrchestrator extends BaseService {
 		const verificationService = this.getService("verificationService");
 		let resubmitting = false;
 		const handler = async (event: Event) => {
-			if (resubmitting) {
-				resubmitting = false;
-				return;
-			}
+			if (resubmitting) return;
 			event.preventDefault();
 			const allow = await verificationService.verifyBeforeSubmit();
-			if (allow) {
-				resubmitting = true;
-				if (typeof form.requestSubmit === "function") form.requestSubmit();
-				else form.submit();
-			}
+			if (!allow) return;
+			// The re-submission MUST be deferred to a macrotask: a fast verify
+			// resolves in a microtask checkpoint *between listeners of the original
+			// submit event*, and the HTML form-submission algorithm silently ignores
+			// a nested requestSubmit on a form whose submit event is still
+			// dispatching — the submission would be lost. The flag is reset in the
+			// finally, not in the re-entrant handler, because requestSubmit may fire
+			// no event at all (constraint validation) — a stuck flag would skip the
+			// gate on the next genuine submit.
+			resubmitting = true;
+			setTimeout(() => {
+				try {
+					if (typeof form.requestSubmit === "function") form.requestSubmit();
+					else form.submit();
+				} finally {
+					resubmitting = false;
+				}
+			}, 0);
 		};
 		form.addEventListener("submit", handler, true);
 		this.cleanups.push(() => form.removeEventListener("submit", handler, true));
@@ -93,20 +118,34 @@ export class VerificationOrchestrator extends BaseService {
 		return element?.closest("form") ?? null;
 	}
 
-	// Invalidate-on-edit staleness (ERD §5.6, Q9). Only user-initiated edits
-	// count — programmatic corrections dispatch untrusted events.
+	// Staleness on edit (ERD §5.6, Q9). Only user-initiated edits count —
+	// programmatic corrections dispatch untrusted events. "invalidate" (default)
+	// clears the verified state and waits for the next configured trigger;
+	// "revalidate" additionally re-verifies after the user pauses typing.
 	private wireStaleness(): void {
-		if (this.staleness !== "invalidate") return;
 		const verificationService = this.getService("verificationService");
+		const revalidates = this.staleness === "revalidate";
 		this.forEachWatchedElement((element) => {
 			const handler = (event: Event) => {
 				if (verificationService.isApplyingCorrection()) return;
 				if (!event.isTrusted && !this.testMode) return;
 				verificationService.markStale();
+				if (revalidates) this.scheduleRevalidate();
 			};
 			element.addEventListener("input", handler);
 			this.cleanups.push(() => element.removeEventListener("input", handler));
 		});
+	}
+
+	// Debounced so revalidation never spends a billable call per keystroke —
+	// the exact risk the ERD flags for silent re-triggering.
+	private scheduleRevalidate(): void {
+		if (this.revalidateTimer) clearTimeout(this.revalidateTimer);
+		this.revalidateTimer = setTimeout(() => {
+			this.revalidateTimer = null;
+			if (!this.addressLooksComplete()) return;
+			void this.getService("verificationService").verifyCurrent("blur");
+		}, REVALIDATE_DEBOUNCE_MS);
 	}
 
 	private forEachWatchedElement(callback: (element: HTMLElement) => void): void {
@@ -122,6 +161,11 @@ export class VerificationOrchestrator extends BaseService {
 		const country = verificationService.resolveCountry();
 		const address = this.getService("formService").readCurrentAddress(country);
 		const hasStreet = !!address.street.trim();
+		// A single-field integration carries the whole address in the street
+		// input, so requiring separate region fields would leave the blur
+		// trigger permanently dead there (PRD §4 mode 2).
+		const isSingleFieldForm = this.watchedSelectors.length === 1;
+		if (isSingleFieldForm) return hasStreet;
 		const hasRegion =
 			!!address.postalCode.trim() ||
 			(!!address.locality.trim() && !!address.administrativeArea.trim());

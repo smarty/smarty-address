@@ -1,4 +1,4 @@
-import type { VerificationConfig } from "./interfaces";
+import type { VerificationBehavior, VerificationConfig, VerificationResultKey } from "./interfaces";
 
 export const APP_VERSION = "1.1.0";
 export const US_AUTOCOMPLETE_PRO_API_URL = "https://us-autocomplete-pro.api.smarty.com/lookup";
@@ -32,6 +32,25 @@ export const INTERNATIONAL_PRECISION_RANK = [
 	"DeliveryPoint",
 ];
 export const INTERNATIONAL_MIN_VERIFIED_PRECISION = "Premise";
+
+// How long after the last keystroke a `staleness: "revalidate"` re-verify
+// fires. Debounced so editing never spends a billable Street call per keystroke
+// (ERD §5.6 Q9).
+export const REVALIDATE_DEBOUNCE_MS = 800;
+
+// Per-type allowed behavior overrides (ERD §3.1 — the canonical contract).
+// Anything else is warned about by validateConfig and ignored by the
+// dispatcher. `error` accepts no override: Type 8 is governed by failureMode.
+export const ALLOWED_RESULT_BEHAVIORS: Record<VerificationResultKey, VerificationBehavior[]> = {
+	verified: ["silent"],
+	corrected: ["apply-and-notify", "silent", "prompt"],
+	missingSecondary: ["prompt", "ignore"],
+	secondaryNotMatched: ["prompt", "apply-primary", "ignore"],
+	flagged: ["warn", "silent"],
+	ambiguous: ["prompt", "first-candidate", "ignore"],
+	undeliverable: ["warn", "block", "silent"],
+	error: [],
+};
 
 // Provisional defaults (PRD §6). Every field is a one-line change so locking the
 // API does not lock the defaults. `enabled` is gated at Epic 5's public ship.

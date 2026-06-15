@@ -88,4 +88,33 @@ describe("validateConfig", () => {
 		const messages = warn.mock.calls.map((call) => String(call[0]));
 		expect(messages.some((m) => m.includes("not yet supported"))).toBe(false);
 	});
+
+	it("warns on an override outside the ERD §3.1 allowed list (e.g. verified: block)", () => {
+		validateConfig({
+			embeddedKey: "k",
+			streetSelector: "#s",
+			verification: { onResult: { verified: "block" } },
+		} as NormalizedSmartyAddressConfig);
+		expect(warn).toHaveBeenCalledWith(
+			expect.stringContaining('verification.onResult.verified: "block" is not an allowed override'),
+		);
+	});
+
+	it("warns that type 8 takes no override (governed by failureMode)", () => {
+		validateConfig({
+			embeddedKey: "k",
+			streetSelector: "#s",
+			verification: { onResult: { error: "silent" } },
+		} as never);
+		expect(warn).toHaveBeenCalledWith(expect.stringContaining("verification.failureMode"));
+	});
+
+	it("does not warn for allowed overrides", () => {
+		validateConfig({
+			embeddedKey: "k",
+			streetSelector: "#s",
+			verification: { onResult: { corrected: "silent", secondaryNotMatched: "apply-primary" } },
+		} as NormalizedSmartyAddressConfig);
+		expect(warn).not.toHaveBeenCalled();
+	});
 });

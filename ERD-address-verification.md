@@ -4,7 +4,7 @@
 **Source of truth:** `PRD-address-verification.md` (requirements) + `release-structure-address-verification.md` (sequencing). §-refs below point at the PRD unless prefixed `RS§` (release structure).
 **Scope of this doc:** the **engineering spike output** the PRD calls for in §12.3 / RS Epic 0 — exact config keys, types, hook contracts, the "current address" abstraction, submission-blocking strategy, staleness behavior, per-country threshold, and CSS variable list. It is the implementation plan that supersedes the scoping plan.
 
-> **What this doc is and isn't.** The PRD owns *what* and *why* (and is deliberately non-committal on UX and defaults until prototypes settle). This ERD owns *how*: concrete TypeScript surfaces, control flow, file-by-file changes, and the test matrix. Where the PRD marks something *provisional / TBD / deferred*, this doc encodes it as a **one-line-changeable constant or config default** (§2 goal: defaults are a one-line change) rather than hard-coding it — so locking the API does not require locking the defaults.
+> **What this doc is and isn't.** The PRD owns _what_ and _why_ (and is deliberately non-committal on UX and defaults until prototypes settle). This ERD owns _how_: concrete TypeScript surfaces, control flow, file-by-file changes, and the test matrix. Where the PRD marks something _provisional / TBD / deferred_, this doc encodes it as a **one-line-changeable constant or config default** (§2 goal: defaults are a one-line change) rather than hard-coding it — so locking the API does not require locking the defaults.
 
 ---
 
@@ -41,9 +41,9 @@ Shared transport is extracted into a thin internal helper rather than inherited,
 
 ### 1.2 New services registered (`SmartyAddress.services`, `src/index.ts`)
 
-| Service | Responsibility |
-|---|---|
-| `VerificationService` | Street API calls (US + Intl), response normalization, result **classification** into the §7 taxonomy, behavior dispatch, dedupe, staleness tracking. |
+| Service                 | Responsibility                                                                                                                                                |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `VerificationService`   | Street API calls (US + Intl), response normalization, result **classification** into the §7 taxonomy, behavior dispatch, dedupe, staleness tracking.          |
 | `VerificationUiService` | The optional UI surfaces (badge, aria-only, panel, ambiguous chooser). Themed via CSS variables. Follows `DropdownService` DOM-creation + `announce()` style. |
 
 Both are instantiated in the `SmartyAddress` constructor, wired via `setServices()`, and `init(mergedConfig)`'d in `SmartyAddress.init`, exactly like the existing nine services. `ServiceDependencies` (BaseService.ts) and `ServiceClassOverrides` (interfaces.ts) gain `verificationService?` / `VerificationService?` (+ UI) entries so the existing service-override mechanism (CLAUDE.md "Service Overrides") works for verification too.
@@ -55,8 +55,8 @@ Both are instantiated in the `SmartyAddress` constructor, wired via `setServices
 `SmartyAddress.init` resolves the three modes from config:
 
 ```ts
-const autocompleteOn = config.autocomplete?.enabled ?? true;       // provisional default §6
-const verificationOn  = config.verification?.enabled ?? true;       // PROVISIONAL — see §9 / RS Epic 5 gate
+const autocompleteOn = config.autocomplete?.enabled ?? true; // provisional default §6
+const verificationOn = config.verification?.enabled ?? true; // PROVISIONAL — see §9 / RS Epic 5 gate
 ```
 
 - **Neither on** → `validateConfig` warns (`console.warn`) and the plugin no-ops: no listeners attached, no services initialized beyond construction. (PRD §4 last paragraph.)
@@ -64,7 +64,7 @@ const verificationOn  = config.verification?.enabled ?? true;       // PROVISION
 - **Verification only** → `DropdownService` is **not** initialized; `VerificationService` + `VerificationUiService` init. No `address_id` anchor exists (Q8); verify operates on free-form/pasted field values.
 - **Both** → full path. Selection feeds `CurrentAddress`, which verification consumes.
 
-> **De-skew note (Q5, RS Epic 1).** Today the top-level config *is* the autocomplete config (`streetSelector`, `embeddedKey`, etc. live at the root — interfaces.ts). We introduce a nested `autocomplete` block AND keep every existing root key working as an alias. `normalizeConfig` (src/utils/configNormalizer) folds root-level autocomplete keys into `config.autocomplete.*`. **Additive only — no existing key is removed or repurposed.** This is the one structural change to the existing surface and it is backward-compatible.
+> **De-skew note (Q5, RS Epic 1).** Today the top-level config _is_ the autocomplete config (`streetSelector`, `embeddedKey`, etc. live at the root — interfaces.ts). We introduce a nested `autocomplete` block AND keep every existing root key working as an alias. `normalizeConfig` (src/utils/configNormalizer) folds root-level autocomplete keys into `config.autocomplete.*`. **Additive only — no existing key is removed or repurposed.** This is the one structural change to the existing surface and it is backward-compatible.
 
 ---
 
@@ -74,64 +74,77 @@ New `verification` block on `SmartyAddressConfig` (interfaces.ts). All keys opti
 
 ```ts
 export interface VerificationConfig {
-  enabled?: boolean;                       // provisional default true (§6, gated RS Epic 5)
+	enabled?: boolean; // provisional default true (§6, gated RS Epic 5)
 
-  // WHEN verification fires (§5 "Trigger", §6)
-  trigger?: VerificationTrigger[];          // default ["selection", "blur"]
-  // "selection" — after an autocomplete pick
-  // "blur"      — street/last field loses focus (handles free-form, §4 mode 2)
-  // "submit"    — pre-submit hook (Epic 3); await-able
-  // "manual"    — only via smartyAddress.verify()
+	// WHEN verification fires (§5 "Trigger", §6)
+	trigger?: VerificationTrigger[]; // default ["selection", "blur"]
+	// "selection" — after an autocomplete pick
+	// "blur"      — street/last field loses focus (handles free-form, §4 mode 2)
+	// "submit"    — pre-submit hook (Epic 3); await-able
+	// "manual"    — only via smartyAddress.verify()
 
-  // WHAT happens per result KIND (§7). Not one global switch.
-  onResult?: Partial<Record<VerificationResultKey, VerificationBehavior>>;
+	// WHAT happens per result KIND (§7). Not one global switch.
+	onResult?: Partial<Record<VerificationResultKey, VerificationBehavior>>;
 
-  // UI surface (§5 "UX surface", §6)
-  ui?: "none" | "aria-only" | "badge" | "panel";  // default per §6: badge/cue
+	// UI surface (§5 "UX surface", §6)
+	ui?: "none" | "aria-only" | "badge" | "panel"; // default per §6: badge/cue
 
-  failureMode?: "fail-open" | "fail-closed";       // default "fail-open" (§6)
-  fieldLevelHighlighting?: boolean;                // default false / atomic (§6)
+	failureMode?: "fail-open" | "fail-closed"; // default "fail-open" (§6)
+	fieldLevelHighlighting?: boolean; // default false / atomic (§6)
 
-  correctionPrompt?: { style?: "inline-note" | "did-you-mean" | "silent-swap" }; // TBD Q3
+	correctionPrompt?: { style?: "inline-note" | "did-you-mean" | "silent-swap" }; // TBD Q3
 
-  // Street API endpoints (parallel to the autocomplete URLs in constants.ts)
-  usStreetApiUrl?: string;                 // default US_STREET_API_URL
-  internationalStreetApiUrl?: string;      // default INTERNATIONAL_STREET_API_URL
+	// Street API endpoints (parallel to the autocomplete URLs in constants.ts)
+	usStreetApiUrl?: string; // default US_STREET_API_URL
+	internationalStreetApiUrl?: string; // default INTERNATIONAL_STREET_API_URL
 
-  // Hooks (§9 Q2) — see §7
-  onVerified?: (result: VerificationResult) => void | Promise<void>;
-  onVerificationFailed?: (error: VerificationError) => void | Promise<void>;
-  onCorrectionOffered?: (diff: AddressDiff, result: VerificationResult)
-      => void | VerificationDecision | Promise<VerificationDecision | void>;
-  onBeforeSubmit?: (result: VerificationResult | null)
-      => boolean | Promise<boolean>;       // Epic 3; resolve(false) blocks submit
+	// Hooks (§9 Q2) — see §7
+	onVerified?: (result: VerificationResult) => void | Promise<void>;
+	onVerificationFailed?: (error: VerificationError) => void | Promise<void>;
+	onCorrectionOffered?: (
+		diff: AddressDiff,
+		result: VerificationResult,
+	) => void | VerificationDecision | Promise<VerificationDecision | void>;
+	onBeforeSubmit?: (result: VerificationResult | null) => boolean | Promise<boolean>; // Epic 3; resolve(false) blocks submit
 }
 ```
 
 ```ts
-type VerificationTrigger  = "selection" | "blur" | "submit" | "manual";
+type VerificationTrigger = "selection" | "blur" | "submit" | "manual";
 type VerificationBehavior =
-  | "silent" | "apply-and-notify" | "prompt" | "apply-primary"
-  | "warn" | "block" | "ignore" | "first-candidate";
+	| "silent"
+	| "apply-and-notify"
+	| "prompt"
+	| "apply-primary"
+	| "warn"
+	| "block"
+	| "ignore"
+	| "first-candidate";
 type VerificationResultKey =
-  | "verified" | "corrected" | "missingSecondary" | "secondaryNotMatched"
-  | "flagged" | "ambiguous" | "undeliverable" | "error";
+	| "verified"
+	| "corrected"
+	| "missingSecondary"
+	| "secondaryNotMatched"
+	| "flagged"
+	| "ambiguous"
+	| "undeliverable"
+	| "error";
 ```
 
 ### 3.1 Per-type behavior defaults (PRD §7 taxonomy + per-type override shape)
 
 These map 1:1 to `design/verification/app/result-types.jsx` (the locked §7 source of truth). Defaults live in `defaultVerificationConfig.onResult`:
 
-| `VerificationResultKey` | Type # | Default behavior | Allowed overrides | Release |
-|---|---|---|---|---|
-| `verified` | 1 | `silent` | — | R1 |
-| `corrected` | 2 | `apply-and-notify` | `silent` · `prompt` | R1 |
-| `missingSecondary` | 3 | `prompt` | `ignore` | R1 |
-| `secondaryNotMatched` | 4 | `prompt` | `apply-primary` · `ignore` | R1 |
-| `flagged` | 5 | `warn` | `silent` | R1 |
-| `ambiguous` | 6 | `prompt` | `first-candidate` · `ignore` | **R2** |
-| `undeliverable` | 7 | `warn` | `block` · `silent` | R1 (warn) / **R3** (`block`) |
-| `error` | 8 | governed by `failureMode` | — | R1 |
+| `VerificationResultKey` | Type # | Default behavior          | Allowed overrides            | Release                      |
+| ----------------------- | ------ | ------------------------- | ---------------------------- | ---------------------------- |
+| `verified`              | 1      | `silent`                  | —                            | R1                           |
+| `corrected`             | 2      | `apply-and-notify`        | `silent` · `prompt`          | R1                           |
+| `missingSecondary`      | 3      | `prompt`                  | `ignore`                     | R1                           |
+| `secondaryNotMatched`   | 4      | `prompt`                  | `apply-primary` · `ignore`   | R1                           |
+| `flagged`               | 5      | `warn`                    | `silent`                     | R1                           |
+| `ambiguous`             | 6      | `prompt`                  | `first-candidate` · `ignore` | **R2**                       |
+| `undeliverable`         | 7      | `warn`                    | `block` · `silent`           | R1 (warn) / **R3** (`block`) |
+| `error`                 | 8      | governed by `failureMode` | —                            | R1                           |
 
 > **Validation guard.** `validateConfig` rejects a `block` override on any type before Epic 3 ships it, and rejects `ui: "panel"` / `onResult.ambiguous` before Epic 2 — with a clear "not yet supported in this version" warning rather than silent no-op. This keeps each release self-contained (RS "usable on its own") without pretending to support unbuilt behaviors.
 
@@ -145,65 +158,70 @@ New top-level types in `src/interfaces.ts` (the PRD §14 designated home). `Veri
 // Deliverability, normalized across US + Intl into one enum the behavior
 // dispatcher keys on. Raw signals preserved in `.raw` for debugging/hooks.
 export type DeliverabilityCode =
-  | "deliverable"          // type 1/2
-  | "deliverable-missing-secondary"  // type 3
-  | "deliverable-bad-secondary"      // type 4
-  | "deliverable-flagged"  // type 5
-  | "ambiguous"            // type 6
-  | "undeliverable"        // type 7
-  | "unknown";             // type 8 (error)
+	| "deliverable" // type 1/2
+	| "deliverable-missing-secondary" // type 3
+	| "deliverable-bad-secondary" // type 4
+	| "deliverable-flagged" // type 5
+	| "ambiguous" // type 6
+	| "undeliverable" // type 7
+	| "unknown"; // type 8 (error)
 
 export interface AddressDiff {
-  // field key -> {from, to}; only changed fields present.
-  // honors verification.fieldLevelHighlighting (atomic vs per-field).
-  changes: Partial<Record<AddressField, { from: string; to: string }>>;
-  changedFields: AddressField[];
+	// field key -> {from, to}; only changed fields present.
+	// honors verification.fieldLevelHighlighting (atomic vs per-field).
+	changes: Partial<Record<AddressField, { from: string; to: string }>>;
+	changedFields: AddressField[];
 }
-type AddressField = "street" | "secondary" | "locality"
-                  | "administrativeArea" | "postalCode" | "country";
+type AddressField =
+	| "street"
+	| "secondary"
+	| "locality"
+	| "administrativeArea"
+	| "postalCode"
+	| "country";
 
 export interface VerificationResult {
-  type: VerificationResultKey;          // the §7 classification (drives behavior)
-  code: DeliverabilityCode;
-  entered: CurrentAddress;              // what the user had
-  corrected: CurrentAddress | null;     // standardized form (null for 6/7/8)
-  diff: AddressDiff | null;             // entered -> corrected
-  candidates?: CurrentAddress[];        // type 6 only
-  nonBlocking: boolean;                 // types 5,7,8 -> never gate submit
-  raw: UsStreetResult | InternationalStreetResult;  // untouched API payload
-  source: "us" | "international";
+	type: VerificationResultKey; // the §7 classification (drives behavior)
+	code: DeliverabilityCode;
+	entered: CurrentAddress; // what the user had
+	corrected: CurrentAddress | null; // standardized form (null for 6/7/8)
+	diff: AddressDiff | null; // entered -> corrected
+	candidates?: CurrentAddress[]; // type 6 only
+	nonBlocking: boolean; // types 5,7,8 -> never gate submit
+	raw: UsStreetResult | InternationalStreetResult; // untouched API payload
+	source: "us" | "international";
 }
 
 export interface VerificationError {
-  kind: "network" | "auth" | "quota" | "parse" | "unknown";
-  message: string;
-  failureMode: "fail-open" | "fail-closed";
-  cause?: unknown;
+	kind: "network" | "auth" | "quota" | "parse" | "unknown";
+	message: string;
+	failureMode: "fail-open" | "fail-closed";
+	cause?: unknown;
 }
 
 // Result of a hook/chooser deciding what to do with a correction/candidate.
 export interface VerificationDecision {
-  action: "accept" | "reject" | "choose";
-  chosen?: CurrentAddress;   // for action "choose" (ambiguous/did-you-mean)
+	action: "accept" | "reject" | "choose";
+	chosen?: CurrentAddress; // for action "choose" (ambiguous/did-you-mean)
 }
 ```
 
 ### 4.1 The "current address" abstraction (PRD §8, §9 Q6)
 
-A single concept for *the address being worked with*, regardless of where it came from. This is the seam that lets verification run identically in all three modes.
+A single concept for _the address being worked with_, regardless of where it came from. This is the seam that lets verification run identically in all three modes.
 
 ```ts
 export interface CurrentAddress {
-  street: string;
-  secondary: string;
-  locality: string;            // city
-  administrativeArea: string;  // state / region / province
-  postalCode: string;
-  country: string;             // resolved ISO code
+	street: string;
+	secondary: string;
+	locality: string; // city
+	administrativeArea: string; // state / region / province
+	postalCode: string;
+	country: string; // resolved ISO code
 
-  origin: "autocomplete" | "free-form" | "verification";
-  address_id?: string;         // present only when origin === "autocomplete" (Intl anchor)
-  verifiedAt?: number;         // set after a successful verify; cleared on staleness
+	origin: "autocomplete" | "free-form" | "verification";
+	address_id?: string; // present only when origin === "autocomplete" (Intl anchor)
+	verifiedAt?: number; // set after a successful verify; cleared on staleness
 }
 ```
 
@@ -221,17 +239,20 @@ export interface CurrentAddress {
 
 ```ts
 class VerificationService extends BaseService {
-  init(config: NormalizedSmartyAddressConfig): void;   // stores embeddedKey, urls, verification cfg
+	init(config: NormalizedSmartyAddressConfig): void; // stores embeddedKey, urls, verification cfg
 
-  // The one manual / standalone entry point (PRD §8 "standalone verify()").
-  // Exposed on the instance as smartyAddress.verify(address?).
-  async verify(address?: CurrentAddress | Partial<CurrentAddress>): Promise<VerificationResult>;
+	// The one manual / standalone entry point (PRD §8 "standalone verify()").
+	// Exposed on the instance as smartyAddress.verify(address?).
+	async verify(address?: CurrentAddress | Partial<CurrentAddress>): Promise<VerificationResult>;
 
-  // Internal trigger entry points (wired by the orchestrator):
-  async verifyCurrent(trigger: VerificationTrigger): Promise<VerificationResult | null>;
+	// Internal trigger entry points (wired by the orchestrator):
+	async verifyCurrent(trigger: VerificationTrigger): Promise<VerificationResult | null>;
 
-  classify(raw: UsStreetResult | InternationalStreetResult, entered: CurrentAddress): VerificationResult;
-  isStale(addr: CurrentAddress): boolean;
+	classify(
+		raw: UsStreetResult | InternationalStreetResult,
+		entered: CurrentAddress,
+	): VerificationResult;
+	isStale(addr: CurrentAddress): boolean;
 }
 ```
 
@@ -266,47 +287,47 @@ Pure function: raw API payload + entered address → `VerificationResult`. Two b
 
 **US** (`dpv_match_code` + footnotes):
 
-| Condition | → type |
-|---|---|
-| zero candidates **or** `dpv_match_code === "N"` | `undeliverable` (7) |
-| `dpv_match_code ∈ {Y,S,D}` **and** (`dpv_vacant==="Y"` ∥ `dpv_no_stat==="Y"` ∥ footnote `R7`) | `flagged` (5) |
-| `dpv_match_code === "D"` (footnote `N1`) | `missingSecondary` (3) |
-| `dpv_match_code === "S"` | `secondaryNotMatched` (4) |
-| multiple candidates returned | `ambiguous` (6) |
-| `dpv_match_code ∈ {Y,S,D}` **and** correction footnotes present (`A#`,`B#`,`M#`,`N#`,`L#`/`K#`, or ZIP4 added) | `corrected` (2) |
-| `dpv_match_code === "Y"`, no correction footnotes, components match, not vacant/no-stat | `verified` (1) |
+| Condition                                                                                                      | → type                    |
+| -------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| zero candidates **or** `dpv_match_code === "N"`                                                                | `undeliverable` (7)       |
+| `dpv_match_code ∈ {Y,S,D}` **and** (`dpv_vacant==="Y"` ∥ `dpv_no_stat==="Y"` ∥ footnote `R7`)                  | `flagged` (5)             |
+| `dpv_match_code === "D"` (footnote `N1`)                                                                       | `missingSecondary` (3)    |
+| `dpv_match_code === "S"`                                                                                       | `secondaryNotMatched` (4) |
+| multiple candidates returned                                                                                   | `ambiguous` (6)           |
+| `dpv_match_code ∈ {Y,S,D}` **and** correction footnotes present (`A#`,`B#`,`M#`,`N#`,`L#`/`K#`, or ZIP4 added) | `corrected` (2)           |
+| `dpv_match_code === "Y"`, no correction footnotes, components match, not vacant/no-stat                        | `verified` (1)            |
 
 > Order matters: evaluate `undeliverable` → `flagged` → secondary cases → `ambiguous` → `corrected` → `verified`. Encode as ordered guard clauses (CLAUDE.md "early returns over nesting"). Footnote parsing → a named helper `parseUsFootnotes(s): Set<string>`; the footnote-class lists become named constants (CLAUDE.md "name magic numbers").
 
 **International** (`verification_status` + `address_precision` + `changes`):
 
-| Condition | → type |
-|---|---|
-| `verification_status === "None"` ∥ `address_precision === "None"` | `undeliverable` (7) |
-| `verification_status === "Ambiguous"` | `ambiguous` (6) |
-| `changes.sub_building === "Unrecognized"` | `secondaryNotMatched` (4) |
-| `verification_status === "Partial"` **and** `address_precision === "Premise"` **and** `sub_building` absent | `missingSecondary` (3) |
-| `verification_status === "Verified"` **and** any `changes.* ∈ {Verified-SmallChange, Added}` | `corrected` (2) |
-| `verification_status === "Verified"` **and** precision reached country max (Q10) | `verified` (1) |
+| Condition                                                                                                   | → type                    |
+| ----------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `verification_status === "None"` ∥ `address_precision === "None"`                                           | `undeliverable` (7)       |
+| `verification_status === "Ambiguous"`                                                                       | `ambiguous` (6)           |
+| `changes.sub_building === "Unrecognized"`                                                                   | `secondaryNotMatched` (4) |
+| `verification_status === "Partial"` **and** `address_precision === "Premise"` **and** `sub_building` absent | `missingSecondary` (3)    |
+| `verification_status === "Verified"` **and** any `changes.* ∈ {Verified-SmallChange, Added}`                | `corrected` (2)           |
+| `verification_status === "Verified"` **and** precision reached country max (Q10)                            | `verified` (1)            |
 
 > **Type 5 (`flagged`) cannot fire internationally** — it is USPS-specific (§7 note, result-types.jsx:104). The intl branch never emits it.
 
-> **Q10 — per-country `max_address_precision` (gates R4 / RS Epic 4).** Type 1 means *reached the country's max precision*, **not** a hard `DeliveryPoint`. `classify` compares `address_precision` against `max_address_precision` from the **same response** rather than a hard-coded `"DeliveryPoint"`. This keeps good addresses in lower-coverage countries out of Types 3/7. Engineering resolution: read `max_address_precision` off each response; no static per-country table needed. If a response omits it, fall back to a precision-rank table (`None < ... < DeliveryPoint`) and treat `>= Premise` as verified-for-country, logging the gap. **This is the R4 entry gate — confirm against live intl responses during the spike before locking.**
+> **Q10 — per-country `max_address_precision` (gates R4 / RS Epic 4).** Type 1 means _reached the country's max precision_, **not** a hard `DeliveryPoint`. `classify` compares `address_precision` against `max_address_precision` from the **same response** rather than a hard-coded `"DeliveryPoint"`. This keeps good addresses in lower-coverage countries out of Types 3/7. Engineering resolution: read `max_address_precision` off each response; no static per-country table needed. If a response omits it, fall back to a precision-rank table (`None < ... < DeliveryPoint`) and treat `>= Premise` as verified-for-country, logging the gap. **This is the R4 entry gate — confirm against live intl responses during the spike before locking.**
 
 ### 5.5 Behavior dispatch
 
 `classify` produces `type`; the orchestrator looks up `config.verification.onResult[type]` (falling back to the §3.1 default) and dispatches:
 
-| Behavior | Effect |
-|---|---|
-| `silent` | apply corrected address to form (if any); no UI; fire `onVerified`. |
-| `apply-and-notify` | apply + show non-blocking note of the diff ("Adjusted to …"); fire `onVerified`. |
-| `prompt` | surface UI asking the user to confirm/supply (secondary / did-you-mean); await decision. |
-| `apply-primary` | apply corrected primary, keep+flag the entered unit (type 4); don't drop it. |
-| `warn` | non-blocking caution; allow submit; fire `onVerified`. |
-| `block` | (Epic 3) gate submit via `onBeforeSubmit` resolving false. |
-| `first-candidate` | (type 6) auto-pick candidate[0]; apply. |
-| `ignore` | no-op beyond recording the result. |
+| Behavior           | Effect                                                                                   |
+| ------------------ | ---------------------------------------------------------------------------------------- |
+| `silent`           | apply corrected address to form (if any); no UI; fire `onVerified`.                      |
+| `apply-and-notify` | apply + show non-blocking note of the diff ("Adjusted to …"); fire `onVerified`.         |
+| `prompt`           | surface UI asking the user to confirm/supply (secondary / did-you-mean); await decision. |
+| `apply-primary`    | apply corrected primary, keep+flag the entered unit (type 4); don't drop it.             |
+| `warn`             | non-blocking caution; allow submit; fire `onVerified`.                                   |
+| `block`            | (Epic 3) gate submit via `onBeforeSubmit` resolving false.                               |
+| `first-candidate`  | (type 6) auto-pick candidate[0]; apply.                                                  |
+| `ignore`           | no-op beyond recording the result.                                                       |
 
 Type 8 (`error`) bypasses `onResult` and is governed by `failureMode`: **fail-open** → record, fire `onVerificationFailed`, allow submit, UI aria-only/silent (result-types.jsx:158); **fail-closed** → additionally block submit (Epic 3 semantics).
 
@@ -339,12 +360,12 @@ Cross-framework validation against the §11 host matrix is the Epic 3 exit crite
 
 All hooks are **async-capable** (return `void | Promise<void>` or a decision) to support customer-side modal flows (Q2). The orchestrator `await`s them.
 
-| Hook | Fires when | Signature | Return semantics |
-|---|---|---|---|
-| `onVerified` | every completed verify (any type 1–7) | `(r: VerificationResult) => void \| Promise<void>` | awaited; return ignored. |
-| `onVerificationFailed` | type 8 / `VerificationError` | `(e: VerificationError) => void \| Promise<void>` | awaited; return ignored. |
-| `onCorrectionOffered` | types 2/3/4/6 when behavior is `prompt` | `(diff, r) => VerificationDecision \| void \| Promise<…>` | if it returns a `VerificationDecision`, that overrides the built-in UI (lets customers supply their own modal). `void` → built-in UI handles it. |
-| `onBeforeSubmit` | `submit` trigger (Epic 3) | `(r \| null) => boolean \| Promise<boolean>` | `false` blocks submission. |
+| Hook                   | Fires when                              | Signature                                                 | Return semantics                                                                                                                                 |
+| ---------------------- | --------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `onVerified`           | every completed verify (any type 1–7)   | `(r: VerificationResult) => void \| Promise<void>`        | awaited; return ignored.                                                                                                                         |
+| `onVerificationFailed` | type 8 / `VerificationError`            | `(e: VerificationError) => void \| Promise<void>`         | awaited; return ignored.                                                                                                                         |
+| `onCorrectionOffered`  | types 2/3/4/6 when behavior is `prompt` | `(diff, r) => VerificationDecision \| void \| Promise<…>` | if it returns a `VerificationDecision`, that overrides the built-in UI (lets customers supply their own modal). `void` → built-in UI handles it. |
+| `onBeforeSubmit`       | `submit` trigger (Epic 3)               | `(r \| null) => boolean \| Promise<boolean>`              | `false` blocks submission.                                                                                                                       |
 
 Existing autocomplete hooks (`onAddressSelected`, etc., interfaces.ts:86) are untouched. Verification hooks live on the same config object.
 
@@ -356,13 +377,13 @@ Follows the `DropdownService` pattern: DOM creation in JS, an `aria-live` announ
 
 ### 8.1 Surfaces (config `verification.ui`)
 
-| Surface | Release | Description |
-|---|---|---|
-| `none` | R1 | no visible UI; hooks/form-population only. |
-| `aria-only` | R1 | screen-reader announcements via the `announce()` region; no visible element. (Type 8 always uses this regardless of `ui`.) |
-| `badge` | R1 | small status cue near the field — ✓ (type 1/2), caution (3/4/5), warning (7). |
-| `panel` | **R2** | full inline panel: shows diff ("Adjusted to …"), secondary prompt, caution text. |
-| ambiguous chooser | **R2** | candidate picker; in verification-only mode a **lightweight fallback** (no dropdown infra) — Q4. |
+| Surface           | Release | Description                                                                                                                |
+| ----------------- | ------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `none`            | R1      | no visible UI; hooks/form-population only.                                                                                 |
+| `aria-only`       | R1      | screen-reader announcements via the `announce()` region; no visible element. (Type 8 always uses this regardless of `ui`.) |
+| `badge`           | R1      | small status cue near the field — ✓ (type 1/2), caution (3/4/5), warning (7).                                              |
+| `panel`           | **R2**  | full inline panel: shows diff ("Adjusted to …"), secondary prompt, caution text.                                           |
+| ambiguous chooser | **R2**  | candidate picker; in verification-only mode a **lightweight fallback** (no dropdown infra) — Q4.                           |
 
 ### 8.2 New CSS variables (PRD §12.3 deliverable, §14)
 
@@ -399,19 +420,19 @@ export const defaultVerificationConfig: Required<Pick<VerificationConfig,
 
 ## 10. File-by-File Change Map
 
-| File | Change | Release |
-|---|---|---|
-| `src/interfaces.ts` | Add `VerificationConfig`, `VerificationResult`, `VerificationError`, `AddressDiff`, `DeliverabilityCode`, `CurrentAddress`, `VerificationDecision`, enums; add `verification?` to `SmartyAddressConfig`; add `verificationService?`/`verificationUiService?` to overrides. | R1 |
-| `src/services/BaseService.ts` | Add `verificationService?` + `verificationUiService?` to `ServiceDependencies`. | R1 |
-| `src/services/VerificationService.ts` | **New.** Street calls, `classify`, dispatch, dedupe, staleness. | R1 (intl branch R4) |
-| `src/services/VerificationUiService.ts` | **New.** badge/aria (R1), panel/chooser (R2), intl (R4). | R1+ |
-| `src/services/http/streetTransport.ts` | **New.** Shared auth/fetch/error helper (§1.1). | R1 |
-| `src/services/FormService.ts` | Add `populateFormWithCurrentAddress` (corrections round-trip, Q6). | R1 |
-| `src/index.ts` | Register new services in `SmartyAddress.services`; instantiate + wire + `init`; add public `verify()` and `verifyBeforeSubmit()`; mode resolution (§2). | R1 (submit R3) |
-| `src/utils/configNormalizer.ts` | De-skew: fold root autocomplete keys into `autocomplete.*` as aliases; normalize `verification` block. | R1 |
-| `src/utils/appUtils.ts` (`validateConfig`) | neither-mode-on warning; reject unsupported behaviors per release (§3.1 guard). | R1 |
-| `src/constants.ts` | `US_STREET_API_URL`, `INTERNATIONAL_STREET_API_URL`, `defaultVerificationConfig`, footnote-class constants. | R1 (intl url R4) |
-| `assets/styles/{colors,spacing,misc,base}.ts` + `theme.ts` | New CSS variables (§8.2). | R1 (panel vars R2) |
+| File                                                       | Change                                                                                                                                                                                                                                                                     | Release             |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| `src/interfaces.ts`                                        | Add `VerificationConfig`, `VerificationResult`, `VerificationError`, `AddressDiff`, `DeliverabilityCode`, `CurrentAddress`, `VerificationDecision`, enums; add `verification?` to `SmartyAddressConfig`; add `verificationService?`/`verificationUiService?` to overrides. | R1                  |
+| `src/services/BaseService.ts`                              | Add `verificationService?` + `verificationUiService?` to `ServiceDependencies`.                                                                                                                                                                                            | R1                  |
+| `src/services/VerificationService.ts`                      | **New.** Street calls, `classify`, dispatch, dedupe, staleness.                                                                                                                                                                                                            | R1 (intl branch R4) |
+| `src/services/VerificationUiService.ts`                    | **New.** badge/aria (R1), panel/chooser (R2), intl (R4).                                                                                                                                                                                                                   | R1+                 |
+| `src/services/http/streetTransport.ts`                     | **New.** Shared auth/fetch/error helper (§1.1).                                                                                                                                                                                                                            | R1                  |
+| `src/services/FormService.ts`                              | Add `populateFormWithCurrentAddress` (corrections round-trip, Q6).                                                                                                                                                                                                         | R1                  |
+| `src/index.ts`                                             | Register new services in `SmartyAddress.services`; instantiate + wire + `init`; add public `verify()` and `verifyBeforeSubmit()`; mode resolution (§2).                                                                                                                    | R1 (submit R3)      |
+| `src/utils/configNormalizer.ts`                            | De-skew: fold root autocomplete keys into `autocomplete.*` as aliases; normalize `verification` block.                                                                                                                                                                     | R1                  |
+| `src/utils/appUtils.ts` (`validateConfig`)                 | neither-mode-on warning; reject unsupported behaviors per release (§3.1 guard).                                                                                                                                                                                            | R1                  |
+| `src/constants.ts`                                         | `US_STREET_API_URL`, `INTERNATIONAL_STREET_API_URL`, `defaultVerificationConfig`, footnote-class constants.                                                                                                                                                                | R1 (intl url R4)    |
+| `assets/styles/{colors,spacing,misc,base}.ts` + `theme.ts` | New CSS variables (§8.2).                                                                                                                                                                                                                                                  | R1 (panel vars R2)  |
 
 ---
 
@@ -435,35 +456,35 @@ export const defaultVerificationConfig: Required<Pick<VerificationConfig,
 
 This ERD is built so the R1 architecture accommodates R2–R4 with no rework (PRD §10). Mapping of ERD sections to epics:
 
-| Epic / Release | ERD sections that land |
-|---|---|
-| **Epic 0** — Discovery & API lock | Resolve Q3/Q4 (prototype), Q10 (live intl responses, §5.4), Q1/Q2; confirm this ERD's type/config surfaces; stand up §11 harness. |
+| Epic / Release                              | ERD sections that land                                                                                                                  |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **Epic 0** — Discovery & API lock           | Resolve Q3/Q4 (prototype), Q10 (live intl responses, §5.4), Q1/Q2; confirm this ERD's type/config surfaces; stand up §11 harness.       |
 | **Epic 1 / R1** — Framework + US (defaults) | §1–§5 (US branch), §5.6 (dedupe + staleness), §7 hooks (minus `onBeforeSubmit`), §8 badge/aria, de-skew (§2 note), types 1–5,7(warn),8. |
-| **Epic 2 / R2** — Panel + ambiguous | §8 panel + chooser, type 6, `onResult.ambiguous`. |
-| **Epic 3 / R3** — Blocking + pre-submit | §6 fully, `block` override + `fail-closed`, `onBeforeSubmit`, framework matrix. |
-| **Epic 4 / R4** — International | §5.3 ordering, §5.4 intl branch (Q10 gate), intl UI. |
-| **Epic 5** — Hardening + public ship | full §11 matrix sweep; `verification.enabled` default + billing confirmed (§9); §12.7 housekeeping. |
+| **Epic 2 / R2** — Panel + ambiguous         | §8 panel + chooser, type 6, `onResult.ambiguous`.                                                                                       |
+| **Epic 3 / R3** — Blocking + pre-submit     | §6 fully, `block` override + `fail-closed`, `onBeforeSubmit`, framework matrix.                                                         |
+| **Epic 4 / R4** — International             | §5.3 ordering, §5.4 intl branch (Q10 gate), intl UI.                                                                                    |
+| **Epic 5** — Hardening + public ship        | full §11 matrix sweep; `verification.enabled` default + billing confirmed (§9); §12.7 housekeeping.                                     |
 
 ---
 
 ## 13. Open Questions — Engineering Disposition
 
-| Q | PRD area | Disposition in this ERD |
-|---|---|---|
-| Q1 | defaults | Deferred to Product (Epic 0); encoded as one-line defaults (§9). |
-| Q2 | hook signatures | **Proposed** async-capable signatures (§7); confirm with Product. |
-| Q3 | correction prompt style | `correctionPrompt.style` config left unset pending prototype (§3, §8). |
-| Q4 | ambiguous chooser (verif-only) | Lightweight fallback in `VerificationUiService` (§8.1); design in Epic 0/2. |
-| Q5 | de-skew config | **Resolved:** nested `autocomplete` block + root-key aliases, additive (§2). |
-| Q6 | current-address abstraction | **Resolved:** `CurrentAddress` + adapters; `FormService` round-trip (§4.1). |
-| Q7 | submission blocking | **Resolved (strategy):** await-able method primary; best-effort native for vanilla (§6); validate Epic 3. |
-| Q8 | verif-only sequencing | **Resolved:** `fromFormFields` adapter, no `address_id` anchor; blur/submit/manual (§5.6). |
-| Q9 | staleness | **Resolved (recommend):** invalidate-on-edit, re-verify on next trigger; `staleness` switch for the alternative (§5.6). |
-| Q10 | per-country precision | **Resolved (approach):** compare `address_precision` to per-response `max_address_precision`; gates R4, confirm vs live responses (§5.4). |
-| Q11–13 | testing | Matrix + documented untested cells (§11). |
+| Q      | PRD area                       | Disposition in this ERD                                                                                                                   |
+| ------ | ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Q1     | defaults                       | Deferred to Product (Epic 0); encoded as one-line defaults (§9).                                                                          |
+| Q2     | hook signatures                | **Proposed** async-capable signatures (§7); confirm with Product.                                                                         |
+| Q3     | correction prompt style        | `correctionPrompt.style` config left unset pending prototype (§3, §8).                                                                    |
+| Q4     | ambiguous chooser (verif-only) | Lightweight fallback in `VerificationUiService` (§8.1); design in Epic 0/2.                                                               |
+| Q5     | de-skew config                 | **Resolved:** nested `autocomplete` block + root-key aliases, additive (§2).                                                              |
+| Q6     | current-address abstraction    | **Resolved:** `CurrentAddress` + adapters; `FormService` round-trip (§4.1).                                                               |
+| Q7     | submission blocking            | **Resolved (strategy):** await-able method primary; best-effort native for vanilla (§6); validate Epic 3.                                 |
+| Q8     | verif-only sequencing          | **Resolved:** `fromFormFields` adapter, no `address_id` anchor; blur/submit/manual (§5.6).                                                |
+| Q9     | staleness                      | **Resolved (recommend):** invalidate-on-edit, re-verify on next trigger; `staleness` switch for the alternative (§5.6).                   |
+| Q10    | per-country precision          | **Resolved (approach):** compare `address_precision` to per-response `max_address_precision`; gates R4, confirm vs live responses (§5.4). |
+| Q11–13 | testing                        | Matrix + documented untested cells (§11).                                                                                                 |
 
 ---
 
 ## 14. Out of Scope (PRD §3)
 
-No built-in caching/dedupe beyond the minimal in-flight fingerprint (§5.6); no cost guardrails; no fresh-API rewrite (additive only); UX/default *finalization* (owned by prototype + Product, not this ERD).
+No built-in caching/dedupe beyond the minimal in-flight fingerprint (§5.6); no cost guardrails; no fresh-API rewrite (additive only); UX/default _finalization_ (owned by prototype + Product, not this ERD).

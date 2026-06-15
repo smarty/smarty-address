@@ -108,6 +108,72 @@ describe("Epic 4 — classifyInternational (ERD §5.4)", () => {
 		expect(classify([]).type).toBe("undeliverable");
 	});
 
+	it("Type 6 requires verification_status Ambiguous — multiple candidates alone are not ambiguous internationally", () => {
+		const verified = intlCandidate({
+			verification_status: "Verified",
+			address_precision: "DeliveryPoint",
+			max_address_precision: "DeliveryPoint",
+			changes: {},
+		});
+		const result = classify([verified, verified]);
+		expect(result.type).toBe("verified");
+	});
+
+	it("guard order: Ambiguous + sub_building Unrecognized is ambiguous, not secondaryNotMatched", () => {
+		const result = classify([
+			intlCandidate({
+				verification_status: "Ambiguous",
+				address_precision: "Premise",
+				changes: { sub_building: "Unrecognized" },
+			}),
+		]);
+		expect(result.type).toBe("ambiguous");
+	});
+
+	it("Type 2 requires a qualifying change — a mere component diff stays verified at country max", () => {
+		const result = classify([
+			intlCandidate(
+				{
+					verification_status: "Verified",
+					address_precision: "DeliveryPoint",
+					max_address_precision: "DeliveryPoint",
+					changes: {},
+				},
+				{ locality: "Camden" },
+			),
+		]);
+		expect(result.type).toBe("verified");
+	});
+
+	it("a diff cannot bypass the Q10 precision gate — Verified below country max is not corrected", () => {
+		const result = classify([
+			intlCandidate(
+				{
+					verification_status: "Verified",
+					address_precision: "Premise",
+					max_address_precision: "DeliveryPoint",
+					changes: {},
+				},
+				{ locality: "Camden" },
+			),
+		]);
+		expect(result.type).toBe("missingSecondary");
+	});
+
+	it("Q10 fallback: missing max_address_precision below Premise is not verified, and the gap is logged", () => {
+		const warn = jest.spyOn(console, "warn").mockImplementation(() => undefined);
+		const result = classify([
+			intlCandidate({
+				verification_status: "Verified",
+				address_precision: "Locality",
+				changes: {},
+			}),
+		]);
+		expect(result.type).not.toBe("verified");
+		expect(warn).toHaveBeenCalledWith(expect.stringContaining("max_address_precision"));
+		warn.mockRestore();
+	});
+
 	it("Type 5 (flagged) can never fire internationally", () => {
 		const statuses = ["Verified", "Partial", "Ambiguous", "None"];
 		statuses.forEach((verification_status) => {

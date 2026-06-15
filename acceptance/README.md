@@ -29,10 +29,15 @@ below** so there are no silent coverage gaps.
 |---|---|---|---|---|---|
 | 1 | Vanilla verification-only | `manual` | `badge` | 1, 2, 7 | US Street; correction round-trips to the form |
 | 2 | Blocking submission (Epic 3) | `manual` (`verifyBeforeSubmit`) | — | 7 (`block`) | undeliverable→block gates the submit |
-| 3 | Ambiguous chooser (Epic 2) | `manual` | `panel` | 6 | chooser → pick candidate → form filled |
-| 4 | Edit-after-verify staleness (Q9) | `manual` | `badge` | 1 | trusted edit clears the ✓ |
-| 5 | Service error fail-open (Type 8) | `manual` | `badge`→aria | 8 | aria-only; submit allowed |
-| 6 | International (Epic 4) | `manual` | `badge` | 1 | International Street API, GBR |
+| 3 | Native `<form>` interception (Epic 3) | `submit` | `badge` | 2, 7 (`block`) | real trusted click: pass → deferred re-submit; block → submission held |
+| 4 | Ambiguous chooser (Epic 2) | `manual` | `panel` | 6 | chooser → pick candidate → form filled |
+| 5 | Edit-after-verify staleness (Q9) | `manual` | `badge` | 1 | trusted edit clears the ✓ |
+| 6 | Service error fail-open (Type 8) | `manual` | `badge`→aria | 8 | aria-only; submit allowed |
+| 7 | International (Epic 4) | `manual` | `badge` | 1 | International Street API, GBR |
+| 8 | Country switch mid-flow (Epic 4) | `manual` | `badge` | 1 | `countrySelector` flip re-routes US API → International API (strict per-endpoint mock) |
+
+The in-page fetch mock has **no fallback**: a request to an unmocked endpoint
+fails the test, so endpoint-routing bugs cannot pass silently.
 
 Unit-level coverage (Jest) complements this with the **full** classification
 tables (all 8 US rows + all international rows incl. the Q10 max-precision
@@ -48,15 +53,32 @@ They are deliberate omissions, not oversights:
 - **Framework hosts** — React controlled inputs, Angular reactive forms (FormGroup),
   Vue 3 `v-model`, Shopify checkout extension (sandboxed iframe), WooCommerce /
   WordPress multi-instance. The harness validates the framework-agnostic core in
-  vanilla DOM; per-framework submission interception is validated manually
-  against the §11 host list (the Epic 3 exit criterion). The supported blocking
-  path (`await verifyBeforeSubmit()`) is framework-independent by construction.
+  vanilla DOM (incl. native `<form>` interception against a real trusted click);
+  **per-framework validation has not been performed yet** — it remains the open
+  Epic 3 exit criterion and must be recorded here when done. The supported
+  blocking path (`await verifyBeforeSubmit()`) is framework-independent by
+  construction.
 - **`selection` + `blur` triggers in-browser** — covered at the unit level
-  (dedupe of the selection→blur double-call); the acceptance specs use the
+  (selection wiring, dedupe of the selection→blur double-call incl. merged
+  street+unit fields, single-field blur); the acceptance specs use the
   deterministic `manual` trigger to avoid coupling to the autocomplete dropdown.
+  **Autocomplete-present verification (a live dropdown selection feeding
+  verify) is not exercised in-browser at all.**
+- **Types 3 (missing secondary), 4 (secondary not matched), and 5 (flagged)
+  in-browser** — unit-covered only (classification + dispatch + prompt copy);
+  no acceptance cell renders their UI in a real browser.
+- **`failureMode: "fail-closed"` and quota/auth (4xx) errors in-browser** —
+  the acceptance harness exercises only the network-500 fail-open path; the
+  fail-closed gate and error-kind mapping are unit-covered.
 - **`apply-and-notify` vs `prompt` vs `silent` per type** — the dispatch matrix
   is exhaustively covered in unit tests; the harness spot-checks the default
   behaviors only.
+- **International types 2/3/6/7 in-browser** — unit-covered only; the
+  acceptance intl cells are Type 1 (static GBR + country switch).
+- **PRD §11 scenarios not yet automated anywhere** — multi-step wizard (verify
+  on step transition), secondary-unit selection then verify, WooCommerce /
+  Shopify / WordPress hosts. Single-field combined address is unit-covered
+  (blur trigger) but has no acceptance cell.
 - **Live API responses** — all Street responses here are mocked. The per-release
   manual run (PRD §13) exercises a real embedded key (deliverable, corrected,
   undeliverable, network error, international) and is the source of truth for

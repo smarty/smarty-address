@@ -23,12 +23,22 @@ const TONE_CLASS: Record<ResultTone, string> = {
 // variables. Each surface is swappable without touching classification.
 export class VerificationUiService extends BaseService {
 	private streetSelector: string | null = null;
+	private themeClasses: string[] = [];
 	private announcer: HTMLElement | null = null;
 	private surface: HTMLElement | null = null;
 	private chooser: HTMLElement | null = null;
 
 	init(config: NormalizedSmartyAddressConfig) {
 		this.streetSelector = config.streetSelector ?? null;
+		this.themeClasses = config.theme ?? [];
+	}
+
+	// Verify surfaces sit outside the dropdown wrapper, so the configured theme
+	// classes are carried on each surface directly — themes restyle verification
+	// the same way they restyle the dropdown (ERD §8.2). The verify_default
+	// class supplies fallback values for every variable.
+	private surfaceClasses(...classes: string[]): string[] {
+		return [CSS_CLASSES.verifyVars, ...this.themeClasses, ...classes];
 	}
 
 	destroy() {
@@ -72,20 +82,25 @@ export class VerificationUiService extends BaseService {
 		config: UiConfig,
 		onChoose: (chosen: CurrentAddress) => void,
 	): void {
-		this.announce(RESULT_TYPE_META.ambiguous.message);
-		if ((config.ui ?? "badge") === "none") return;
+		const surface = config.ui ?? "badge";
+		if (surface === "none") return;
 
+		this.announce(RESULT_TYPE_META.ambiguous.message);
+		if (surface === "aria-only") {
+			this.clear();
+			return;
+		}
+
+		this.clear();
 		const candidates = result.candidates ?? [];
 		const anchor = this.getAnchor();
 		if (!anchor || candidates.length === 0) return;
 
 		const domService = this.getService("domService");
-		this.clear();
-		const chooser = domService.createDomElement("div", [
-			CSS_CLASSES.verifyVars,
-			CSS_CLASSES.verifyPanel,
-			CSS_CLASSES.verifyChooser,
-		]);
+		const chooser = domService.createDomElement(
+			"div",
+			this.surfaceClasses(CSS_CLASSES.verifyPanel, CSS_CLASSES.verifyChooser),
+		);
 		chooser.setAttribute("role", "listbox");
 
 		const heading = domService.createDomElement("div", [CSS_CLASSES.verifyPanelMessage]);
@@ -129,16 +144,15 @@ export class VerificationUiService extends BaseService {
 	}
 
 	private renderBadge(label: string, tone: ResultTone): void {
+		this.clear();
 		const anchor = this.getAnchor();
 		if (!anchor) return;
 
 		const domService = this.getService("domService");
-		this.clear();
-		const badge = domService.createDomElement("span", [
-			CSS_CLASSES.verifyVars,
-			CSS_CLASSES.verifyBadge,
-			TONE_CLASS[tone],
-		]);
+		const badge = domService.createDomElement(
+			"span",
+			this.surfaceClasses(CSS_CLASSES.verifyBadge, TONE_CLASS[tone]),
+		);
 		badge.setAttribute("role", "status");
 		badge.textContent = label;
 		anchor.insertAdjacentElement("afterend", badge);
@@ -148,16 +162,15 @@ export class VerificationUiService extends BaseService {
 	// Full inline panel (R2 / Epic 2): shows the diff note, secondary prompt, or
 	// caution text. Tone-styled; copy comes from the result message.
 	private renderPanel(message: string, tone: ResultTone): void {
+		this.clear();
 		const anchor = this.getAnchor();
 		if (!anchor) return;
 
 		const domService = this.getService("domService");
-		this.clear();
-		const panel = domService.createDomElement("div", [
-			CSS_CLASSES.verifyVars,
-			CSS_CLASSES.verifyPanel,
-			TONE_CLASS[tone],
-		]);
+		const panel = domService.createDomElement(
+			"div",
+			this.surfaceClasses(CSS_CLASSES.verifyPanel, TONE_CLASS[tone]),
+		);
 		panel.setAttribute("role", "status");
 		const text = domService.createDomElement("div", [CSS_CLASSES.verifyPanelMessage]);
 		text.textContent = message;

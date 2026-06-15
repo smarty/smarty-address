@@ -170,9 +170,9 @@ export const themeStyles = {
 	},
 
 	".smartyAddress__verifyChooserOption": {
-		display: "block",
-		width: "100%",
-		"text-align": "left",
+		display: "var(--smartyAddress__verifyChooserOptionDisplay)",
+		width: "var(--smartyAddress__verifyChooserOptionWidth)",
+		"text-align": "var(--smartyAddress__verifyChooserOptionTextAlign)",
 		cursor: "var(--smartyAddress__cursorStyle)",
 		padding: "var(--smartyAddress__verifyBadgePadding)",
 		"margin-top": "var(--smartyAddress__verifyPanelGap)",

@@ -33,9 +33,11 @@ async function loadPlugin(
 			};
 			win.fetch = async (url: unknown) => {
 				const target = String(url);
-				const match =
-					(responses as MockResponse[]).find((r) => target.includes(r.match)) ??
-					(responses as MockResponse[])[0];
+				const match = (responses as MockResponse[]).find((r) => target.includes(r.match));
+				// No fallback: a request to an unmocked endpoint must fail the test,
+				// otherwise a routing bug (e.g. intl address hitting the US API)
+				// would silently receive the canned payload and pass.
+				if (!match) throw new Error(`Unmocked fetch in acceptance test: ${target}`);
 				return {
 					ok: match.ok ?? true,
 					status: match.status ?? 200,
@@ -162,6 +164,53 @@ test.describe("Blocking submission (Epic 3)", () => {
 		);
 		expect(await verifyBeforeSubmit(page)).toBe(false);
 	});
+
+	const NATIVE_FORM = `<form id="form">${US_FORM}<button id="go" type="submit">Submit</button></form>`;
+
+	// Counts submit events the plugin let through. Attached after plugin init so
+	// it runs behind the plugin's interception handler; preventDefault keeps the
+	// browser from navigating.
+	const trackPassedSubmits = (page: Page) =>
+		page.evaluate(() => {
+			const win = window as unknown as { __passed: number };
+			win.__passed = 0;
+			document.querySelector("#form")!.addEventListener("submit", (event) => {
+				if (!event.defaultPrevented) win.__passed++;
+				event.preventDefault();
+			});
+		});
+
+	test("native <form> interception: verified address is re-submitted", async ({ page }) => {
+		await loadPlugin(
+			page,
+			NATIVE_FORM,
+			[
+				{
+					match: "us-street",
+					body: [usCandidate({ dpv_match_code: "Y", footnotes: "A#" }, { plus4_code: "0003" })],
+				},
+			],
+			usConfig({ trigger: ["submit"], ui: "badge" }),
+		);
+		await trackPassedSubmits(page);
+		await page.click("#go");
+		await expect
+			.poll(() => page.evaluate(() => (window as unknown as { __passed: number }).__passed))
+			.toBe(1);
+	});
+
+	test("native <form> interception: block override holds the submission", async ({ page }) => {
+		await loadPlugin(
+			page,
+			NATIVE_FORM,
+			[{ match: "us-street", body: [usCandidate({ dpv_match_code: "N", footnotes: "" }, {})] }],
+			usConfig({ trigger: ["submit"], onResult: { undeliverable: "block" }, ui: "badge" }),
+		);
+		await trackPassedSubmits(page);
+		await page.click("#go");
+		await expect(page.locator(".smartyAddress__verifyBadge_negative")).toHaveText("Undeliverable");
+		expect(await page.evaluate(() => (window as unknown as { __passed: number }).__passed)).toBe(0);
+	});
 });
 
 test.describe("Ambiguous chooser (Epic 2)", () => {
@@ -271,5 +320,73 @@ test.describe("International verification (Epic 4)", () => {
 		const result = await verify(page);
 		expect(result?.type).toBe("verified");
 		await expect(page.locator(".smartyAddress__verifyBadge_positive")).toHaveText("Verified");
+	});
+
+	test("country switch mid-flow re-routes from the US API to the international API", async ({
+		page,
+	}) => {
+		const SWITCHING_FORM = `
+			<input id="street" value="3214 N University Ave" />
+			<input id="city" value="Provo" />
+			<input id="state" value="UT" />
+			<input id="zip" value="84604" />
+			<select id="country">
+				<option value="USA" selected>United States</option>
+				<option value="GBR">United Kingdom</option>
+			</select>`;
+		await loadPlugin(
+			page,
+			SWITCHING_FORM,
+			[
+				{
+					match: "us-street",
+					body: [
+						{
+							delivery_line_1: "3214 N University Ave",
+							components: { city_name: "Provo", state_abbreviation: "UT", zipcode: "84604" },
+							analysis: { dpv_match_code: "Y", footnotes: "" },
+						},
+					],
+				},
+				{
+					match: "international-street",
+					body: [
+						{
+							address1: "221B Baker St",
+							components: { locality: "London", postal_code: "NW1 6XE", country_iso3: "GBR" },
+							analysis: {
+								verification_status: "Verified",
+								address_precision: "DeliveryPoint",
+								max_address_precision: "DeliveryPoint",
+								changes: {},
+							},
+						},
+					],
+				},
+			],
+			{
+				embeddedKey: "test-key",
+				streetSelector: "#street",
+				localitySelector: "#city",
+				administrativeAreaSelector: "#state",
+				postalCodeSelector: "#zip",
+				countrySelector: "#country",
+				autocomplete: { enabled: false },
+				verification: { trigger: ["manual"], ui: "badge" },
+			},
+		);
+		const usResult = (await verify(page)) as { type: string; source: string } | null;
+		expect(usResult?.type).toBe("verified");
+		expect(usResult?.source).toBe("us");
+
+		await page.selectOption("#country", "GBR");
+		await page.locator("#street").fill("221B Baker St");
+		await page.locator("#city").fill("London");
+		await page.locator("#state").fill("");
+		await page.locator("#zip").fill("NW1 6XE");
+
+		const intlResult = (await verify(page)) as { type: string; source: string } | null;
+		expect(intlResult?.type).toBe("verified");
+		expect(intlResult?.source).toBe("international");
 	});
 });

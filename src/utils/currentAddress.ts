@@ -53,14 +53,20 @@ export function toSuggestion(address: CurrentAddress): AutocompleteSuggestion {
 	return suggestion;
 }
 
-// Normalized 6-field fingerprint for the in-memory dedupe + staleness check
-// (ERD §5.6). No persistent cache; this is the only dedupe in v1.
+// Normalized fingerprint for the in-memory dedupe + staleness check (ERD §5.6).
+// No persistent cache; this is the only dedupe in v1. Field boundaries are
+// deliberately collapsed: forms without a secondary (or with a single combined
+// field) merge components into the street input, so "123 Main St, Apt 4" + ""
+// must fingerprint the same as "123 Main St" + "Apt 4" or the documented
+// selection→blur double-call comes back (RS Epic 1 exit criterion).
 export function fingerprint(address: CurrentAddress): string {
-	return FINGERPRINT_FIELDS.map((field) =>
-		String(address[field] ?? "")
-			.trim()
-			.toLowerCase(),
-	).join("|");
+	return normalizeForFingerprint(
+		FINGERPRINT_FIELDS.map((field) => String(address[field] ?? "")).join(" "),
+	);
+}
+
+function normalizeForFingerprint(value: string): string {
+	return value.toLowerCase().replace(/[.,#]/g, " ").replace(/\s+/g, " ").trim();
 }
 
 export function computeDiff(

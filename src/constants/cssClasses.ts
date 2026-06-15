@@ -27,8 +27,6 @@ export const CSS_CLASSES = {
 	verifyBadgeNegative: "smartyAddress__verifyBadge_negative",
 	verifyPanel: "smartyAddress__verifyPanel",
 	verifyPanelMessage: "smartyAddress__verifyPanelMessage",
-	verifyPanelActions: "smartyAddress__verifyPanelActions",
-	verifyPanelButton: "smartyAddress__verifyPanelButton",
 	verifyChooser: "smartyAddress__verifyChooser",
 	verifyChooserOption: "smartyAddress__verifyChooserOption",
 } as const;
