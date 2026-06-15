@@ -8,6 +8,10 @@ export const INTERNATIONAL_AUTOCOMPLETE_API_URL =
 export const US_STREET_API_URL = "https://us-street.api.smarty.com/street-address";
 export const INTERNATIONAL_STREET_API_URL = "https://international-street.api.smarty.com/verify";
 
+// Max candidates requested from the US Street API. More than one returned is
+// what drives the ambiguous (Type 6) classification (ERD §5.4).
+export const US_STREET_CANDIDATE_LIMIT = 10;
+
 export const US_COUNTRY_CODES = ["US", "USA"];
 
 // US Street footnote classes that indicate the address was standardized /

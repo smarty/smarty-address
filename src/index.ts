@@ -55,6 +55,7 @@ export default class SmartyAddress {
 		StyleService,
 		VerificationService,
 		VerificationUiService,
+		VerificationOrchestrator,
 	};
 
 	private static instances: SmartyAddress[] = [];
@@ -98,7 +99,7 @@ export default class SmartyAddress {
 		this.formService = new svc.FormService();
 		this.verificationService = new svc.VerificationService();
 		this.verificationUiService = new svc.VerificationUiService();
-		this.verificationOrchestrator = new VerificationOrchestrator();
+		this.verificationOrchestrator = new svc.VerificationOrchestrator();
 
 		const services = {
 			apiService: this.apiService,

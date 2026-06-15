@@ -11,6 +11,7 @@ import {
 	US_COUNTRY_CODES,
 	US_FLAGGED_FOOTNOTE_CLASS,
 	US_STREET_API_URL,
+	US_STREET_CANDIDATE_LIMIT,
 } from "../constants";
 import type {
 	AutocompleteSuggestion,
@@ -137,8 +138,7 @@ const TYPE_TO_CODE: Record<VerificationResultKey, DeliverabilityCode> = {
 
 const NON_BLOCKING_TYPES: VerificationResultKey[] = ["flagged", "undeliverable", "error"];
 
-// Footnotes arrive as a "#"-joined string (e.g. "A#N#R7#"). Split into the set
-// of class tokens ("A", "N", "R7", …). ERD §5.4.
+// Footnotes arrive as a "#"-joined string (e.g. "A#N#R7#"). ERD §5.4.
 export function parseUsFootnotes(footnotes: string | undefined): Set<string> {
 	if (!footnotes) return new Set();
 	return new Set(
@@ -248,9 +248,7 @@ export class VerificationService extends BaseService {
 		return !!country && !US_COUNTRY_CODES.includes(country.toUpperCase());
 	}
 
-	// --- Entry points ------------------------------------------------------
-
-	// Manual / standalone entry (PRD §8). Exposed as smartyAddress.verify().
+	// Manual / standalone entry (PRD §8).
 	async verify(
 		address?: CurrentAddress | Partial<CurrentAddress>,
 	): Promise<VerificationResult | null> {
@@ -318,8 +316,6 @@ export class VerificationService extends BaseService {
 			...(address.address_id ? { address_id: address.address_id } : {}),
 		};
 	}
-
-	// --- Core flow ---------------------------------------------------------
 
 	private async runFlow(
 		entered: CurrentAddress,
@@ -393,12 +389,10 @@ export class VerificationService extends BaseService {
 		return !address.street?.trim() && !address.postalCode?.trim() && !address.locality?.trim();
 	}
 
-	// --- US request + classification --------------------------------------
-
 	private async fetchUs(entered: CurrentAddress): Promise<UsStreetCandidate[]> {
 		const params: Record<string, string> = {
 			key: this.embeddedKey,
-			candidates: "10",
+			candidates: String(US_STREET_CANDIDATE_LIMIT),
 			match: "enhanced",
 		};
 		if (entered.street) params.street = entered.street;
@@ -621,8 +615,6 @@ export class VerificationService extends BaseService {
 		return this.behaviorFor(type) !== "block";
 	}
 
-	// --- Dispatch ----------------------------------------------------------
-
 	behaviorFor(type: VerificationResultKey): VerificationBehavior {
 		return this.effective.onResult[type] ?? defaultVerificationConfig.onResult[type] ?? "ignore";
 	}
@@ -761,8 +753,6 @@ export class VerificationService extends BaseService {
 		await this.effective.hooks.onVerificationFailed?.(verificationError);
 		return result;
 	}
-
-	// --- Staleness ---------------------------------------------------------
 
 	isStale(address: CurrentAddress): boolean {
 		return this.stale || !this.verifiedFingerprints.has(fingerprint(address));
