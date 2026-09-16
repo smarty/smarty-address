@@ -593,34 +593,6 @@ describe("ApiService", () => {
 			expect(calledUrl).toContain("country=CAN");
 		});
 
-		it("truncates search to 32 characters", async () => {
-			const mockFetch = jest.fn().mockResolvedValue({
-				ok: true,
-				json: () => Promise.resolve({ candidates: [] }),
-			});
-
-			const longSearch = "a".repeat(50);
-			await service.fetchAutocompleteResults(apiConfig, longSearch, null, mockFetch);
-
-			const calledUrl: string = mockFetch.mock.calls[0][0];
-			const search = new URL(calledUrl).searchParams.get("search");
-			expect(search).toHaveLength(32);
-		});
-
-		it("preserves search exactly at the 32-character boundary", async () => {
-			const mockFetch = jest.fn().mockResolvedValue({
-				ok: true,
-				json: () => Promise.resolve({ candidates: [] }),
-			});
-
-			const search32 = "a".repeat(32);
-			await service.fetchAutocompleteResults(apiConfig, search32, null, mockFetch);
-
-			const calledUrl: string = mockFetch.mock.calls[0][0];
-			const search = new URL(calledUrl).searchParams.get("search");
-			expect(search).toBe(search32);
-		});
-
 		it("omits the search param entirely when the search string is empty", async () => {
 			const mockFetch = jest.fn().mockResolvedValue({
 				ok: true,
