@@ -307,7 +307,7 @@ export class ApiService extends BaseService {
 		};
 
 		if (searchString) {
-			requestData.search = searchString.slice(0, 32);
+			requestData.search = searchString;
 		}
 
 		this.addMappedParams(requestData, apiConfig, INTERNATIONAL_API_PARAM_MAP, ",");
