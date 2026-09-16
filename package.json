@@ -2,6 +2,10 @@
   "name": "smarty-address",
   "version": "1.1.1",
   "description": "Quick and easy Smarty address autocomplete and validation.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smarty/smarty-address.git"
+  },
   "keywords": [
     "smarty",
     "smartystreets",
